@@ -13,6 +13,9 @@ import Login from './pages/Login';
 import http from './http';
 import UserContext from './contexts/UserContext';
 
+import ReviewsPage from './pages/ReviewsPage';
+import CreateReviewPage from './pages/CreateReviewPage';
+
 function App() {
   const [user, setUser] = useState(null);
 
@@ -69,6 +72,10 @@ function App() {
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
               <Route path={"/form"} element={<MyForm />} />
+
+              <Route path={"/reviews"} element={<ReviewsPage />} />
+              <Route path={"/createreview"} element={<CreateReviewPage />} />
+              
             </Routes>
           </Container>
         </ThemeProvider>
