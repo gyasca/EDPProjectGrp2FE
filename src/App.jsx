@@ -12,6 +12,8 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import http from './http';
 import UserContext from './contexts/UserContext';
+import ViewUsers from './pages/ViewUsers';
+import ViewSpecificUser from './pages/ViewSpecificUser';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -42,6 +44,12 @@ function App() {
                   </Typography>
                 </Link>
                 <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
+
+
+                {/* To be updated to only allow roleName admin to access */}
+                <Link to="/viewusersadmin" ><Typography>View Users</Typography></Link>
+
+
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -69,6 +77,8 @@ function App() {
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
               <Route path={"/form"} element={<MyForm />} />
+              <Route path={"/viewusersadmin"} element={<ViewUsers />} />
+              <Route path={"/viewspecificuser/:userId"} element={<ViewSpecificUser />} />
             </Routes>
           </Container>
         </ThemeProvider>
