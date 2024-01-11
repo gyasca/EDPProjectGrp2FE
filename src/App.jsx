@@ -45,7 +45,7 @@ function App() {
                     UPlay
                   </Typography>
                 </Link>
-                <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
+                <Link to="/events" ><Typography>Event</Typography></Link>
 
 
                 {/* To be updated to only allow roleName admin to access */}
