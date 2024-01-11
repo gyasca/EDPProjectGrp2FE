@@ -14,6 +14,8 @@ import http from './http';
 import UserContext from './contexts/UserContext';
 import ViewUsers from './pages/ViewUsers';
 import ViewSpecificUser from './pages/ViewSpecificUser';
+import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
+import EventRoute from './pages/Event/EventRoute';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -79,6 +81,8 @@ function App() {
               <Route path={"/form"} element={<MyForm />} />
               <Route path={"/viewusersadmin"} element={<ViewUsers />} />
               <Route path={"/viewspecificuser/:userId"} element={<ViewSpecificUser />} />
+              <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
+              <Route path={"/events/*"} element={<EventRoute />} />
             </Routes>
           </Container>
         </ThemeProvider>
