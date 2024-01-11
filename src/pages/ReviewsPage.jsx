@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, Chip, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, fabClasses } from '@mui/material'
-import LoadingButton from '@mui/lab/LoadingButton/LoadingButton';
 import { DataGrid, GridActionsCellItem, GridToolbarExport } from '@mui/x-data-grid';
 import { useNavigate, Link } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
@@ -24,7 +23,9 @@ const ReviewsPage = () => {
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
         { field: 'name', headerName: 'Username', width: 150 },
+        { field: 'subject', headerName: 'Subject', flex: 1},
         { field: 'comment', headerName: 'Comment', flex: 1 },
+        { field: 'rating', headerName: 'Rating', flex: 1},
         {
             field: 'actions', type: 'actions', width: 80, getActions: (params) => [
                 <GridActionsCellItem
@@ -38,7 +39,7 @@ const ReviewsPage = () => {
                     icon={<EditIcon />}
                     label="Edit Review"
                     onClick={() => {
-                        navigate("/reviews/edit/"+params.row.id)
+                        navigate("/reviews/edit/" + params.row.id)
                     }}
                     showInMenu
                 />
@@ -48,6 +49,7 @@ const ReviewsPage = () => {
                     label="Delete Review"
                     onClick={() => {
                         console.log("Delete Review")
+                        navigate("/reviews/delete/" + params.row.id)
                     }}
                     showInMenu
                 />,

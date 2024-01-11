@@ -1,5 +1,4 @@
-// src/pages/EditReview.jsx
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Container from '@mui/material/Container';
@@ -13,64 +12,40 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import CardTitle from "../components/CardTitle";
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const EditReview = ({ onSubmit }) => {
-    const { id } = useParams();
+const CreateTicket = ({ onSubmit }) => {
+    const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
-            name: 'name',
-            rating: '',
             subject: '',
-            comment: '',
+            description: '',
+            status: '',
         },
         validationSchema: Yup.object({
-            name: Yup.string().required('Name is required'),
-            rating: Yup.number().required('Rating is required').min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
             subject: Yup.string().required('Subject is required'),
-            comment: Yup.string().required('Comment is required'),
+            description: Yup.string().required('Description is required'),
+            status: Yup.string().required('Description is required'),
         }),
         onSubmit: async values => {
             try {
-                const response = await axios.put('https://localhost:7261/Reviews/'+id, values);
+                const response = await axios.post('https://localhost:7261/Tickets', values);
 
-                if (response.status === 200) {
+                if (response.status === 201) {
                     // Review added successfully, you can perform additional actions if needed
-                    console.log('Review edited successfully');
-                    navigate("/reviews")
+                    console.log('Ticket added successfully');
+                    navigate("/tickets")
 
                     // Call the provided onSubmit callback
                     onSubmit(values);
                 } else {
-                    console.error('Failed to edit review', response.status);
+                    console.error('Failed to add ticket', response.status);
                 }
             } catch (error) {
-                console.error('Error editing review', error.message, error.response?.data);
+                console.error('Error adding ticket', error.message, error.response?.data);
             }
-            console.log("TEST 1")
         },
     });
-
-    useEffect(() => {
-        // Fetch review information based on reviewId
-        const fetchReview = async () => {
-            try {
-                const response = await axios.get(`https://localhost:7261/Reviews/${id}`);
-                const reviewData = response.data;
-
-                // Set form values with the fetched review data
-                formik.setValues({
-                    rating: reviewData.rating.toString(),
-                    subject: reviewData.subject,
-                    comment: reviewData.comment,
-                });
-            } catch (error) {
-                console.error('Error fetching review data', error);
-            }
-            console.log("TEST 2");
-        };
-        fetchReview();
-    }, [id]);
 
     return (
         <>
@@ -82,27 +57,10 @@ const EditReview = ({ onSubmit }) => {
                     <Box component="form" onSubmit={formik.handleSubmit}>
                         <CardContent>
                             {/* Form Title */}
-                            <CardTitle title="Edit Review" />
+                            <CardTitle title="Create Ticket" />
 
                             {/* Form Fields */}
                             <Grid container marginTop={'1rem'} spacing={2}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        id="rating"
-                                        name="rating"
-                                        label="Rating"
-                                        variant="outlined"
-                                        type="number"
-                                        value={formik.values.rating}
-                                        onChange={formik.handleChange}
-                                        error={formik.touched.rating && Boolean(formik.errors.rating)}
-                                        helperText={formik.touched.rating && formik.errors.rating}
-                                        InputProps={{
-                                            endAdornment: <InputAdornment position="start">/5</InputAdornment>,
-                                        }}
-                                    />
-                                </Grid>
                                 <Grid item xs={6}>
                                     <TextField
                                         fullWidth
@@ -116,19 +74,32 @@ const EditReview = ({ onSubmit }) => {
                                         helperText={formik.touched.subject && formik.errors.subject}
                                     />
                                 </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        fullWidth
+                                        id="description"
+                                        name="description"
+                                        label="Description"
+                                        variant="outlined"
+                                        value={formik.values.description}
+                                        onChange={formik.handleChange}
+                                        error={formik.touched.description && Boolean(formik.errors.description)}
+                                        helperText={formik.touched.description && formik.errors.description}
+                                    />
+                                </Grid>
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
-                                        id="comment"
-                                        name="comment"
-                                        label="Comment"
+                                        id="status"
+                                        name="status"
+                                        label="Status"
                                         variant="outlined"
                                         multiline
                                         rows={4}
-                                        value={formik.values.comment}
+                                        value={formik.values.status}
                                         onChange={formik.handleChange}
-                                        error={formik.touched.comment && Boolean(formik.errors.comment)}
-                                        helperText={formik.touched.comment && formik.errors.comment}
+                                        error={formik.touched.status && Boolean(formik.errors.status)}
+                                        helperText={formik.touched.status && formik.errors.status}
                                     />
                                 </Grid>
                             </Grid>
@@ -143,7 +114,7 @@ const EditReview = ({ onSubmit }) => {
                                 startIcon={<AddIcon />}
                                 sx={{ marginTop: '1rem' }}
                             >
-                                Submit Edit
+                                Add Ticket
                             </LoadingButton>
                         </CardContent>
                     </Box>
@@ -153,4 +124,4 @@ const EditReview = ({ onSubmit }) => {
     );
 };
 
-export default EditReview;
+export default CreateTicket;

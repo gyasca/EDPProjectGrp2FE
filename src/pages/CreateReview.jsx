@@ -12,21 +12,41 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import CardTitle from "../components/CardTitle";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CreateReview = ({ onSubmit }) => {
+    const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
+            name: 'name',
             rating: '',
             subject: '',
             comment: '',
         },
         validationSchema: Yup.object({
+            name: Yup.string().required('Name is required'),
             rating: Yup.number().required('Rating is required').min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
             subject: Yup.string().required('Subject is required'),
             comment: Yup.string().required('Comment is required'),
         }),
-        onSubmit: values => {
-            onSubmit(values);
+        onSubmit: async values => {
+            try {
+                const response = await axios.post('https://localhost:7261/Reviews', values);
+
+                if (response.status === 201) {
+                    // Review added successfully, you can perform additional actions if needed
+                    console.log('Review added successfully');
+                    navigate("/reviews")
+
+                    // Call the provided onSubmit callback
+                    onSubmit(values);
+                } else {
+                    console.error('Failed to add review', response.status);
+                }
+            } catch (error) {
+                console.error('Error adding review', error.message, error.response?.data);
+            }
         },
     });
 

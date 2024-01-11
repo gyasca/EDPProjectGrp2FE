@@ -15,7 +15,11 @@ import UserContext from './contexts/UserContext';
 
 import ReviewsPage from './pages/ReviewsPage';
 import CreateReviewPage from './pages/CreateReviewPage';
-import EditReview from './pages/EditReview';
+import EditReviewPage from './pages/EditReviewPage';
+import DeleteReview from './pages/DeleteReview';
+
+import TicketPage from './pages/TicketPage';
+import CreateTicket from './pages/CreateTicket';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,6 +51,7 @@ function App() {
                 </Link>
                 <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
                 <Link to="/reviews" ><Typography>Reviews</Typography></Link>
+                <Link to="/tickets" ><Typography>Customer Service Tickets</Typography></Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -77,8 +82,12 @@ function App() {
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
-              <Route path={"/reviews/edit/:id"} element={<EditReview />} />
-              
+              <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
+              <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
+
+              <Route path={"/tickets"} element={<TicketPage />} />
+              <Route path={"/tickets/create"} element={<CreateTicket />} />
+
             </Routes>
           </Container>
         </ThemeProvider>
