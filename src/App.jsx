@@ -15,6 +15,7 @@ import UserContext from './contexts/UserContext';
 
 import ReviewsPage from './pages/ReviewsPage';
 import CreateReviewPage from './pages/CreateReviewPage';
+import EditReview from './pages/EditReview';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -45,6 +46,7 @@ function App() {
                   </Typography>
                 </Link>
                 <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
+                <Link to="/reviews" ><Typography>Reviews</Typography></Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -74,7 +76,8 @@ function App() {
               <Route path={"/form"} element={<MyForm />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
-              <Route path={"/createreview"} element={<CreateReviewPage />} />
+              <Route path={"/reviews/create"} element={<CreateReviewPage />} />
+              <Route path={"/reviews/edit/:id"} element={<EditReview />} />
               
             </Routes>
           </Container>

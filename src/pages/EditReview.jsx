@@ -1,5 +1,5 @@
-// src/pages/CreateReviewForm.jsx
-import React from 'react';
+// src/pages/EditReview.jsx
+import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Container from '@mui/material/Container';
@@ -12,8 +12,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import CardTitle from "../components/CardTitle";
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
-const CreateReview = ({ onSubmit }) => {
+const EditReview = ({ onSubmit }) => {
+    const { id } = useParams();
     const formik = useFormik({
         initialValues: {
             rating: '',
@@ -30,6 +33,27 @@ const CreateReview = ({ onSubmit }) => {
         },
     });
 
+    useEffect(() => {
+        // Fetch review information based on reviewId
+        const fetchReview = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7261/Reviews/${id}`);
+                const reviewData = response.data;
+
+                // Set form values with the fetched review data
+                formik.setValues({
+                    rating: reviewData.rating.toString(), // Assuming rating is a number
+                    subject: reviewData.subject,
+                    comment: reviewData.comment,
+                });
+            } catch (error) {
+                console.error('Error fetching review data', error);
+            }
+        };
+
+        fetchReview();
+    }, [id, formik]);
+
     return (
         <>
             <Container maxWidth="xl" sx={{ marginTop: '1rem' }}>
@@ -40,7 +64,7 @@ const CreateReview = ({ onSubmit }) => {
                     <Box component="form" onSubmit={formik.handleSubmit}>
                         <CardContent>
                             {/* Form Title */}
-                            <CardTitle title="Create Review" />
+                            <CardTitle title="Edit Review" />
 
                             {/* Form Fields */}
                             <Grid container marginTop={'1rem'} spacing={2}>
@@ -101,7 +125,7 @@ const CreateReview = ({ onSubmit }) => {
                                 startIcon={<AddIcon />}
                                 sx={{ marginTop: '1rem' }}
                             >
-                                Add Review
+                                Submit Edit
                             </LoadingButton>
                         </CardContent>
                     </Box>
@@ -111,4 +135,4 @@ const CreateReview = ({ onSubmit }) => {
     );
 };
 
-export default CreateReview;
+export default EditReview;

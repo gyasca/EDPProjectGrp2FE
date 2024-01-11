@@ -1,12 +1,18 @@
 // src/pages/ReviewsPage.jsx
 import React, { useEffect, useState } from 'react';
-import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
-import { Container } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Container, Typography, Chip, Button, Dialog, DialogContent, DialogContentText, DialogTitle, DialogActions, fabClasses } from '@mui/material'
+import LoadingButton from '@mui/lab/LoadingButton/LoadingButton';
+import { DataGrid, GridActionsCellItem, GridToolbarExport } from '@mui/x-data-grid';
+import { useNavigate, Link } from 'react-router-dom';
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Visibility } from '@mui/icons-material';
 
 const ReviewsPage = () => {
     const [reviews, setReviews] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Fetch reviews from your ASP.NET MVC API
@@ -17,15 +23,44 @@ const ReviewsPage = () => {
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'userName', headerName: 'User Name', width: 150 },
+        { field: 'name', headerName: 'Username', width: 150 },
         { field: 'comment', headerName: 'Comment', flex: 1 },
+        {
+            field: 'actions', type: 'actions', width: 80, getActions: (params) => [
+                <GridActionsCellItem
+                    icon={<Visibility />}
+                    label="View Review Details"
+                    onClick={() => {
+                        navigate("/reviews")
+                    }}
+                />,
+                <GridActionsCellItem
+                    icon={<EditIcon />}
+                    label="Edit Review"
+                    onClick={() => {
+                        navigate("/reviews/edit/"+params.row.id)
+                    }}
+                    showInMenu
+                />
+                ,
+                <GridActionsCellItem
+                    icon={<DeleteIcon />}
+                    label="Delete Review"
+                    onClick={() => {
+                        console.log("Delete Review")
+                    }}
+                    showInMenu
+                />,
+
+            ]
+        },
     ];
 
     return (
         <Container>
             <div><h1>Reviews for Activity</h1></div>
 
-            <Link to="/createreview">Create Review</Link>
+            <Link to="/reviews/create">Create Review</Link>
 
             <div style={{ height: 400, width: '100%' }}>
                 <DataGrid rows={reviews} columns={columns} pageSize={5} />
