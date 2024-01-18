@@ -13,10 +13,12 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import CardTitle from "../components/CardTitle";
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const EditReview = ({ onSubmit }) => {
+    const navigate = useNavigate();
     const { id } = useParams();
+
     const formik = useFormik({
         initialValues: {
             name: 'name',
@@ -34,7 +36,7 @@ const EditReview = ({ onSubmit }) => {
             try {
                 const response = await axios.put('https://localhost:7261/Reviews/'+id, values);
 
-                if (response.status === 200) {
+                if (response.status === 204) {
                     // Review added successfully, you can perform additional actions if needed
                     console.log('Review edited successfully');
                     navigate("/reviews")
@@ -50,27 +52,6 @@ const EditReview = ({ onSubmit }) => {
             console.log("TEST 1")
         },
     });
-
-    useEffect(() => {
-        // Fetch review information based on reviewId
-        const fetchReview = async () => {
-            try {
-                const response = await axios.get(`https://localhost:7261/Reviews/${id}`);
-                const reviewData = response.data;
-
-                // Set form values with the fetched review data
-                formik.setValues({
-                    rating: reviewData.rating.toString(),
-                    subject: reviewData.subject,
-                    comment: reviewData.comment,
-                });
-            } catch (error) {
-                console.error('Error fetching review data', error);
-            }
-            console.log("TEST 2");
-        };
-        fetchReview();
-    }, [id]);
 
     return (
         <>

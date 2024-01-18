@@ -34,7 +34,7 @@ const CreateReview = ({ onSubmit }) => {
             try {
                 const response = await axios.post('https://localhost:7261/Reviews', values);
 
-                if (response.status === 201) {
+                if (response.status === 200) {
                     // Review added successfully, you can perform additional actions if needed
                     console.log('Review added successfully');
                     navigate("/reviews")
