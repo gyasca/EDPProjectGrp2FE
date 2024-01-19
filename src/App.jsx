@@ -12,7 +12,10 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import http from './http';
 import UserContext from './contexts/UserContext';
-
+import ViewUsers from './pages/ViewUsers';
+import ViewSpecificUser from './pages/ViewSpecificUser';
+import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
+import EventRoute from './pages/Event/EventRoute';
 import ReviewsPage from './pages/ReviewsPage';
 import CreateReviewPage from './pages/CreateReviewPage';
 import EditReviewPage from './pages/EditReviewPage';
@@ -49,7 +52,13 @@ function App() {
                     UPlay
                   </Typography>
                 </Link>
-                <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
+                <Link to="/events" ><Typography>Event</Typography></Link>
+
+
+                {/* To be updated to only allow roleName admin to access */}
+                <Link to="/viewusersadmin" ><Typography>View Users</Typography></Link>
+
+
                 <Link to="/reviews" ><Typography>Reviews</Typography></Link>
                 <Link to="/tickets" ><Typography>Customer Service Tickets</Typography></Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
@@ -79,6 +88,10 @@ function App() {
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
               <Route path={"/form"} element={<MyForm />} />
+              <Route path={"/viewusersadmin"} element={<ViewUsers />} />
+              <Route path={"/viewspecificuser/:userId"} element={<ViewSpecificUser />} />
+              <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
+              <Route path={"/events/*"} element={<EventRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
