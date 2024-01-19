@@ -16,6 +16,13 @@ import ViewUsers from './pages/ViewUsers';
 import ViewSpecificUser from './pages/ViewSpecificUser';
 import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
 import EventRoute from './pages/Event/EventRoute';
+import ReviewsPage from './pages/ReviewsPage';
+import CreateReviewPage from './pages/CreateReviewPage';
+import EditReviewPage from './pages/EditReviewPage';
+import DeleteReview from './pages/DeleteReview';
+
+import TicketPage from './pages/TicketPage';
+import CreateTicket from './pages/CreateTicket';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -52,6 +59,8 @@ function App() {
                 <Link to="/viewusersadmin" ><Typography>View Users</Typography></Link>
 
 
+                <Link to="/reviews" ><Typography>Reviews</Typography></Link>
+                <Link to="/tickets" ><Typography>Customer Service Tickets</Typography></Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -83,6 +92,15 @@ function App() {
               <Route path={"/viewspecificuser/:userId"} element={<ViewSpecificUser />} />
               <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />
+
+              <Route path={"/reviews"} element={<ReviewsPage />} />
+              <Route path={"/reviews/create"} element={<CreateReviewPage />} />
+              <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
+              <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
+
+              <Route path={"/tickets"} element={<TicketPage />} />
+              <Route path={"/tickets/create"} element={<CreateTicket />} />
+
             </Routes>
           </Container>
         </ThemeProvider>
