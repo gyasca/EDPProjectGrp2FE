@@ -87,8 +87,8 @@ const ViewUsers = () => {
                   </IconButton>
                   <IconButton
                     component={Link}
-                    to={`/viewuser/${user.id}`}
-                    title="View User"
+                    to={`/edituser/${user.id}`}
+                    title="Edit User"
                   >
                     <EditIcon />
                   </IconButton>
