@@ -4,6 +4,7 @@ import { Container, Typography, Chip, Button, Dialog, DialogContent, DialogConte
 import { DataGrid, GridActionsCellItem, GridToolbarExport } from '@mui/x-data-grid';
 import { useNavigate, Link } from 'react-router-dom';
 import { Visibility } from '@mui/icons-material';
+import { format } from 'date-fns';
 
 const TicketPage = () => {
     const [tickets, setTickets] = useState([]);
@@ -17,17 +18,26 @@ const TicketPage = () => {
     }, []);
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 70 },
-        { field: 'subject', headerName: 'Subject', width: 150 },
+        { field: 'id', headerName: 'ID', flex: 0.5 },
+        { field: 'subject', headerName: 'Subject', flex: 0.5 },
         { field: 'description', headerName: 'Description', flex: 1 },
+        {
+            field: 'createdAt',
+            headerName: 'Created At',
+            flex: 0.5,
+            valueGetter: (params) => {
+                const formattedDate = format(new Date(params.row.createdAt), 'HH:mm dd/MM');
+                return formattedDate;
+            },
+        },
         { field: 'status', headerName: 'Status', flex: 1 },
         {
-            field: 'actions', type: 'actions', width: 80, getActions: (params) => [
+            field: 'actions', type: 'actions', flex: 1, getActions: (params) => [
                 <GridActionsCellItem
                     icon={<Visibility />}
                     label="View Ticket Details"
                     onClick={() => {
-                        navigate("/tickets")
+                        navigate("/staff/tickets/" + params.row.id)
                     }}
                 />,
             ]
@@ -38,7 +48,7 @@ const TicketPage = () => {
         <Container>
             <div><h1>Tickets Pending</h1></div>
 
-            <Link to="/tickets/create">Create Ticket</Link>
+            {/* <Link to="/tickets/create">Create Ticket</Link> */}
 
             <div style={{ height: 400, width: '100%' }}>
                 <DataGrid rows={tickets} columns={columns} pageSize={5} />

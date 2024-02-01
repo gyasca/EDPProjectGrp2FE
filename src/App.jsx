@@ -22,6 +22,7 @@ import EditReviewPage from './pages/EditReviewPage';
 import DeleteReview from './pages/DeleteReview';
 
 import TicketPage from './pages/TicketPage';
+import TicketPageInd from './pages/TicketPageInd';
 import CreateTicket from './pages/CreateTicket';
 
 function App() {
@@ -60,7 +61,7 @@ function App() {
 
 
                 <Link to="/reviews" ><Typography>Reviews</Typography></Link>
-                <Link to="/tickets" ><Typography>Customer Service Tickets</Typography></Link>
+                <Link to="/staff/tickets" ><Typography>Customer Service Tickets</Typography></Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -98,7 +99,10 @@ function App() {
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
 
-              <Route path={"/tickets"} element={<TicketPage />} />
+              <Route path={"/staff/tickets"} element={<TicketPage />} />
+              <Route path={"/staff/tickets/:id"} element={<TicketPageInd />} />
+
+
               <Route path={"/tickets/create"} element={<CreateTicket />} />
 
             </Routes>

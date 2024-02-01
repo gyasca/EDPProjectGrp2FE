@@ -16,15 +16,21 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateTicket = ({ onSubmit }) => {
     const navigate = useNavigate();
+
+    const currentDate = new Date();
+    currentDate.setHours(currentDate.getHours() + 8);
+
     const formik = useFormik({
         initialValues: {
             subject: '',
             description: '',
-            status: '',
+            createdat: currentDate,
+            status: 'pending',
         },
         validationSchema: Yup.object({
             subject: Yup.string().required('Subject is required'),
             description: Yup.string().required('Description is required'),
+            createdat: Yup.string().required('Date created is required'),
             status: Yup.string().required('Description is required'),
         }),
         onSubmit: async values => {
@@ -74,7 +80,7 @@ const CreateTicket = ({ onSubmit }) => {
                                         helperText={formik.touched.subject && formik.errors.subject}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         id="description"
@@ -85,21 +91,6 @@ const CreateTicket = ({ onSubmit }) => {
                                         onChange={formik.handleChange}
                                         error={formik.touched.description && Boolean(formik.errors.description)}
                                         helperText={formik.touched.description && formik.errors.description}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        id="status"
-                                        name="status"
-                                        label="Status"
-                                        variant="outlined"
-                                        multiline
-                                        rows={4}
-                                        value={formik.values.status}
-                                        onChange={formik.handleChange}
-                                        error={formik.touched.status && Boolean(formik.errors.status)}
-                                        helperText={formik.touched.status && formik.errors.status}
                                     />
                                 </Grid>
                             </Grid>
