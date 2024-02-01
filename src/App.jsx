@@ -1,35 +1,58 @@
-import './App.css';
-import { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import MyTheme from './themes/MyTheme';
-import Tutorials from './pages/Tutorials';
-import AddTutorial from './pages/AddTutorial';
-import EditTutorial from './pages/EditTutorial';
-import MyForm from './pages/MyForm';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import http from './http';
-import UserContext from './contexts/UserContext';
-import ViewUsers from './pages/ViewUsers';
-import ViewSpecificUser from './pages/ViewSpecificUser';
+import "./App.css";
+import { useState, useEffect } from "react";
+import {
+  Container,
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Button,
+} from "@mui/material";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { ThemeProvider } from "@mui/material/styles";
+import MyTheme from "./themes/MyTheme";
+import Tutorials from "./pages/Tutorials";
+import AddTutorial from "./pages/AddTutorial";
+import EditTutorial from "./pages/EditTutorial";
+import MyForm from "./pages/MyForm";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import http from "./http";
+import UserContext from "./contexts/UserContext";
+import ViewUsers from "./pages/ViewUsers";
+import ViewSpecificUser from "./pages/ViewSpecificUser";
+import EditUser from "./pages/EditUser";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // New loading state
 
   useEffect(() => {
-    if (localStorage.getItem("accessToken")) {
-      http.get('/user/auth').then((res) => {
-        setUser(res.data.user);
-      });
-    }
+    const fetchData = async () => {
+      try {
+        if (localStorage.getItem("accessToken")) {
+          const response = await http.get("/user/auth");
+          setUser(response.data.user);
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      } finally {
+        setLoading(false); // Set loading to false regardless of success or failure
+      }
+    };
+
+    fetchData();
   }, []);
 
   const logout = () => {
     localStorage.clear();
     window.location = "/";
   };
+
+  // Render loading message while waiting for user data
+  if (loading) {
+    return <Typography variant="h5">Loading...</Typography>;
+  }
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
@@ -43,12 +66,14 @@ function App() {
                     UPlay
                   </Typography>
                 </Link>
-                <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
-
+                <Link to="/tutorials">
+                  <Typography>Tutorials</Typography>
+                </Link>
 
                 {/* To be updated to only allow roleName admin to access */}
-                <Link to="/viewusersadmin" ><Typography>View Users</Typography></Link>
-
+                <Link to="/viewusersadmin">
+                  <Typography>View Users</Typography>
+                </Link>
 
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
@@ -56,12 +81,15 @@ function App() {
                     <Typography>{user.name}</Typography>
                     <Button onClick={logout}>Logout</Button>
                   </>
-                )
-                }
+                )}
                 {!user && (
                   <>
-                    <Link to="/register" ><Typography>Register</Typography></Link>
-                    <Link to="/login" ><Typography>Login</Typography></Link>
+                    <Link to="/register">
+                      <Typography>Register</Typography>
+                    </Link>
+                    <Link to="/login">
+                      <Typography>Login</Typography>
+                    </Link>
                   </>
                 )}
               </Toolbar>
@@ -78,7 +106,14 @@ function App() {
               <Route path={"/login"} element={<Login />} />
               <Route path={"/form"} element={<MyForm />} />
               <Route path={"/viewusersadmin"} element={<ViewUsers />} />
-              <Route path={"/viewspecificuser/:userId"} element={<ViewSpecificUser />} />
+              <Route
+                path={"/viewspecificuser/:userId"}
+                element={<ViewSpecificUser />}
+              />
+              <Route
+                path={"/edituser/:userId"}
+                element={<EditUser />}
+              />
             </Routes>
           </Container>
         </ThemeProvider>
