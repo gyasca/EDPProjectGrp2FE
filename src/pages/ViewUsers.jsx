@@ -1,20 +1,9 @@
-// ViewUsers.jsx
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  Typography,
-  IconButton,
-} from "@mui/material";
-import http from "../http";
+import { Container, Typography, Button } from "@mui/material";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { ToastContainer, toast } from "react-toastify";
+import http from "../http";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -37,74 +26,61 @@ const ViewUsers = () => {
       });
   }, []);
 
-  // Function to handle user deletion
+  const columns = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'firstName', headerName: 'First Name', width: 150 },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 200,
+      renderCell: (params) => (
+        <>
+          <GridActionsCellItem
+            icon={<Link to={`/viewspecificuser/${params.id}`}><VisibilityIcon /></Link>}
+            label="View User"
+          />
+          <GridActionsCellItem
+            icon={<Link to={`/edituser/${params.id}`}><EditIcon /></Link>}
+            label="Edit User"
+          />
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete User"
+            onClick={() => handleDeleteUser(params.id)}
+          />
+        </>
+      ),
+    },
+  ];
+
   const handleDeleteUser = (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       // Make a request to delete the user by ID
-      http
+      axios
         .delete(`/user/${userId}`)
         .then((response) => {
           // Update the users list after deletion
           setUsers(users.filter((user) => user.id !== userId));
-          toast.success("User deleted successfully");
         })
         .catch((error) => {
           console.error("Error deleting user:", error);
-          toast.error("Error deleting user");
         });
     }
   };
 
   return (
-    <div>
+    <Container>
       <Typography variant="h4" gutterBottom>
         Admin Page - All Users
       </Typography>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>First Name</TableCell>
-              <TableCell>Actions</TableCell>{" "}
-              {/* New column for edit and delete buttons */}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.firstName}</TableCell>
-                <TableCell>
-                  <IconButton
-                    component={Link}
-                    to={`/viewspecificuser/${user.id}`}
-                    title="View User"
-                  >
-                    <VisibilityIcon />
-                  </IconButton>
-                  <IconButton
-                    component={Link}
-                    to={`/viewuser/${user.id}`}
-                    title="View User"
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleDeleteUser(user.id)}
-                    title="Delete User"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+      <Button component={Link} to="/createuser" variant="contained" color="primary">
+        Create User
+      </Button>
+      <div style={{ height: 400, width: '100%', marginTop: '1rem' }}>
+        <DataGrid rows={users} columns={columns} pageSize={5} />
+      </div>
+    </Container>
   );
 };
 
