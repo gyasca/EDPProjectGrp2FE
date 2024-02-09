@@ -2,12 +2,20 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Box, Paper } from "@mui/material";
+import { Typography, Box, Paper, IconButton, Button } from "@mui/material";
 import http from "../http";
+import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Link, useNavigate } from 'react-router-dom';
 
 const ViewUser = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const handleBack = () => {
+    // Use navigate to go back to the previous page
+    navigate(-1);
+  };
 
   useEffect(() => {
     // Fetch user details when the component mounts
@@ -29,6 +37,14 @@ const ViewUser = () => {
 
   return (
     <Box mt={4}>
+      <Button
+        variant="outlined"
+        color="primary"
+        sx={{ marginBottom: 2 }}
+        onClick={handleBack}
+      >
+        Back
+      </Button>
       <Typography variant="h4" gutterBottom>
         User Details
       </Typography>
@@ -64,6 +80,12 @@ const ViewUser = () => {
           Date of Birth: {new Date(user.dateOfBirth).toLocaleString()}
         </Typography>
       </Paper>
+      <IconButton component={Link} to={`/edituser/${userId}`} title="Edit user">
+        <EditIcon />
+      </IconButton>
+      <Button component={Link} to={`/viewusersadmin`} title="Edit user">
+        View All users
+      </Button>
     </Box>
   );
 };
