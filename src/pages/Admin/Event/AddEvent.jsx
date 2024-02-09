@@ -4,16 +4,16 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
 import { CategoryContext } from './EventRouteAdmin';
-import MDEditor from '@uiw/react-md-editor'; // Import MDEditor
+import MDEditor from '@uiw/react-md-editor';
 import http from '../../../http';
+import { toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddEvent() {
   const [loading, setLoading] = useState(false);
   const [markdown, setMarkdown] = useState('');
   const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
   const { setActivePage } = useContext(CategoryContext);
 
   const handleDescriptionChange = (value) => {
@@ -59,12 +59,12 @@ function AddEvent() {
       http.post('/Admin/Event', values)
         .then((response) => {
           if (response.status === 200) {
-            enqueueSnackbar('Event successfully created', { variant: 'success' });
+            toast.success('Event successfully created'); 
             navigate('/admin/events');
           }
         })
         .catch((error) => {
-          enqueueSnackbar("Error creating event: " + error.response.data.message, { variant: "error" });
+          toast.error("Error creating event: " + error.response.data.message); 
           setLoading(false);
         });
     }

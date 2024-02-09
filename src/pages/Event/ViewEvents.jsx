@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Card, CardContent, Button, Chip } from '@mui/material';
 import http from '../../http';
 import { Link } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
+import { toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css'; 
 
 function ViewEvents() {
     const [eventList, setEventList] = useState([]);
     const [filteredEvents, setFilteredEvents] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('All Categories');
-    const { enqueueSnackbar } = useSnackbar();
 
     // Define your categories
     const categories = ['All Categories', 'Dine & Wine', 'Family Bonding', 'Hobbies & Wellness', 'Sports & Adventure', 'Travel'];
@@ -17,10 +17,10 @@ function ViewEvents() {
         http.get('/Event')
             .then(response => {
                 setEventList(response.data);
-                setFilteredEvents(response.data); // Initialize filteredEvents with all events
+                setFilteredEvents(response.data); 
             })
             .catch(error => {
-                enqueueSnackbar('Error fetching events: ' + error.message, { variant: 'error' });
+                toast.error('Error fetching events: ' + error.message);
             });
     };
 

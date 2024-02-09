@@ -4,7 +4,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
+import { toast } from 'react-toastify'; 
 import { CategoryContext } from './EventRouteAdmin';
 import MDEditor from '@uiw/react-md-editor'; 
 import http from '../../../http';
@@ -14,7 +14,6 @@ function EditEvent() {
   const [markdown, setMarkdown] = useState('');
   const { id: eventId } = useParams();
   const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
   const { setActivePage } = useContext(CategoryContext);
 
   useEffect(() => {
@@ -26,11 +25,11 @@ function EditEvent() {
       })
       .catch(error => {
         console.error("Fetching Error:", error);
-        enqueueSnackbar("Error fetching event details: " + error.message, { variant: "error" });
+        toast.error("Error fetching event details: " + error.message);  
       });
   
     setActivePage(2);
-  }, [eventId, enqueueSnackbar, setActivePage]);
+  }, [eventId, setActivePage]);
   
 
   const handleDescriptionChange = (value) => {
@@ -73,11 +72,11 @@ function EditEvent() {
       setLoading(true);
       http.put(`/Admin/Event/${eventId}`, values)
         .then(response => {
-          enqueueSnackbar('Event successfully updated', { variant: 'success' });
+          toast.success('Event successfully updated'); 
           navigate('/admin/events'); 
         })
         .catch(error => {
-          enqueueSnackbar("Error updating event: " + error.response.data.message, { variant: "error" });
+          toast.error("Error updating event: " + error.response.data.message); 
           setLoading(false);
         });
     },
