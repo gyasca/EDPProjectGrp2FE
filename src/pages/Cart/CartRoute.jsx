@@ -1,18 +1,16 @@
 import { useContext, useEffect, createContext, useState } from 'react'
 import { Link, Route, Routes, useNavigate } from 'react-router-dom'
-import ViewEvents from './ViewEvents'
-import ViewSpecificEvent from './ViewSpecificEvent'
+import { ViewCart } from './Cart';
 
 export const CategoryContext = createContext(null);
-export default function EventRoute() {
+export default function CartRoute() {
     const [activePage, setActivePage] = useState(null);
 
     return (
         <>
             <CategoryContext.Provider value={{activePage, setActivePage}}>
                 <Routes>
-                    <Route path="/" element={<ViewEvents />} />
-                    <Route path="/:id" element={<ViewSpecificEvent />} />
+                    <Route path="/" element={<ViewCart />} />
                 </Routes>
             </CategoryContext.Provider>
         </>

@@ -1,8 +1,9 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
+import { Container, AppBar, Toolbar, Typography, Box, Button, IconButton } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import MyTheme from './themes/MyTheme';
 import Tutorials from './pages/Tutorials';
 import AddTutorial from './pages/AddTutorial';
@@ -16,6 +17,7 @@ import ViewUsers from './pages/ViewUsers';
 import ViewSpecificUser from './pages/ViewSpecificUser';
 import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
 import EventRoute from './pages/Event/EventRoute';
+import CartRoute from './pages/Cart/CartRoute';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -55,6 +57,11 @@ function App() {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
+                    <Link to="/cart" >
+                      <IconButton>
+                        <ShoppingCartIcon />
+                      </IconButton>
+                    </Link>
                     <Typography>{user.name}</Typography>
                     <Button onClick={logout}>Logout</Button>
                   </>
@@ -83,6 +90,7 @@ function App() {
               <Route path={"/viewspecificuser/:userId"} element={<ViewSpecificUser />} />
               <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />
+              <Route path={"/cart/*"} element={<CartRoute />} />
             </Routes>
           </Container>
         </ThemeProvider>

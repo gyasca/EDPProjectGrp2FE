@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Card, CardContent, TextField, FormControlLabel, Checkbox, Grid, Typography } from '@mui/material';
+import { Box, Card, CardContent, TextField, Grid, Typography, Divider, MenuItem, Select, FormControl, InputLabel, FormControlLabel, Checkbox } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { CategoryContext } from './EventRouteAdmin';
+import MDEditor from '@uiw/react-md-editor'; 
 import http from '../../../http';
 
 function EditEvent() {
   const [loading, setLoading] = useState(false);
+  const [markdown, setMarkdown] = useState('');
   const { id: eventId } = useParams();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -20,6 +22,7 @@ function EditEvent() {
       .then(response => {
         console.log("Fetched Data:", response.data);
         formik.setValues(response.data);
+        setMarkdown(response.data.eventDescription);
       })
       .catch(error => {
         console.error("Fetching Error:", error);
@@ -30,6 +33,11 @@ function EditEvent() {
   }, [eventId, enqueueSnackbar, setActivePage]);
   
 
+  const handleDescriptionChange = (value) => {
+    setMarkdown(value);
+    formik.setFieldValue('eventDescription', value);
+  };
+
   const formik = useFormik({
     initialValues: {
       eventName: '',
@@ -37,9 +45,9 @@ function EditEvent() {
       eventCategory: '',
       eventLocation: '',
       eventTicketStock: 0,
+      eventPrice: 0,
       eventUplayMemberPrice: 0,
       eventNtucClubPrice: 0,
-      ntucClubPrice: 0,
       eventDate: '',
       eventDuration: 0,
       eventSale: false,
@@ -65,7 +73,6 @@ function EditEvent() {
       setLoading(true);
       http.put(`/Admin/Event/${eventId}`, values)
         .then(response => {
-          console.log(values)
           enqueueSnackbar('Event successfully updated', { variant: 'success' });
           navigate('/admin/events'); 
         })
@@ -77,17 +84,24 @@ function EditEvent() {
   });
 
   return (
-    <>
-      <Box sx={{ marginY: "1rem" }}>
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>
-              Edit Event
-            </Typography>
-            <Box component="form" mt={3} onSubmit={formik.handleSubmit}>
-              <Grid container spacing={2}>
-                {/* Event Name */}
+    <Box sx={{ marginY: "1rem" }}>
+      <Card>
+        <CardContent>
+          <Typography variant="h5" gutterBottom>
+            Edit Event
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          <form onSubmit={formik.handleSubmit}>
+          <Grid container spacing={3}>
+            {/* Left Column */}
+            <Grid item xs={12} md={6}>
+              {/* Basic Information */}
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
+                  <Typography variant="h6">Basic Information</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  {/* Event Name */}
                   <TextField
                     fullWidth
                     id="eventName"
@@ -99,36 +113,37 @@ function EditEvent() {
                     helperText={formik.touched.eventName && formik.errors.eventName}
                   />
                 </Grid>
-                {/* Event Description */}
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    id="eventDescription"
-                    name="eventDescription"
-                    label="Event Description"
-                    multiline
-                    rows={4}
-                    value={formik.values.eventDescription}
-                    onChange={formik.handleChange}
-                    error={formik.touched.eventDescription && Boolean(formik.errors.eventDescription)}
-                    helperText={formik.touched.eventDescription && formik.errors.eventDescription}
-                  />
+                <Grid item xs={12} sm={6}>
+                  {/* Event Category */}
+                  <FormControl fullWidth>
+                    <InputLabel id="eventCategory-label">Event Category</InputLabel>
+                    <Select
+                      id="eventCategory"
+                      name="eventCategory"
+                      label="Event Category"
+                      value={formik.values.eventCategory}
+                      onChange={formik.handleChange}
+                      error={formik.touched.eventCategory && Boolean(formik.errors.eventCategory)}
+                    >
+                      <MenuItem value="" disabled>
+                        Select Event Category
+                      </MenuItem>
+                      {['Dine & Wine', 'Family Bonding', 'Hobbies & Wellness', 'Sports & Adventure', 'Travel'].map((category) => (
+                        <MenuItem key={category} value={category}>
+                          {category}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
-                {/* Event Category */}
+              </Grid>
+              {/* Location and Date */}
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    id="eventCategory"
-                    name="eventCategory"
-                    label="Event Category"
-                    value={formik.values.eventCategory}
-                    onChange={formik.handleChange}
-                    error={formik.touched.eventCategory && Boolean(formik.errors.eventCategory)}
-                    helperText={formik.touched.eventCategory && formik.errors.eventCategory}
-                  />
+                  <Typography variant="h6">Location & Date</Typography>
                 </Grid>
-                {/* Event Location */}
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={6}>
+                  {/* Event Location */}
                   <TextField
                     fullWidth
                     id="eventLocation"
@@ -140,64 +155,8 @@ function EditEvent() {
                     helperText={formik.touched.eventLocation && formik.errors.eventLocation}
                   />
                 </Grid>
-                {/* Event Ticket Stock */}
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    id="eventTicketStock"
-                    name="eventTicketStock"
-                    label="Event Ticket Stock"
-                    type="number"
-                    value={formik.values.eventTicketStock}
-                    onChange={formik.handleChange}
-                    error={formik.touched.eventTicketStock && Boolean(formik.errors.eventTicketStock)}
-                    helperText={formik.touched.eventTicketStock && formik.errors.eventTicketStock}
-                  />
-                </Grid>
-                {/* Event Price */}
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    id="eventPrice"
-                    name="eventPrice"
-                    label="Event Price"
-                    type="number"
-                    value={formik.values.eventPrice}
-                    onChange={formik.handleChange}
-                    error={formik.touched.eventPrice && Boolean(formik.errors.eventPrice)}
-                    helperText={formik.touched.eventPrice && formik.errors.eventPrice}
-                  />
-                </Grid>
-                {/* Uplay Member Price */}
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    id="eventUplayMemberPrice"
-                    name="eventUplayMemberPrice"
-                    label="Uplay Price"
-                    type="number"
-                    value={formik.values.eventUplayMemberPrice}
-                    onChange={formik.handleChange}
-                    error={formik.touched.eventUplayMemberPrice && Boolean(formik.errors.eventUplayMemberPrice)}
-                    helperText={formik.touched.eventUplayMemberPrice && formik.errors.eventUplayMemberPrice}
-                  />
-                </Grid>
-                {/* NTUC Club Price */}
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    id="eventNtucClubPrice"
-                    name="eventNtucClubPrice"
-                    label="NTUC Club Price"
-                    type="number"
-                    value={formik.values.eventNtucClubPrice}
-                    onChange={formik.handleChange}
-                    error={formik.touched.eventNtucClubPrice && Boolean(formik.errors.eventNtucClubPrice)}
-                    helperText={formik.touched.eventNtucClubPrice && formik.errors.eventNtucClubPrice}
-                  />
-                </Grid>
-                {/* Event Date */}
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={6}>
+                  {/* Event Date */}
                   <TextField
                     fullWidth
                     id="eventDate"
@@ -211,8 +170,62 @@ function EditEvent() {
                     helperText={formik.touched.eventDate && formik.errors.eventDate}
                   />
                 </Grid>
-                {/* Event Duration */}
+              </Grid>
+              {/* Pricing Information */}
+              <Grid container spacing={3}>
                 <Grid item xs={12}>
+                  <Typography variant="h6">Pricing Information</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  {/* Event Ticket Stock */}
+                  <TextField
+                    fullWidth
+                    id="eventTicketStock"
+                    name="eventTicketStock"
+                    label="Event Ticket Stock"
+                    type="number"
+                    value={formik.values.eventTicketStock}
+                    onChange={formik.handleChange}
+                    error={formik.touched.eventTicketStock && Boolean(formik.errors.eventTicketStock)}
+                    helperText={formik.touched.eventTicketStock && formik.errors.eventTicketStock}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  {/* Event Price */}
+                  <TextField
+                    fullWidth
+                    id="eventPrice"
+                    name="eventPrice"
+                    label="Event Price"
+                    type="number"
+                    value={formik.values.eventPrice}
+                    onChange={formik.handleChange}
+                    error={formik.touched.eventPrice && Boolean(formik.errors.eventPrice)}
+                    helperText={formik.touched.eventPrice && formik.errors.eventPrice}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  {/* Uplay Member Price */}
+                  <TextField
+                    fullWidth
+                    id="eventUplayMemberPrice"
+                    name="eventUplayMemberPrice"
+                    label="Uplay Member Price"
+                    type="number"
+                    value={formik.values.eventUplayMemberPrice}
+                    onChange={formik.handleChange}
+                    error={formik.touched.eventUplayMemberPrice && Boolean(formik.errors.eventUplayMemberPrice)}
+                    helperText={formik.touched.eventUplayMemberPrice && formik.errors.eventUplayMemberPrice}
+                  />
+                </Grid>
+              </Grid>
+              {/* Event Details */}
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Typography variant="h6">Event Details</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  {/* Event Duration */}
                   <TextField
                     fullWidth
                     id="eventDuration"
@@ -225,34 +238,8 @@ function EditEvent() {
                     helperText={formik.touched.eventDuration && formik.errors.eventDuration}
                   />
                 </Grid>
-                {/* Event Sale */}
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formik.values.eventSale}
-                        onChange={formik.handleChange}
-                        name="eventSale"
-                      />
-                    }
-                    label="Event Sale"
-                  />
-                </Grid>
-                {/* Event Status */}
-                <Grid item xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formik.values.eventStatus}
-                        onChange={formik.handleChange}
-                        name="eventStatus"
-                      />
-                    }
-                    label="Event Status"
-                  />
-                </Grid>
-                {/* Event Picture */}
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={6}>
+                  {/* Event Picture URL */}
                   <TextField
                     fullWidth
                     id="eventPicture"
@@ -264,24 +251,67 @@ function EditEvent() {
                     helperText={formik.touched.eventPicture && formik.errors.eventPicture}
                   />
                 </Grid>
-                {/* Submit Button */}
-                <Grid item xs={12}>
-                  <LoadingButton
-                    color="primary"
-                    variant="contained"
-                    fullWidth
-                    type="submit"
-                    loading={loading}
-                  >
-                    Edit Event
-                  </LoadingButton>
+              </Grid>
+              {/* Checkboxes */}
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formik.values.eventSale}
+                        onChange={formik.handleChange}
+                        name="eventSale"
+                      />
+                    }
+                    label="Event Sale"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formik.values.eventStatus}
+                        onChange={formik.handleChange}
+                        name="eventStatus"
+                      />
+                    }
+                    label="Event Status"
+                  />
                 </Grid>
               </Grid>
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
-    </>
+              {/* Submit Button */}
+              <Grid item xs={12}>
+                <LoadingButton
+                  color="primary"
+                  variant="contained"
+                  fullWidth
+                  type="submit"
+                  loading={loading}
+                >
+                  Edit Event
+                </LoadingButton>
+              </Grid>
+            </Grid>
+            {/* Right Column */}
+            <Grid item xs={12} md={6}>
+              {/* Event Description */}
+              <Typography fontWeight={700} marginBottom={"0.25rem"}>Event Description</Typography>
+              <MDEditor
+                value={markdown}
+                onChange={handleDescriptionChange}
+                height={300}
+                data-color-mode="light"
+                preview="edit"
+              />
+              {formik.touched.eventDescription && formik.errors.eventDescription && (
+                <Typography color="error">{formik.errors.eventDescription}</Typography>
+              )}
+            </Grid>
+          </Grid>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }
 
