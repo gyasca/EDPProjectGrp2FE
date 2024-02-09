@@ -19,13 +19,9 @@ import dayjs from "dayjs";
 
 function EditUser() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const { userId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-
-  const handleChangeDate = (dateTime) => {
-    formik.setFieldValue("dateTime", dateTime); // Update the "dateTime" field directly with the selected dateTime
-  };
 
   useEffect(() => {
     // Fetch user details when the component mounts
@@ -41,28 +37,74 @@ function EditUser() {
       });
   }, [userId]);
 
-  const formik = useFormik({
+  // Formik hook for password change form
+  const passwordFormik = useFormik({
+    initialValues: {
+      password: "",
+      confirmPassword: ""
+    },
+    enableReinitialize: true, // This option allows the form to reinitialize when props (in this case, initialValues) change
+    validationSchema: yup.object({
+      password: yup
+        .string()
+        .trim()
+        .min(8, "Password must be at least 8 characters")
+        // .required("Password is required")
+        .matches(
+          /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
+          "At least 1 letter and 1 number"
+        ),
+      confirmPassword: yup
+        .string()
+        .oneOf([yup.ref("password")], "Passwords must match")
+        .required("Confirm password is required")
+    }),
+    onSubmit: (data) => {
+      console.log("Password Form Values:", data);
+      // Handle password change submission
+      http
+        .put(`/user/password/${userId}`, data)
+        .then((res) => {
+          console.log(res.data);
+          navigate(`/viewspecificuser/${userId}`);
+        })
+        .catch(function (err) {
+          toast.error(`${err.response.data.message}`);
+        });
+    },
+  }, [user]);
+
+  // Formik hook for user details edit form
+  const userDetailsFormik = useFormik({
     initialValues: {
       roleName: user?.roleName || "", // Make sure to provide default values
       membershipStatus: user?.membershipStatus || "",
       mobileNumber: user?.mobileNumber || "",
       email: user?.email || "",
-      password: user?.password || "",
       profilePhotoFile: user?.profilePhotoFile || "",
       firstName: user?.firstName || "",
       lastName: user?.lastName || "",
       gender: user?.gender || "",
       occupationType: user?.occupationType || "",
       address: user?.address || "",
-      postalCode: parseInt(user?.postalCode) || "000000",
+      postalCode: parseInt(user?.postalCode) || "",
       newsletterSubscriptionStatus: user?.newsletterSubscriptionStatus || false,
       twoFactorAuthStatus: user?.twoFactorAuthStatus || false,
       verificationStatus: user?.verificationStatus || false,
       dateOfBirth: dayjs(user?.dateOfBirth) || dayjs(new Date()),
-      confirmPassword: user?.password || "",
     },
     enableReinitialize: true, // This option allows the form to reinitialize when props (in this case, initialValues) change
     validationSchema: yup.object({
+      mobileNumber: yup
+        .string()
+        .matches(/^\d{8}$/, "Mobile Number must be exactly 8 digits"),
+      profilePhotoFile: yup.mixed(),
+      email: yup
+        .string()
+        .trim()
+        .email("Enter a valid email")
+        .max(50, "Email must be at most 50 characters")
+        .required("Email is required"),
       firstName: yup
         .string()
         .trim()
@@ -73,85 +115,17 @@ function EditUser() {
           /^[a-zA-Z '-,.]+$/,
           "Only allow letters, spaces and characters: ' - , ."
         ),
-      email: yup
+      postalCode: yup
         .string()
-        .trim()
-        .email("Enter a valid email")
-        .max(50, "Email must be at most 50 characters")
-        .required("Email is required"),
-      password: yup
-        .string()
-        .trim()
-        .min(8, "Password must be at least 8 characters")
-        .required("Password is required")
-        .matches(
-          /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
-          "At least 1 letter and 1 number"
-        ),
-      confirmPassword: yup
-        .string()
-        .trim()
-        .required("Confirm password is required")
-        .oneOf([yup.ref("password")], "Passwords must match"),
-      //   roleName: yup.string().required("Role Name is required"), // Add this line
-      //   membershipStatus: yup.string().required("Membership Status is required"), // Add this line
-      //   mobileNumber: yup
-      //     .number()
-      //     .typeError("Mobile Number must be a number")
-      //     .test(
-      //       "len",
-      //       "Mobile Number must be exactly 8 digits",
-      //       (val) => val && val.toString().length === 8
-      //     ), // Add this line
-      //   profilePhotoFile: yup
-      //     .mixed()
-      //     .test(
-      //       "fileSize",
-      //       "File size is too large",
-      //       (value) => value && value.size <= 1024 * 1024
-      //     ), // Add this line
-      //   lastName: yup.string().required("Last Name is required"), // Add this line
-      //   gender: yup.string().required("Gender is required"), // Add this line
-      //   occupationType: yup.string().required("Occupation Type is required"), // Add this line
-      //   address: yup.string().required("Address is required"), // Add this line
-      //   postalCode: yup
-      //     .number()
-      //     .typeError("Postal Code must be a number")
-      //     .test(
-      //       "len",
-      //       "Postal Code must be at most 6 digits",
-      //       (val) => val && val.toString().length <= 6
-      //     ), // Add this line
-      //   newsletterSubscriptionStatus: yup
-      //     .boolean("must be boolean")
-      //     .required("Newsletter Subscription Status is required"), // Add this line
-      //   dateOfBirth: yup.date().required("Date of Birth is required"), // Add this line
+        .matches(/^\d{6}$/, "Postal Code must be exactly 6 digits"),
     }),
-
     onSubmit: (data) => {
-      // Ensure values is defined
-      if (!data) {
-        console.error("Form values are undefined.");
-        return;
-      }
-      console.log("Data:", data);
-      data.roleName = data.roleName;
-      data.membershipStatus = data.membershipStatus;
+      console.log("User Details Form Values:", data);
+      // Handle user details edit submission
+      // clean input first because need convert some inputs to proper format
       data.mobileNumber = data.mobileNumber.toString();
       data.email = data.email.trim().toLowerCase();
-      data.password = data.password;
-      data.profilePhotoFile = data.profilePhotoFile;
-      data.firstName = data.firstName;
-      data.lastName = data.lastName;
-      data.gender = data.gender;
-      data.occupationType = data.occupationType;
-      data.address = data.address;
       data.postalCode = data.postalCode.toString();
-      data.newsletterSubscriptionStatus = data.newsletterSubscriptionStatus;
-      data.twoFactorAuthStatus = data.twoFactorAuthStatus;
-      data.verificationStatus = data.verificationStatus;
-      data.dateOfBirth = data.dateOfBirth;
-
       http
         .put(`/user/${userId}`, data)
         .then((res) => {
@@ -162,7 +136,7 @@ function EditUser() {
           toast.error(`${err.response.data.message}`);
         });
     },
-  });
+  }, [user]);
 
   if (!user) {
     return <Typography variant="h5">Loading...</Typography>;
@@ -171,22 +145,23 @@ function EditUser() {
   return (
     <Box
       sx={{
-        marginTop: 8,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Typography variant="h5" sx={{ my: 2 }}>
-        Edit User Details
-      </Typography>
+      marginTop: 8,
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "2rem",
+      alignItems: "start", // Align items at the top
+    }}
+    >   
 
-      <Box
+    {/* Edit User Details Form */}
+    <Box
         component="form"
-        sx={{ maxWidth: "500px" }}
-        onSubmit={formik.handleSubmit}
+        sx={{ maxWidth: "500px"}}
+        onSubmit={userDetailsFormik.handleSubmit}
       >
-        {/* <input
+        <Typography variant="h6">Edit User Details</Typography>
+
+          {/* <input
           type="file"
           onChange={(event) =>
             formik.setFieldValue(
@@ -210,11 +185,11 @@ function EditUser() {
           autoComplete="off"
           label="First Name"
           name="firstName"
-          value={formik.values.firstName}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-          helperText={formik.touched.firstName && formik.errors.firstName}
+          value={userDetailsFormik.values.firstName}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={userDetailsFormik.touched.firstName && Boolean(userDetailsFormik.errors.firstName)}
+          helperText={userDetailsFormik.touched.firstName && userDetailsFormik.errors.firstName}
         />
         <TextField
           fullWidth
@@ -222,24 +197,24 @@ function EditUser() {
           autoComplete="off"
           label="Email"
           name="email"
-          value={formik.values.email}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.email && Boolean(formik.errors.email)}
-          helperText={formik.touched.email && formik.errors.email}
+          value={userDetailsFormik.values.email}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={userDetailsFormik.touched.email && Boolean(userDetailsFormik.errors.email)}
+          helperText={userDetailsFormik.touched.email && userDetailsFormik.errors.email}
         />
-        <TextField
+        {/* <TextField
           fullWidth
           margin="dense"
           autoComplete="off"
           label="Change Password"
           name="password"
           type="password"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.password && Boolean(formik.errors.password)}
-          helperText={formik.touched.password && formik.errors.password}
+          value={userDetailsFormik.values.password}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={userDetailsFormik.touched.password && Boolean(userDetailsFormik.errors.password)}
+          helperText={userDetailsFormik.touched.password && userDetailsFormik.errors.password}
         />
         <TextField
           fullWidth
@@ -248,17 +223,17 @@ function EditUser() {
           label="Confirm new Password"
           name="confirmPassword"
           type="password"
-          value={formik.values.confirmPassword}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          value={userDetailsFormik.values.confirmPassword}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
           error={
-            formik.touched.confirmPassword &&
-            Boolean(formik.errors.confirmPassword)
+            userDetailsFormik.touched.confirmPassword &&
+            Boolean(userDetailsFormik.errors.confirmPassword)
           }
           helperText={
-            formik.touched.confirmPassword && formik.errors.confirmPassword
+            userDetailsFormik.touched.confirmPassword && userDetailsFormik.errors.confirmPassword
           }
-        />
+        /> */}
 
         <TextField
           fullWidth
@@ -267,10 +242,10 @@ function EditUser() {
           label="Role Name"
           select
           variant="outlined"
-          value={formik.values.roleName}
-          onChange={formik.handleChange}
-          error={formik.touched.roleName && Boolean(formik.errors.roleName)}
-          helperText={formik.touched.roleName && formik.errors.roleName}
+          value={userDetailsFormik.values.roleName}
+          onChange={userDetailsFormik.handleChange}
+          error={userDetailsFormik.touched.roleName && Boolean(userDetailsFormik.errors.roleName)}
+          helperText={userDetailsFormik.touched.roleName && userDetailsFormik.errors.roleName}
           sx={{ marginY: "1rem" }}
         >
           <MenuItem value="employee-master">Employee (Master)</MenuItem>
@@ -285,13 +260,13 @@ function EditUser() {
           label="Mobile Number"
           name="mobileNumber"
           type="tel"
-          value={formik.values.mobileNumber}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          value={userDetailsFormik.values.mobileNumber}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
           error={
-            formik.touched.mobileNumber && Boolean(formik.errors.mobileNumber)
+            userDetailsFormik.touched.mobileNumber && Boolean(userDetailsFormik.errors.mobileNumber)
           }
-          helperText={formik.touched.mobileNumber && formik.errors.mobileNumber}
+          helperText={userDetailsFormik.touched.mobileNumber && userDetailsFormik.errors.mobileNumber}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">+65</InputAdornment>
@@ -305,11 +280,11 @@ function EditUser() {
           autoComplete="off"
           label="Last Name"
           name="lastName"
-          value={formik.values.lastName}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-          helperText={formik.touched.lastName && formik.errors.lastName}
+          value={userDetailsFormik.values.lastName}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={userDetailsFormik.touched.lastName && Boolean(userDetailsFormik.errors.lastName)}
+          helperText={userDetailsFormik.touched.lastName && userDetailsFormik.errors.lastName}
         />
 
         <TextField
@@ -320,10 +295,10 @@ function EditUser() {
           name="gender"
           select
           variant="outlined"
-          value={formik.values.gender}
-          onChange={formik.handleChange}
-          error={formik.touched.gender && Boolean(formik.errors.gender)}
-          helperText={formik.touched.gender && formik.errors.gender}
+          value={userDetailsFormik.values.gender}
+          onChange={userDetailsFormik.handleChange}
+          error={userDetailsFormik.touched.gender && Boolean(userDetailsFormik.errors.gender)}
+          helperText={userDetailsFormik.touched.gender && userDetailsFormik.errors.gender}
         >
           <MenuItem value="male">Male</MenuItem>
           <MenuItem value="female">Female</MenuItem>
@@ -339,14 +314,14 @@ function EditUser() {
           name="occupationType"
           select
           variant="outlined"
-          value={formik.values.occupationType}
-          onChange={formik.handleChange}
+          value={userDetailsFormik.values.occupationType}
+          onChange={userDetailsFormik.handleChange}
           error={
-            formik.touched.occupationType &&
-            Boolean(formik.errors.occupationType)
+            userDetailsFormik.touched.occupationType &&
+            Boolean(userDetailsFormik.errors.occupationType)
           }
           helperText={
-            formik.touched.occupationType && formik.errors.occupationType
+            userDetailsFormik.touched.occupationType && userDetailsFormik.errors.occupationType
           }
         >
           <MenuItem value="student">Student</MenuItem>
@@ -361,11 +336,11 @@ function EditUser() {
           autoComplete="off"
           label="Address"
           name="address"
-          value={formik.values.address}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.address && Boolean(formik.errors.address)}
-          helperText={formik.touched.address && formik.errors.address}
+          value={userDetailsFormik.values.address}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={userDetailsFormik.touched.address && Boolean(userDetailsFormik.errors.address)}
+          helperText={userDetailsFormik.touched.address && userDetailsFormik.errors.address}
         />
 
         <TextField
@@ -375,11 +350,11 @@ function EditUser() {
           label="Postal Code"
           name="postalCode"
           type="number"
-          value={formik.values.postalCode}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={formik.touched.postalCode && Boolean(formik.errors.postalCode)}
-          helperText={formik.touched.postalCode && formik.errors.postalCode}
+          value={userDetailsFormik.values.postalCode}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={userDetailsFormik.touched.postalCode && Boolean(userDetailsFormik.errors.postalCode)}
+          helperText={userDetailsFormik.touched.postalCode && userDetailsFormik.errors.postalCode}
         />
 
         <TextField
@@ -390,15 +365,15 @@ function EditUser() {
           name="newsletterSubscriptionStatus"
           select
           variant="outlined"
-          value={formik.values.newsletterSubscriptionStatus}
-          onChange={formik.handleChange}
+          value={userDetailsFormik.values.newsletterSubscriptionStatus}
+          onChange={userDetailsFormik.handleChange}
           error={
-            formik.touched.newsletterSubscriptionStatus &&
-            Boolean(formik.errors.newsletterSubscriptionStatus)
+            userDetailsFormik.touched.newsletterSubscriptionStatus &&
+            Boolean(userDetailsFormik.errors.newsletterSubscriptionStatus)
           }
           helperText={
-            formik.touched.newsletterSubscriptionStatus &&
-            formik.errors.newsletterSubscriptionStatus
+            userDetailsFormik.touched.newsletterSubscriptionStatus &&
+            userDetailsFormik.errors.newsletterSubscriptionStatus
           }
         >
           <MenuItem value={true}>Subscribed</MenuItem>
@@ -427,11 +402,50 @@ function EditUser() {
             dateOfBirth
           />
         </LocalizationProvider> */}
-
+        
         <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
-          Save
+          Save User Details
         </Button>
       </Box>
+
+      {/* Change Password Form */}
+      <Box component="form" sx={{ maxWidth: "500px" }} onSubmit={passwordFormik.handleSubmit}>
+        <Typography variant="h6">Change Password</Typography>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="New Password"
+          name="password"
+          type="password"
+          value={passwordFormik.values.password}
+          onChange={passwordFormik.handleChange}
+          onBlur={passwordFormik.handleBlur}
+          error={passwordFormik.touched.password && Boolean(passwordFormik.errors.password)}
+          helperText={passwordFormik.touched.password && passwordFormik.errors.password}
+        />
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Confirm New Password"
+          name="confirmPassword"
+          type="password"
+          value={passwordFormik.values.confirmPassword}
+          onChange={passwordFormik.handleChange}
+          onBlur={passwordFormik.handleBlur}
+          error={
+            passwordFormik.touched.confirmPassword &&
+            Boolean(passwordFormik.errors.confirmPassword)
+          }
+          helperText={
+            passwordFormik.touched.confirmPassword &&
+            passwordFormik.errors.confirmPassword
+          }
+        />
+        <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
+          Change Password
+        </Button>
+      </Box>
+
 
       <ToastContainer />
     </Box>

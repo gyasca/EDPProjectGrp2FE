@@ -22,6 +22,19 @@ import UserContext from "./contexts/UserContext";
 import ViewUsers from "./pages/ViewUsers";
 import ViewSpecificUser from "./pages/ViewSpecificUser";
 import EditUser from "./pages/EditUser";
+import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
+import EventRoute from './pages/Event/EventRoute';
+import ReviewsPage from './pages/ReviewsPage';
+import CreateReviewPage from './pages/CreateReviewPage';
+import EditReviewPage from './pages/EditReviewPage';
+import DeleteReview from './pages/DeleteReview';
+
+import TicketPage from './pages/TicketPage';
+import TicketPageInd from './pages/TicketPageInd';
+import CreateTicket from './pages/CreateTicket';
+import CreateForumPost from "./pages/CreateForumPost";
+import ViewForum from "./pages/ViewForum";
+import Home from "./pages/Home";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -66,15 +79,17 @@ function App() {
                     UPlay
                   </Typography>
                 </Link>
-                <Link to="/tutorials">
-                  <Typography>Tutorials</Typography>
+                <Link to="/events">
+                  <Typography>Event</Typography>
                 </Link>
 
                 {/* To be updated to only allow roleName admin to access */}
-                <Link to="/viewusersadmin">
-                  <Typography>View Users</Typography>
-                </Link>
+                <Link to="/viewusersadmin" ><Typography>View Users</Typography></Link>
 
+                <Link to="/forum/view" ><Typography>Community Forum</Typography></Link>
+
+                <Link to="/reviews" ><Typography>Reviews</Typography></Link>
+                <Link to="/staff/tickets" ><Typography>Customer Service Tickets</Typography></Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {user && (
                   <>
@@ -98,22 +113,35 @@ function App() {
 
           <Container>
             <Routes>
-              <Route path={"/"} element={<Tutorials />} />
+              <Route path={"/"} element={<Home />} />
               <Route path={"/tutorials"} element={<Tutorials />} />
               <Route path={"/addtutorial"} element={<AddTutorial />} />
               <Route path={"/edittutorial/:id"} element={<EditTutorial />} />
+              
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
               <Route path={"/form"} element={<MyForm />} />
               <Route path={"/viewusersadmin"} element={<ViewUsers />} />
-              <Route
-                path={"/viewspecificuser/:userId"}
-                element={<ViewSpecificUser />}
-              />
-              <Route
-                path={"/edituser/:userId"}
-                element={<EditUser />}
-              />
+              <Route path={"/viewspecificuser/:userId"} element={<ViewSpecificUser />} />
+              <Route path={"/edituser/:userId"} element={<EditUser />} />
+
+              <Route path={"/forum/create"} element={<CreateForumPost />} />
+              <Route path={"/forum/view"} element={<ViewForum />} />
+
+              <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
+              <Route path={"/events/*"} element={<EventRoute />} />
+
+              <Route path={"/reviews"} element={<ReviewsPage />} />
+              <Route path={"/reviews/create"} element={<CreateReviewPage />} />
+              <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
+              <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
+
+              <Route path={"/staff/tickets"} element={<TicketPage />} />
+              <Route path={"/staff/tickets/:id"} element={<TicketPageInd />} />
+
+
+              <Route path={"/tickets/create"} element={<CreateTicket />} />
+
             </Routes>
           </Container>
         </ThemeProvider>
