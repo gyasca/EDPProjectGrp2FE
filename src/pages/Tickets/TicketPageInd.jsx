@@ -15,6 +15,7 @@ const TicketPageInd = () => {
         description: 'This is a sample ticket description.',
         createdAt: "20 Apr 2005",
         status: 'Pending',
+        responseType: "Filler"
         // Add more ticket details as needed
     });
 
@@ -62,6 +63,9 @@ const TicketPageInd = () => {
         </Typography>
         <Typography variant="subtitle1">
             <strong>Status:</strong> {ticketDetails.status}
+        </Typography>
+        <Typography variant="subtitle1">
+            <strong>Response Type:</strong> {ticketDetails.responseType}
         </Typography>
 
         {ticketDetails.status === 'pending' && (

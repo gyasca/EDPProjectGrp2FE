@@ -1,3 +1,4 @@
+// src/pages/CreateReviewForm.jsx
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -10,45 +11,41 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import CardTitle from "../components/CardTitle";
+import CardTitle from "../../components/CardTitle";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const CreateTicket = ({ onSubmit }) => {
+const CreateReview = ({ onSubmit }) => {
     const navigate = useNavigate();
-
-    const currentDate = new Date();
-    currentDate.setHours(currentDate.getHours() + 8);
-
     const formik = useFormik({
         initialValues: {
+            name: 'name',
+            rating: '',
             subject: '',
-            description: '',
-            createdat: currentDate,
-            status: 'pending',
+            comment: '',
         },
         validationSchema: Yup.object({
+            name: Yup.string().required('Name is required'),
+            rating: Yup.number().required('Rating is required').min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
             subject: Yup.string().required('Subject is required'),
-            description: Yup.string().required('Description is required'),
-            createdat: Yup.string().required('Date created is required'),
-            status: Yup.string().required('Description is required'),
+            comment: Yup.string().required('Comment is required'),
         }),
         onSubmit: async values => {
             try {
-                const response = await axios.post('https://localhost:7261/Tickets', values);
+                const response = await axios.post('https://localhost:7261/Reviews', values);
 
-                if (response.status === 201) {
+                if (response.status === 200) {
                     // Review added successfully, you can perform additional actions if needed
-                    console.log('Ticket added successfully');
-                    navigate("/tickets")
+                    console.log('Review added successfully');
+                    navigate("/reviews")
 
                     // Call the provided onSubmit callback
                     onSubmit(values);
                 } else {
-                    console.error('Failed to add ticket', response.status);
+                    console.error('Failed to add review', response.status);
                 }
             } catch (error) {
-                console.error('Error adding ticket', error.message, error.response?.data);
+                console.error('Error adding review', error.message, error.response?.data);
             }
         },
     });
@@ -63,10 +60,27 @@ const CreateTicket = ({ onSubmit }) => {
                     <Box component="form" onSubmit={formik.handleSubmit}>
                         <CardContent>
                             {/* Form Title */}
-                            <CardTitle title="Create Ticket" />
+                            <CardTitle title="Create Review" />
 
                             {/* Form Fields */}
                             <Grid container marginTop={'1rem'} spacing={2}>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        fullWidth
+                                        id="rating"
+                                        name="rating"
+                                        label="Rating"
+                                        variant="outlined"
+                                        type="number"
+                                        value={formik.values.rating}
+                                        onChange={formik.handleChange}
+                                        error={formik.touched.rating && Boolean(formik.errors.rating)}
+                                        helperText={formik.touched.rating && formik.errors.rating}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="start">/5</InputAdornment>,
+                                        }}
+                                    />
+                                </Grid>
                                 <Grid item xs={6}>
                                     <TextField
                                         fullWidth
@@ -83,14 +97,16 @@ const CreateTicket = ({ onSubmit }) => {
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
-                                        id="description"
-                                        name="description"
-                                        label="Description"
+                                        id="comment"
+                                        name="comment"
+                                        label="Comment"
                                         variant="outlined"
-                                        value={formik.values.description}
+                                        multiline
+                                        rows={4}
+                                        value={formik.values.comment}
                                         onChange={formik.handleChange}
-                                        error={formik.touched.description && Boolean(formik.errors.description)}
-                                        helperText={formik.touched.description && formik.errors.description}
+                                        error={formik.touched.comment && Boolean(formik.errors.comment)}
+                                        helperText={formik.touched.comment && formik.errors.comment}
                                     />
                                 </Grid>
                             </Grid>
@@ -105,7 +121,7 @@ const CreateTicket = ({ onSubmit }) => {
                                 startIcon={<AddIcon />}
                                 sx={{ marginTop: '1rem' }}
                             >
-                                Add Ticket
+                                Add Review
                             </LoadingButton>
                         </CardContent>
                     </Box>
@@ -115,4 +131,4 @@ const CreateTicket = ({ onSubmit }) => {
     );
 };
 
-export default CreateTicket;
+export default CreateReview;

@@ -16,14 +16,16 @@ import ViewUsers from './pages/ViewUsers';
 import ViewSpecificUser from './pages/ViewSpecificUser';
 import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
 import EventRoute from './pages/Event/EventRoute';
-import ReviewsPage from './pages/ReviewsPage';
-import CreateReviewPage from './pages/CreateReviewPage';
-import EditReviewPage from './pages/EditReviewPage';
-import DeleteReview from './pages/DeleteReview';
 
-import TicketPage from './pages/TicketPage';
-import TicketPageInd from './pages/TicketPageInd';
-import CreateTicket from './pages/CreateTicket';
+import ReviewsPage from './pages/Reviews/ReviewsPage';
+import CreateReviewPage from './pages/Reviews/CreateReviewPage';
+import EditReviewPage from './pages/Reviews/EditReviewPage';
+import DeleteReview from './pages/Reviews/DeleteReview';
+
+import TicketPage from './pages/Tickets/TicketPage';
+import TicketPageInd from './pages/Tickets/TicketPageInd';
+import CreateTicket from './pages/Tickets/CreateTicket';
+import Chat from './pages/Tickets/Chat';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -104,6 +106,7 @@ function App() {
 
 
               <Route path={"/tickets/create"} element={<CreateTicket />} />
+              <Route path ={"/tickets/chat"} element={<Chat />} />
 
             </Routes>
           </Container>
