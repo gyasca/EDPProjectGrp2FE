@@ -12,9 +12,9 @@ function Register() {
 
     const formik = useFormik({
         initialValues: {
-            roleName: "string",
-            membershipStatus: "string",
-            mobileNumber: "string",
+            roleName: "customer",
+            membershipStatus: "non-member",
+            mobileNumber: "00000000",
             email: "",
             password: "",
             profilePhotoFile: "string",
@@ -22,8 +22,8 @@ function Register() {
             lastName: "string",
             gender: "string",
             occupationType: "string",
-            address: "string",
-            postalCode: "string",
+            address: "Example Avenue 1 Block 123",
+            postalCode: "000000",
             newsletterSubscriptionStatus: false,
             twoFactorAuthStatus: false,
             verificationStatus: false,
