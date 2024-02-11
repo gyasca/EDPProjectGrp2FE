@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box, Typography, TextField, Button } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
@@ -16,12 +16,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import UserContext from '../contexts/UserContext';
 
 function EditUser() {
   const navigate = useNavigate();
   const { userId } = useParams();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const { contextUser, setContextUser } = useContext(UserContext);
 
   useEffect(() => {
     // Fetch user details when the component mounts
@@ -126,10 +128,12 @@ function EditUser() {
       data.mobileNumber = data.mobileNumber.toString();
       data.email = data.email.trim().toLowerCase();
       data.postalCode = data.postalCode.toString();
+      
       http
         .put(`/user/${userId}`, data)
         .then((res) => {
           console.log(res.data);
+          // setContextUser(res.data);
           navigate(`/viewspecificuser/${userId}`);
         })
         .catch(function (err) {
@@ -235,7 +239,7 @@ function EditUser() {
           }
         /> */}
 
-        <TextField
+        {/* <TextField
           fullWidth
           id="roleName"
           name="roleName"
@@ -251,7 +255,7 @@ function EditUser() {
           <MenuItem value="employee-master">Employee (Master)</MenuItem>
           <MenuItem value="employee-normal">Employee (Normal)</MenuItem>
           <MenuItem value="customer">Customer</MenuItem>
-        </TextField>
+        </TextField> */}
 
         <TextField
           fullWidth
