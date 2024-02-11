@@ -7,7 +7,7 @@ function Home() {
   return (
     <div>
       {/* Secondary Navigation (App Bar) */}
-      <AppBar position="static" color="default">
+      <AppBar position="sticky" color="default" sx={{top: "80px", borderRadius: "20px"}}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'center', backgroundColor: '#FFFFFF' }}>
           <Button variant="contained" sx={{ borderRadius: '20px', margin: '0 10px' }}>All Categories</Button>
           <Button variant="contained" sx={{ borderRadius: '20px', margin: '0 10px' }}>Dine & Wine</Button>
@@ -36,11 +36,11 @@ function Home() {
             </Box>
             <Box>
             {/* Placeholder for Carousel/Slider Images */}
-            <img src="/assets/placeholder2.jpg" alt="Placeholder 2" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
+            <img src="src\assets\sunset vector wallpaper.jpg" alt="Placeholder 2" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
             </Box>
             <Box>
             {/* Placeholder for Carousel/Slider Images */}
-            <img src="/assets/placeholder3.jpg" alt="Placeholder 3" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
+            <img src="src\assets\dark waves.jpg" alt="Placeholder 3" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
             </Box>
         </Carousel>
         </Container>

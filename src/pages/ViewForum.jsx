@@ -1,124 +1,138 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { Box, Typography, Grid, Card, CardContent, Input, IconButton, Button } from '@mui/material';
-import { AccountCircle, AccessTime, Search, Clear, Edit } from '@mui/icons-material';
-import http from '../http';
-import dayjs from 'dayjs';
-import UserContext from '../contexts/UserContext';
-import global from '../global';
+import React, { useEffect, useState, useContext } from "react";
+import { Link } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Input,
+  IconButton,
+  Button,
+} from "@mui/material";
+import {
+  AccountCircle,
+  AccessTime,
+  Search,
+  Clear,
+  Edit,
+} from "@mui/icons-material";
+import http from "../http";
+import dayjs from "dayjs";
+import UserContext from "../contexts/UserContext";
+import global from "../global";
 
 function ViewForum() {
-    const [forumPosts, setForumPosts] = useState([]);
-    const [search, setSearch] = useState('');
-    const { user } = useContext(UserContext);
+  const [forumPosts, setForumPosts] = useState([]);
+  const [search, setSearch] = useState("");
+  const { user } = useContext(UserContext);
 
-    const onSearchChange = (e) => {
-        setSearch(e.target.value);
-    };
+  const onSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
 
-    const getForumPosts = () => {
-        http.get('/forumpost').then((res) => {
-            setForumPosts(res.data);
-        });
-    };
+  const getForumPosts = () => {
+    http.get("/forumpost").then((res) => {
+      setForumPosts(res.data);
+    });
+  };
 
-    const searchForumPosts = () => {
-        http.get(`/forumpost?search=${search}`).then((res) => {
-            setForumPosts(res.data);
-        });
-    };
+  const searchForumPosts = () => {
+    http.get(`/forumpost?search=${search}`).then((res) => {
+      setForumPosts(res.data);
+    });
+  };
 
-    useEffect(() => {
-        getForumPosts();
-    }, []);
+  useEffect(() => {
+    getForumPosts();
+  }, []);
 
-    const onSearchKeyDown = (e) => {
-        if (e.key === "Enter") {
-            searchForumPosts();
-        }
-    };
-
-    const onClickSearch = () => {
-        searchForumPosts();
+  const onSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      searchForumPosts();
     }
+  };
 
-    const onClickClear = () => {
-        setSearch('');
-        getForumPosts();
-    };
+  const onClickSearch = () => {
+    searchForumPosts();
+  };
 
-    return (
-        <Box>
-            <Typography variant="h5" sx={{ my: 2 }}>
-                Forum Posts
-            </Typography>
+  const onClickClear = () => {
+    setSearch("");
+    getForumPosts();
+  };
 
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Input value={search} placeholder="Search post by Title"
-                    onChange={onSearchChange}
-                    onKeyDown={onSearchKeyDown} />
-                <IconButton color="primary"
-                    onClick={onClickSearch}>
-                    <Search />
-                </IconButton>
-                <IconButton color="primary"
-                    onClick={onClickClear}>
-                    <Clear />
-                </IconButton>
-                <Box sx={{ flexGrow: 1 }} />
-                {
-                    user && (
-                        <Link to="/forum/create" style={{ textDecoration: 'none' }}>
-                            <Button variant='contained'>
-                                Add Post
-                            </Button>
-                        </Link>
-                    )
-                }
-            </Box>
+  return (
+    <Box>
+      <Typography variant="h5" sx={{ my: 2 }}>
+        Forum Posts
+      </Typography>
 
-            <Grid container spacing={2}>
-                {
-                    forumPosts.map((post, i) => {
-                        return (
-                            <Grid item xs={12} md={6} lg={4} key={post.PostId}>
-                                <Card>
-                                    <CardContent>
-                                    <Box sx={{ display: 'flex', mb: 1 }}>
-                                        <Typography variant="h6">
-                                            {post.title}
-                                        </Typography>
-                                    </Box>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <Input
+          value={search}
+          placeholder="Search post by Title"
+          onChange={onSearchChange}
+          onKeyDown={onSearchKeyDown}
+        />
+        <IconButton color="primary" onClick={onClickSearch}>
+          <Search />
+        </IconButton>
+        <IconButton color="primary" onClick={onClickClear}>
+          <Clear />
+        </IconButton>
+        <Box sx={{ flexGrow: 1 }} />
+        {user && (
+          <Link to="/forum/create" style={{ textDecoration: "none" }}>
+            <Button variant="contained">Add Post</Button>
+          </Link>
+        )}
+      </Box>
 
-                                    <Box sx={{ display: 'flex', mb: 1 }}>
-                                    <Typography>
-                                            {post.content}
-                                        </Typography>
-                                    </Box>
+      <Grid container spacing={2}>
+        {forumPosts.map((post, i) => {
+          return (
+            <Grid item xs={12} md={6} lg={4} key={post.PostId}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: "flex", mb: 1 }}>
+                    <Typography variant="h6" sx={{ flexGrow: 1 }}>{post.title}</Typography>
+                  </Box>
 
-                                    <Box sx={{ display: 'flex', mb: 1 }}>
-                                    <Typography color="text.secondary">
-                                            {post.User?.email}
-                                        </Typography>
-                                    </Box>
+                  <Box sx={{ display: "flex", mb: 1 }}>
+                    <Typography>{post.content}</Typography>
+                  </Box>
 
-                                    
+                  <Box sx={{ display: "flex", mb: 1 }}>
+                    <AccountCircle sx={{ mr: 1 }} />
+                    <Typography color="text.secondary">
+                      {post.user?.email}
+                    </Typography>
+                  </Box>
 
-                                    <Box sx={{ display: 'flex', mb: 1 }}>
-                                    <Typography color="text.secondary">
-                                            {dayjs(post.dateCreated).format(global.datetimeFormat)}
-                                        </Typography>
-                                    </Box>
-                                    
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        );
-                    })
-                }
+                  <Box sx={{ display: "flex", mb: 1 }}>
+                    <AccessTime sx={{ mr: 1 }} />
+                    <Typography color="text.secondary">
+                      {dayjs(post.dateCreated).format(global.datetimeFormat)}
+                    </Typography>
+                  </Box>
+
+                  {user && user.id === post.userId && (
+                    <Link to={`/forum/edit/${post.postId}`}>
+                      <IconButton color="primary" sx={{ padding: "4px" }}>
+                        <Edit />
+                      </IconButton>
+                    </Link>
+                  )}
+
+                </CardContent>
+              </Card>
             </Grid>
-        </Box>
-    );
+          );
+        })}
+      </Grid>
+    </Box>
+  );
 }
 
 export default ViewForum;
