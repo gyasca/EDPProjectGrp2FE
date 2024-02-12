@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import { Box, Typography, TextField, Button, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -10,20 +10,14 @@ import UserContext from "../contexts/UserContext";
 import { jwtDecode } from "jwt-decode";
 
 function Login() {
-  // start of google
-  const [googleUser, setGoogleUser] = useState([]);
-  function handleCallbackResponse(response) {
-    // testing response from google
-    console.log("Encoded JWT ID token: " + response.credential);
-    // end of response testing from google. it was a success!! - greg
+  const [googleUser, setGoogleUser] = useState(null);
+  const { setUser } = useContext(UserContext);
+  const navigate = useNavigate();
 
-    // decode the jwt response from google to retrieve user name, email and picture
-    var userObject = jwtDecode(response.credential);
-    console.log(userObject);
+  const handleCallbackResponse = (response) => {
+    const userObject = jwtDecode(response.credential);
     setGoogleUser(userObject);
 
-    // handle login/register
-    // Prepare user data to send to backend
     const userData = {
       roleName: "customer",
       membershipStatus: "non-member",
@@ -46,17 +40,12 @@ function Login() {
     http
       .get(`/user/email/${userObject.email}`)
       .then((res) => {
-        console.log("user details from get by email: ", res.data);
-        // If the user exists, log them in
         loginUser(userObject.email);
       })
       .catch((error) => {
-        console.error("Error fetching user details:", error);
-        // If the user does not exist, create a new user account and then log them in
         http
           .post("/user/register", userData)
           .then((res) => {
-            console.log(res.data);
             loginUser(userObject.email);
           })
           .catch((err) => {
@@ -64,8 +53,7 @@ function Login() {
           });
       });
 
-    function loginUser(email) {
-      // Log in the user by setting the access token and navigating to the home page
+    const loginUser = (email) => {
       const loginRequest = {
         email: email,
         password: "googlesecretpasswordxx94n2a",
@@ -75,17 +63,15 @@ function Login() {
         .then((res) => {
           localStorage.setItem("accessToken", res.data.accessToken);
           setUser(res.data.user);
-          console.log(res.data.user);
           navigate("/");
         })
         .catch((err) => {
           toast.error(`${err.response.data.message}`);
         });
-    }
-  }
+    };
+  };
 
   useEffect(() => {
-    /* global google */
     google.accounts.id.initialize({
       client_id:
         "661561841765-j6easap6fmjismk71ohvhl3pp9shtth1.apps.googleusercontent.com",
@@ -99,9 +85,6 @@ function Login() {
 
     google.accounts.id.prompt();
   }, []);
-
-  const navigate = useNavigate();
-  const { setUser } = useContext(UserContext);
 
   const formik = useFormik({
     initialValues: {
@@ -118,8 +101,6 @@ function Login() {
       password: yup
         .string()
         .trim()
-        .min(8, "Password must be at least 8 characters")
-        // .max(50, 'Password must be at most 50 characters')
         .required("Password is required"),
     }),
     onSubmit: (data) => {
@@ -130,11 +111,10 @@ function Login() {
         .then((res) => {
           localStorage.setItem("accessToken", res.data.accessToken);
           setUser(res.data.user);
-          console.log(res.data.user);
           navigate("/");
         })
-        .catch(function (err) {
-          toast.error(`${err.response.data.message}`);
+        .catch((err) => {
+          toast.error(`Incorrect email or password`);
         });
     },
   });
@@ -149,7 +129,7 @@ function Login() {
       }}
     >
       <Typography variant="h5" sx={{ my: 2 }}>
-        Login
+        Sign in to UPlay Account
       </Typography>
       <Box
         component="form"
@@ -184,36 +164,37 @@ function Login() {
         <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
           Login
         </Button>
-        <Box
-          fullWidth
-          className="App"
-          sx={{
-            marginTop: 5,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Box id="signInBox"></Box>
-
-          {googleUser && (
-            <Box
-              alignItems={"center"}
-              className="App"
-              sx={{
-                marginTop: 5,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <img src={googleUser.picture}></img>
-              <h3>{googleUser.name}</h3>
-            </Box>
-          )}
-        </Box>
       </Box>
+      <Box
+        fullWidth
+        className="App"
+        sx={{
+          marginTop: 5,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Box id="signInBox"></Box>
+        {googleUser && (
+          <Grid container justifyContent="center" alignItems="center" spacing={1}>
+            <Grid item>
+              <img src={googleUser.picture} alt="Profile" style={{ borderRadius: "50%", width: "50px", height: "50px" }} />
+            </Grid>
+            <Grid item>
+              <Typography variant="subtitle1">{googleUser.name}</Typography>
+            </Grid>
+          </Grid>
+        )}
 
+        {/* Don't have an account? Register now */}
+        <Typography variant="body2" sx={{ mt: 4 }}>
+          Don't have an account?{" "}
+          <Button href="/register" variant="body2" sx={{ color:"orangered" }}>
+            Register an account
+          </Button>
+        </Typography>
+      </Box>
       <ToastContainer />
     </Box>
   );
