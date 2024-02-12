@@ -132,36 +132,44 @@ export function ViewCart() {
     }
   
     const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id));
-  
+    console.log(selectedCartItems)
     const subTotalAmount = selectedCartItems.reduce((acc, item) => acc + (item.quantity * item.eventPrice), 0);
     const gstRate = 0.09; // Assuming 9% GST rate
     const gstAmount = parseFloat((subTotalAmount * gstRate).toFixed(2));
     const totalAmount = parseFloat((subTotalAmount + gstAmount).toFixed(2));
     const noOfItems = selectedCartItems.reduce((acc, item) => acc + item.quantity, 0);
   
-    const order = {
-      orderStatus: "Pending", 
-      subTotalAmount: subTotalAmount,
-      gstAmount: gstAmount,
-      totalAmount: totalAmount,
-      noOfItems: noOfItems,
-      orderPaymentMethod: "Online", 
-      orderItems: [],
-    };
-  
-    console.log("Order:", order);
-  
     try {
-      const response = await http.post(`/Order`, order); 
-      if (response.status === 200) {
+      const order = {
+        OrderStatus: "Pending",
+        SubTotalAmount: subTotalAmount,
+        GstAmount: gstAmount,
+        TotalAmount: totalAmount,
+        NoOfItems: noOfItems,
+        OrderPaymentMethod: "NIL",
+        OrderItems: selectedCartItems.map(item => ({
+          EventId: item.eventId,
+          Quantity: item.quantity,
+          TotalPrice: item.quantity * item.eventPrice,
+          Discounted: 0, 
+          DiscountedTotalPrice: item.quantity * item.eventPrice
+        }))
+      };
+  
+      const orderResponse = await http.post(`/Order`, order);
+      if (orderResponse.status === 200) {
+        const orderId = orderResponse.data.orderId;
+  
         toast.success("Order created successfully!");
+  
         setSelectedItems([]);
         setCartItems([]);
-        navigate('/'); 
+  
+        navigate('/cart/checkout/' + orderId);
       }
     } catch (error) {
-      console.error("Failed to create order:", error.response ? error.response.data : error);
-      toast.error("Failed to create order: " + (error.response?.data.message || error.message));
+      console.error("Failed to complete the order process:", error.response ? error.response.data : error);
+      toast.error("Failed to complete the order process: " + (error.response?.data.message || error.message));
     }
   };
   
