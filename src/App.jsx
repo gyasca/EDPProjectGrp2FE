@@ -7,6 +7,7 @@ import {
   Typography,
   Box,
   Button,
+  IconButton,
   Menu,
   MenuItem,
   IconButton,
@@ -27,6 +28,7 @@ import {
   Key,
 } from "@mui/icons-material";
 import { ThemeProvider } from "@mui/material/styles";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import MyTheme from "./themes/MyTheme";
 import Tutorials from "./pages/Tutorials";
 import AddTutorial from "./pages/AddTutorial";
@@ -39,6 +41,16 @@ import UserContext from "./contexts/UserContext";
 import ViewUsers from "./pages/Admin/User/ViewUsers";
 import ViewSpecificUser from "./pages/ViewSpecificUser";
 import EditUser from "./pages/EditUser";
+import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
+import EventRoute from './pages/Event/EventRoute';
+import ReviewsPage from './pages/ReviewsPage';
+import CreateReviewPage from './pages/CreateReviewPage';
+import EditReviewPage from './pages/EditReviewPage';
+import DeleteReview from './pages/DeleteReview';
+import CartRoute from './pages/Cart/CartRoute';
+import TicketPage from './pages/TicketPage';
+import TicketPageInd from './pages/TicketPageInd';
+import CreateTicket from './pages/CreateTicket';
 import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import EventRoute from "./pages/Event/EventRoute";
 import ReviewsPage from "./pages/ReviewsPage";
@@ -166,6 +178,12 @@ function App() {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {/* {user && (
                   <>
+                    <Link to="/cart" >
+                      <IconButton>
+                        <ShoppingCartIcon />
+                      </IconButton>
+                    </Link>
+                    <Typography>{user.name}</Typography>
                     <Button>{user?.firstName}</Button>
                     <Button onClick={logout}>Logout</Button>
                   </>
@@ -332,6 +350,7 @@ function App() {
 
               <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />
+              <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
