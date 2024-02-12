@@ -1,58 +1,58 @@
-import "./App.css";
-import { useState, useEffect, useContext } from "react";
-import {
-  Container,
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-} from "@mui/material";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import {
   AccountCircle,
+  AssignmentInd,
   Edit,
+  Key,
   Settings,
   ShoppingCart,
-  AssignmentInd,
   Visibility,
-  Key,
 } from "@mui/icons-material";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography
+} from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
-import MyTheme from "./themes/MyTheme";
-import Tutorials from "./pages/Tutorials";
+import { useEffect, useState } from "react";
+import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import "./App.css";
+import UserContext from "./contexts/UserContext";
+import http from "./http";
 import AddTutorial from "./pages/AddTutorial";
+import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
+import CartRoute from './pages/Cart/CartRoute';
+import CreateReviewPage from './pages/CreateReviewPage';
+import CreateTicket from './pages/CreateTicket';
+import DeleteReview from './pages/DeleteReview';
+import EditReviewPage from './pages/EditReviewPage';
 import EditTutorial from "./pages/EditTutorial";
+import EditUser from "./pages/EditUser";
+import EventRoute from './pages/Event/EventRoute';
+import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
-import Login from "./pages/Login";
-import http from "./http";
-import UserContext from "./contexts/UserContext";
-import ViewUsers from "./pages/Admin/User/ViewUsers";
+import ReviewsPage from './pages/ReviewsPage';
+import TicketPage from './pages/TicketPage';
+import TicketPageInd from './pages/TicketPageInd';
+import Tutorials from "./pages/Tutorials";
 import ViewSpecificUser from "./pages/ViewSpecificUser";
-import EditUser from "./pages/EditUser";
-import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
-import EventRoute from "./pages/Event/EventRoute";
-import ReviewsPage from "./pages/ReviewsPage";
-import CreateReviewPage from "./pages/CreateReviewPage";
-import EditReviewPage from "./pages/EditReviewPage";
-import DeleteReview from "./pages/DeleteReview";
+import MyTheme from "./themes/MyTheme";
 
-import TicketPage from "./pages/TicketPage";
-import TicketPageInd from "./pages/TicketPageInd";
-import CreateTicket from "./pages/CreateTicket";
-import CreateForumPost from "./pages/CreateForumPost";
-import ViewForum from "./pages/ViewForum";
-import Home from "./pages/Home";
 import AdminRoutes from "./pages/Admin/AdminRoutes";
+import CreateForumPost from "./pages/CreateForumPost";
+import Home from "./pages/Home";
+import ViewForum from "./pages/ViewForum";
 
 function App() {
   // const { user, setUser } = useContext(UserContext);
@@ -166,6 +166,12 @@ function App() {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {/* {user && (
                   <>
+                    <Link to="/cart" >
+                      <IconButton>
+                        <ShoppingCartIcon />
+                      </IconButton>
+                    </Link>
+                    <Typography>{user.name}</Typography>
                     <Button>{user?.firstName}</Button>
                     <Button onClick={logout}>Logout</Button>
                   </>
@@ -332,6 +338,7 @@ function App() {
 
               <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />
+              <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
