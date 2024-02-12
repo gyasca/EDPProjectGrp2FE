@@ -144,7 +144,8 @@ function App() {
 
 
               <Route path={"/tickets/create"} element={<CreateTicket />} />
-              <Route path ={"/tickets/chat"} element={<Chat />} />
+              <Route path={"/tickets/chat"} element={<Chat />} />
+              <Route path={"/tickets/chat/:id"} element={<Chat />} />
 
             </Routes>
           </Container>

@@ -16,10 +16,11 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const CreateTicket = ({ onSubmit }) => {
     const navigate = useNavigate();
+    // const { id } = useParams();
 
     const currentDate = new Date();
     currentDate.setHours(currentDate.getHours() + 8);
@@ -29,8 +30,8 @@ const CreateTicket = ({ onSubmit }) => {
             subject: '',
             description: '',
             createdat: currentDate,
-            status: 'pending',
-            responseType: 'ai', // Added for user to choose between 'ai' and 'real'
+            status: 'Pending',
+            responseType: '', // Added for user to choose between 'ai' and 'real'
         },
         validationSchema: Yup.object({
             subject: Yup.string().required('Subject is required'),
@@ -42,7 +43,7 @@ const CreateTicket = ({ onSubmit }) => {
 
                 if (response.status === 201) {
                     console.log('Ticket added successfully');
-                    navigate("/tickets");
+                    navigate("/tickets/chat");
                     onSubmit(values);
                 } else {
                     console.error('Failed to add ticket', response.status);

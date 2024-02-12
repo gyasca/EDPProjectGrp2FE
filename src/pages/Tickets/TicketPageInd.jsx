@@ -4,26 +4,49 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
 import { Typography, Button } from '@mui/material';
+import axios from 'axios';
 
 
 const TicketPageInd = () => {
     // State to store ticket details
+    const navigate = useNavigate();
     const { id } = useParams();
     const [ticketDetails, setTicketDetails] = useState({
         id: 1,
         subject: 'Sample Ticket',
         description: 'This is a sample ticket description.',
         createdAt: "20 Apr 2005",
-        status: 'Pending',
-        responseType: "Filler"
+        status: 'Pending'
         // Add more ticket details as needed
     });
 
     // Function to handle ticket acceptance
-    const handleAcceptance = () => {
-        // Implement logic to update ticket status to "Accepted" in the database
-        // You might want to make an API call or use a state management library for this purpose
-        console.log('Ticket Accepted');
+    const handleAcceptance = async () => {
+        try {
+            const updateStatusEndpoint = `https://localhost:7261/Tickets/${id}`; // Replace with the actual API endpoint
+    
+            // Define the request payload
+            const requestData = {
+                status: 'Accepted',
+                subject: ticketDetails.subject,
+                description: ticketDetails.description
+            };
+    
+            // Send the PUT request using Axios
+            const response = await axios.put(updateStatusEndpoint, requestData);
+    
+            if (response.status === 204) {
+                console.log('Ticket Accepted');
+                navigate("/tickets/chat/"+id);
+
+                // Add any additional logic after successful acceptance
+            } else {
+                throw new Error('Failed to update ticket status');
+            }
+        } catch (error) {
+            console.error('Error updating ticket status:', error.message);
+            // Add error handling logic if needed
+        }
     };
 
     useEffect(() => {
@@ -64,11 +87,11 @@ const TicketPageInd = () => {
         <Typography variant="subtitle1">
             <strong>Status:</strong> {ticketDetails.status}
         </Typography>
-        <Typography variant="subtitle1">
+        {/* <Typography variant="subtitle1">
             <strong>Response Type:</strong> {ticketDetails.responseType}
-        </Typography>
+        </Typography> */}
 
-        {ticketDetails.status === 'pending' && (
+        {ticketDetails.status === 'Pending' && (
             <Button variant="contained" color="primary" onClick={handleAcceptance} style={{ marginTop: '20px' }}>
                 Accept Ticket
             </Button>
