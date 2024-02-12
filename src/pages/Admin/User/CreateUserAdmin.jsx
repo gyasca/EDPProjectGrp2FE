@@ -26,7 +26,7 @@ function Register() {
   const navigate = useNavigate();
 
   const handleChangeDate = (dateTime) => {
-    formik.setFieldValue("dateTime", dateTime); // Update the "dateTime" field directly with the selected dateTime
+    formik.setFieldValue("dateOfBirth", dateTime); // Update the "dateTime" field directly with the selected dateTime
   };
 
   const [imageFile, setImageFile] = useState(null);

@@ -90,7 +90,7 @@ function EditUser() {
 
   // Configurations for userDetails edit form.
   const handleChangeDate = (dateTime) => {
-    userDetailsFormik.setFieldValue("dateTime", dateTime); // Update the "dateTime" field directly with the selected dateTime
+    userDetailsFormik.setFieldValue("dateOfBirth", dateTime); // Update the "dateOfBirth" field directly with the selected dateTime
   };
 
   const [imageFile, setImageFile] = useState(null);
@@ -292,7 +292,7 @@ function EditUser() {
                 />
               </Grid>
 
-              {/* Datepicker field for dateTime */}
+              {/* Datepicker field for dateOfBirth */}
               <Grid item xs={12} lg={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DateTimePicker
