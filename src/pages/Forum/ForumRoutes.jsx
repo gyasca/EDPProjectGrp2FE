@@ -3,7 +3,6 @@ import { validateUser } from "../../functions/user";
 import { useSnackbar } from "notistack";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import CreateForumPost from "./CreateForumPost";
-import ViewForum from "./ViewForum";
 
 function ForumRoutes() {
   const { enqueueSnackbar } = useSnackbar();
@@ -21,7 +20,6 @@ function ForumRoutes() {
   return (
     <Routes>
       <Route path={"/create"} element={<CreateForumPost />} />
-      <Route path={"/view"} element={<ViewForum />} />
     </Routes>
   );
 }
