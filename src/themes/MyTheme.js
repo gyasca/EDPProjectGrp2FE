@@ -35,7 +35,7 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     // borderRadius: 15, // Set border radius to 30px for TextField
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Add a bit of drop shadow
+                    // boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Add a bit of drop shadow
                     
                 },
             },
