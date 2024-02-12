@@ -21,7 +21,7 @@ import {
   Menu,
   MenuItem,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { useEffect, useState } from "react";
@@ -29,30 +29,30 @@ import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import UserContext from "./contexts/UserContext";
 import http from "./http";
-import AddTutorial from "./pages/AddTutorial";
-import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
-import CartRoute from './pages/Cart/CartRoute';
-import CreateReviewPage from './pages/CreateReviewPage';
-import CreateTicket from './pages/CreateTicket';
-import DeleteReview from './pages/DeleteReview';
-import EditReviewPage from './pages/EditReviewPage';
-import EditTutorial from "./pages/EditTutorial";
+import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
+import CartRoute from "./pages/Cart/CartRoute";
+import CreateReviewPage from "./pages/CreateReviewPage";
+import CreateTicket from "./pages/CreateTicket";
+import DeleteReview from "./pages/DeleteReview";
+import EditReviewPage from "./pages/EditReviewPage";
 import EditUser from "./pages/EditUser";
-import EventRoute from './pages/Event/EventRoute';
+import EventRoute from "./pages/Event/EventRoute";
 import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
-import ReviewsPage from './pages/ReviewsPage';
-import TicketPage from './pages/TicketPage';
-import TicketPageInd from './pages/TicketPageInd';
-import Tutorials from "./pages/Tutorials";
+import ReviewsPage from "./pages/ReviewsPage";
+import TicketPage from "./pages/TicketPage";
+import TicketPageInd from "./pages/TicketPageInd";
 import ViewSpecificUser from "./pages/ViewSpecificUser";
 import MyTheme from "./themes/MyTheme";
 
+// WHATEVER U DO DON'T LEAVE THIS OUT!!! DON'T DELETE THIS ROUTE
 import AdminRoutes from "./pages/Admin/AdminRoutes";
-import CreateForumPost from "./pages/CreateForumPost";
+
 import Home from "./pages/Home";
-import ViewForum from "./pages/ViewForum";
+import ForumRoutes from "./pages/Forum/ForumRoutes";
+
+// validateAdmin and validateUser functions from user.js to check if user is logged in
 
 function App() {
   // const { user, setUser } = useContext(UserContext);
@@ -126,18 +126,22 @@ function App() {
     setAnchorEl(null);
   };
 
+
   // Render loading message while waiting for user data
   if (loading) {
     return <Typography variant="h5">Loading...</Typography>;
   }
 
   return (
-    <UserContext.Provider value={{ 
-      user: user, 
-      setUser: setUser,
-      userLoading: userLoading,
-      isAdminPage: isAdminPage,
-      setIsAdminPage: setIsAdminPage }}>
+    <UserContext.Provider
+      value={{
+        user: user,
+        setUser: setUser,
+        userLoading: userLoading,
+        isAdminPage: isAdminPage,
+        setIsAdminPage: setIsAdminPage,
+      }}
+    >
       <Router>
         <ThemeProvider theme={MyTheme}>
           <AppBar position="sticky" className="AppBar">
@@ -151,7 +155,6 @@ function App() {
                 <Link to="/events">
                   <Typography>Event</Typography>
                 </Link>
-
 
                 <Link to="/forum/view">
                   <Typography>Community Forum</Typography>
@@ -317,11 +320,13 @@ function App() {
           <Container>
             <Routes>
               <Route path={"/"} element={<Home />} />
-              <Route path={"/tutorials"} element={<Tutorials />} />
+              {/* <Route path={"/tutorials"} element={<Tutorials />} />
               <Route path={"/addtutorial"} element={<AddTutorial />} />
-              <Route path={"/edittutorial/:id"} element={<EditTutorial />} />
+              <Route path={"/edittutorial/:id"} element={<EditTutorial />} /> */}
 
+              {/* IMPORTANT DONT TOUCH */}
               <Route path={"/admin/*"} element={<AdminRoutes />} />
+              {/* END OF IMPORTANT DONT TOUCH */}
 
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
@@ -333,8 +338,7 @@ function App() {
               />
               <Route path={"/edituser/:userId"} element={<EditUser />} />
 
-              <Route path={"/forum/create"} element={<CreateForumPost />} />
-              <Route path={"/forum/view"} element={<ViewForum />} />
+              <Route path={"/forum/*"} element={<ForumRoutes />} />
 
               <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />

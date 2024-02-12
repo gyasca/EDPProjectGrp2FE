@@ -4,7 +4,7 @@ import { Box, Typography, TextField, Button, Select, MenuItem } from '@mui/mater
 import { useFormik } from 'formik';
 import { ToastContainer, toast } from 'react-toastify';
 import * as yup from 'yup';
-import http from '../http';
+import http from '../../http';
 
 function CreateForumPost() {
     const navigate = useNavigate();
