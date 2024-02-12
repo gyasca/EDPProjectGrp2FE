@@ -194,12 +194,11 @@ function Login() {
             alignItems: "center",
           }}
         >
-          <Box fullWidth id="signInBox"></Box>
+          <Box id="signInBox"></Box>
 
           {googleUser && (
             <Box
               alignItems={"center"}
-              fullWidth
               className="App"
               sx={{
                 marginTop: 5,

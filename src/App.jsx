@@ -51,6 +51,7 @@ import AdminRoutes from "./pages/Admin/AdminRoutes";
 
 import Home from "./pages/Home";
 import ForumRoutes from "./pages/Forum/ForumRoutes";
+import ViewForum from "./pages/Forum/ViewForum";
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
@@ -338,7 +339,11 @@ function App() {
               />
               <Route path={"/edituser/:userId"} element={<EditUser />} />
 
+              {/* Forum only logged in */}
               <Route path={"/forum/*"} element={<ForumRoutes />} />
+              {/* Forum for Public */}
+              <Route path={"/forum/view"} element={<ViewForum />} />
+              {/* End of forums */}
 
               <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />
@@ -353,6 +358,7 @@ function App() {
               <Route path={"/staff/tickets/:id"} element={<TicketPageInd />} />
 
               <Route path={"/tickets/create"} element={<CreateTicket />} />
+
             </Routes>
           </Container>
         </ThemeProvider>

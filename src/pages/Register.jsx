@@ -269,7 +269,6 @@ function Register() {
         </Button>
 
         <Box
-          fullWidth
           className="App"
           sx={{
             marginTop: 5,
@@ -283,7 +282,6 @@ function Register() {
           {googleUser && (
             <Box
               alignItems={"center"}
-              fullWidth
               className="App"
               sx={{
                 marginTop: 5,
