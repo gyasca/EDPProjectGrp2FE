@@ -452,41 +452,54 @@ function Register() {
                 <MenuItem value={false}>Not subscribed</MenuItem>
               </TextField>
             </Grid>
-          </Grid>
-          <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Button variant="contained" component="label">
-              Upload Image
-              <input
-                hidden
-                accept="image/*"
-                multiple
-                type="file"
-                onChange={onFileChange}
-              />
-            </Button>
-          </Box>
-          <Box
-            sx={{
-              height: "200px",
-              width: "200px",
-              borderRadius: "50%",
-              overflow: "hidden",
-              textAlign: "center",
-              mt: 2,
-            }}
-          >
-            {imageFile && (
-              <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                <img
-                  alt="profilephoto"
-                  src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                ></img>
+            <Grid item xs={12} lg={6}>
+              <Box sx={{ textAlign: "center", mt: 2 }}>
+                <Button variant="contained" component="label">
+                  Upload Image
+                  <input
+                    hidden
+                    accept="image/*"
+                    multiple
+                    type="file"
+                    onChange={onFileChange}
+                  />
+                </Button>
               </Box>
-            )}
-          </Box>
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <Box
+                sx={{
+                  height: "200px",
+                  width: "200px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  textAlign: "center",
+                  mt: 2,
+                }}
+              >
+                {imageFile && (
+                  <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
+                    <img
+                      alt="profilephoto"
+                      src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    ></img>
+                  </Box>
+                )}
+              </Box>
+            </Grid>
+          </Grid>
           <ToastContainer />
-          <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ mt: 2, mb: 5 }}
+            type="submit"
+          >
             Register
           </Button>
         </Box>
