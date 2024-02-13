@@ -8,11 +8,15 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UserContext from "../contexts/UserContext";
 import { jwtDecode } from "jwt-decode";
+import { validateUser } from "../functions/user";
+import { useSnackbar } from "notistack";
 
 function Login() {
   const [googleUser, setGoogleUser] = useState(null);
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const [checkedLoggedIn, setCheckedLoggedIn] = useState(null);
 
   const handleCallbackResponse = (response) => {
     const userObject = jwtDecode(response.credential);
@@ -84,6 +88,16 @@ function Login() {
     });
 
     google.accounts.id.prompt();
+  }, [checkedLoggedIn]);
+
+  useEffect(() => {
+    if (validateUser()) {
+      enqueueSnackbar("You are already logged in!", {
+        variant: "error",
+      });
+      setCheckedLoggedIn(true);
+      return navigate("/");
+    }
   }, []);
 
   const formik = useFormik({

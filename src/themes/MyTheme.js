@@ -34,13 +34,16 @@ const theme = createTheme({
         MuiTextField: {
             styleOverrides: {
                 root: {
-                    // borderRadius: 15, // Set border radius to 30px for TextField
-                    // boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Add a bit of drop shadow
+                    borderRadius: 15, // Set border radius to 30px for TextField
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Add a bit of drop shadow
                     
                 },
             },
         },
     },
+    shape : {
+        borderRadius: 15,
+    }
 });
 
 export default theme;
