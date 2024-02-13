@@ -7,7 +7,11 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+import EventReviewSmall from '../Reviews/EventReviewSmall';
+
 import Carousel from 'react-material-ui-carousel';
+
 
 function ViewSingleEvent() {
     const navigate = useNavigate();
@@ -41,8 +45,10 @@ function ViewSingleEvent() {
             if (response.status === 200) {
                 const allEventsResponse = response.data;
                 const sameCategoryEvents = allEventsResponse.filter(e => e.category === eventCategory);
+
                 const otherEvents = sameCategoryEvents.filter(e => e.id !== Number(eventId));
                 let relatedEventsToShow;
+
                 if (otherEvents.length < 3) {
                     const remainingEventsCount = 3 - otherEvents.length;
                     const otherCategoriesEvents = allEventsResponse.filter(e => e.category !== eventCategory && e.id !== Number(eventId));
@@ -267,6 +273,9 @@ function ViewSingleEvent() {
                             </Grid>
                         </Container>
                     </Paper>
+                    {/* Event Review Section */}
+                    <EventReviewSmall eventId={eventId} />
+
                     <ToastContainer />
                 </Box>
             )}

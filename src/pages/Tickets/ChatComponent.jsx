@@ -23,7 +23,7 @@ const ChatComponent = () => {
     const [resolved, setResolved] = useState(false);
     const [ticket, setTicket] = useState(null);
     const [typingIndicator, setTypingIndicator] = useState(null);
-    const [otherUserTyping, setOtherUserTyping] = useState(false);
+    // const [otherUserTyping, setOtherUserTyping] = useState(false);
     var { user } = useContext(UserContext);
 
     // If user is null or undefined, user will be assigned the default object
@@ -132,16 +132,16 @@ const ChatComponent = () => {
             //     setIsTyping(true)
             // });
 
-            connection.on('OtherUserTyping', (isTyping, userName) => {
-                console.log(isTyping, userName, "hello there");
-                // Update the typing indicator when other user is typing
-                if (isTyping) {
-                    setTypingIndicator(<TypingIndicator content={`${userName} is typing`} />);
-                } else {
-                    // Remove the typing indicator if other user is not typing
-                    setTypingIndicator(null);
-                }
-            });
+            // connection.on('OtherUserTyping', (isTyping, userName) => {
+            //     console.log(isTyping, userName, "hello there");
+            //     // Update the typing indicator when other user is typing
+            //     if (isTyping) {
+            //         setTypingIndicator(<TypingIndicator content={`${userName} is typing`} />);
+            //     } else {
+            //         // Remove the typing indicator if other user is not typing
+            //         setTypingIndicator(null);
+            //     }
+            // });
         }
     }, [connection, id, user && user.firstName]);
 
@@ -202,9 +202,9 @@ const ChatComponent = () => {
                     onChange={
                         (e) => {
                             setNewMessage(e.target.value)
-                            if (!otherUserTyping) {
-                                connection.invoke('StartTyping', user.firstName)
-                            }
+                            // if (!otherUserTyping) {
+                            //     connection.invoke('StartTyping', user.firstName)
+                            // }
                         }
                     }
                     style={{ flexGrow: 1, padding: '5px', border: 'none', borderRadius: '3px' }}

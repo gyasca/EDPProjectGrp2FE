@@ -33,17 +33,25 @@ import http from "./http";
 import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
 
+
+import EditUser from "./pages/User/EditUser";
+
 import CreateReview from "./pages/Reviews/CreateReview";
 import CreateTicket from "./pages/Tickets/CreateTicket";
 import DeleteReview from "./pages/Reviews/DeleteReview";
 import EditReviewPage from "./pages/Reviews/EditReviewPage";
+
 
 import EventRoute from "./pages/Event/EventRoute";
 import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
 
+
+import ViewSpecificUser from "./pages/User/ViewSpecificUser";
+
 import ReviewsPage from "./pages/Reviews/ReviewsPage";
+
 
 import MyTheme from "./themes/MyTheme";
 
@@ -58,6 +66,8 @@ import ViewForum from "./pages/Forum/ViewForum";
 import Home from "./pages/Home";
 
 import ForumRoutes from "./pages/Forum/ForumRoutes";
+import EventReviewAll from "./pages/Reviews/EventReviewAll";
+
 
 import ResetPassword from "./pages/ResetPassword";
 import UserRoutes from "./pages/User/UserRoutes";
@@ -383,7 +393,11 @@ function App() {
               <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
-              <Route path={"/reviews/create"} element={<CreateReview />} />
+              
+              <Route path={"/reviews/:id"} element={<EventReviewAll />} />
+              <Route path={"/reviews/create"} element={<CreateReviewPage />} />
+              <Route path={"/reviews/create/:id"} element={<CreateReviewPage />} />
+
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
 
