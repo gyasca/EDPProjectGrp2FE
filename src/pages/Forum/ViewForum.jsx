@@ -17,10 +17,10 @@ import {
   Clear,
   Edit,
 } from "@mui/icons-material";
-import http from "../http";
+import http from "../../http";
 import dayjs from "dayjs";
-import UserContext from "../contexts/UserContext";
-import global from "../global";
+import UserContext from "../../contexts/UserContext";
+import global from "../../global";
 
 function ViewForum() {
   const [forumPosts, setForumPosts] = useState([]);

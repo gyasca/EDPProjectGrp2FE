@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from '@mui/material/styles';
+import { useTheme } from "@mui/material/styles";
 import {
   Container,
   Typography,
@@ -17,16 +17,17 @@ import http from "../../../http";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AdminPageTitle from "../../../components/AdminPageTitle";
 import { grey } from "@mui/material/colors";
 
 const ViewUsers = () => {
   const [users, setUsers] = useState([]);
   const [userId, setUserId] = useState(null); // Define userId state
+  const navigate = useNavigate();
 
   // Inside your functional component
-const theme = useTheme();
+  const theme = useTheme();
 
   const [open, setOpen] = useState(false);
   const handleOpen = (userId) => {
@@ -56,45 +57,41 @@ const theme = useTheme();
       field: "actions",
       headerName: "Actions",
       width: 120,
-      '&:visited': {
+      "&:visited": {
         color: grey, // Set the visited link color to be the same as the regular link color
       },
       renderCell: (params) => (
         <>
           <GridActionsCellItem
-            icon={
-              <Link to={`/viewspecificuser/${params.id}`}>
-                <VisibilityIcon />
-              </Link>
-            }
+            icon={<VisibilityIcon />}
             label="View User"
+            onClick={() => {
+              navigate("/viewspecificuser/" + params.row.id);
+            }}
           />
           <GridActionsCellItem
-            icon={
-              <Link to={`/admin/users/edit/${params.id}`}>
-                <EditIcon />
-              </Link>
-            }
+            icon={<EditIcon />}
             label="Edit User"
+            onClick={() => {
+              navigate("/admin/users/edit/" + params.id);
+            }}
           />
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete User"
-            onClick={() => handleOpen(params.id)}
+            onClick={() => handleOpen(params.row.id)}
           />
         </>
       ),
     },
-    { field: "id", headerName: "ID", width: 70 },
+    { field: "id", headerName: "ID", width: 50 },
     { field: "email", headerName: "Email", width: 200 },
     { field: "firstName", headerName: "First Name", width: 150 },
-    { field: "lastName", headerName: "Last Name", width: 150 },
     { field: "roleName", headerName: "Role Name", width: 150 },
     { field: "membershipStatus", headerName: "Membership Status", width: 150 },
     { field: "mobileNumber", headerName: "Mobile Number", width: 150 },
     { field: "gender", headerName: "Gender", width: 120 },
     { field: "address", headerName: "Address", width: 200 },
-    { field: "postalCode", headerName: "Postal Code", width: 120 },
     {
       field: "newsletterSubscriptionStatus",
       headerName: "Newsletter Subscription",
@@ -121,7 +118,13 @@ const theme = useTheme();
   };
 
   return (
-    <Container>
+    <Container
+      sx={{
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
       <AdminPageTitle title="All Users" subtitle={`Manage users`} backbutton />
       <Button
         component={Link}
@@ -131,12 +134,12 @@ const theme = useTheme();
       >
         Create User
       </Button>
-      <Box sx={{ height: 400, width: "100%", marginTop: 2 }}>
+      <Box sx={{ maxWidth: "100%", overflowX: "auto", marginTop: 2 }}>
         <DataGrid rows={users} columns={columns} pageSize={5} />
       </Box>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Delete Tutorial</DialogTitle>
+        <DialogTitle>Delete User</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to delete user with ID: {userId}?

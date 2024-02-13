@@ -1,41 +1,54 @@
-import "./App.css";
-import { useState, useEffect, useContext } from "react";
-import {
-  Container,
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-} from "@mui/material";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import {
   AccountCircle,
+  AssignmentInd,
   Edit,
+  Key,
   Settings,
   ShoppingCart,
-  AssignmentInd,
   Visibility,
-  Key,
 } from "@mui/icons-material";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
-import MyTheme from "./themes/MyTheme";
-import Tutorials from "./pages/Tutorials";
-import AddTutorial from "./pages/AddTutorial";
-import EditTutorial from "./pages/EditTutorial";
+import { useEffect, useState } from "react";
+import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import "./App.css";
+import UserContext from "./contexts/UserContext";
+import http from "./http";
+import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
+import CartRoute from "./pages/Cart/CartRoute";
+import CreateReviewPage from "./pages/CreateReviewPage";
+import CreateTicket from "./pages/CreateTicket";
+import DeleteReview from "./pages/DeleteReview";
+import EditReviewPage from "./pages/EditReviewPage";
+import EditUser from "./pages/EditUser";
+import EventRoute from "./pages/Event/EventRoute";
+import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
-import Login from "./pages/Login";
-import http from "./http";
-import UserContext from "./contexts/UserContext";
+import ReviewsPage from "./pages/ReviewsPage";
+import TicketPage from "./pages/TicketPage";
+import TicketPageInd from "./pages/TicketPageInd";
+import ViewSpecificUser from "./pages/ViewSpecificUser";
+import MyTheme from "./themes/MyTheme";
+
+// WHATEVER U DO DON'T LEAVE THIS OUT!!! DON'T DELETE THIS ROUTE
+import AdminRoutes from "./pages/Admin/AdminRoutes";
+
 import ViewUsers from "./pages/Admin/User/ViewUsers";
 import ViewSpecificUser from "./pages/ViewSpecificUser";
 import EditUser from "./pages/EditUser";
@@ -56,7 +69,12 @@ import ChatComponent from './pages/Tickets/ChatComponent'
 import CreateForumPost from "./pages/CreateForumPost";
 import ViewForum from "./pages/ViewForum";
 import Home from "./pages/Home";
-import AdminRoutes from "./pages/Admin/AdminRoutes";
+
+import Home from "./pages/Home";
+import ForumRoutes from "./pages/Forum/ForumRoutes";
+import ViewForum from "./pages/Forum/ViewForum";
+
+// validateAdmin and validateUser functions from user.js to check if user is logged in
 
 function App() {
   // const { user, setUser } = useContext(UserContext);
@@ -130,18 +148,22 @@ function App() {
     setAnchorEl(null);
   };
 
+
   // Render loading message while waiting for user data
   if (loading) {
     return <Typography variant="h5">Loading...</Typography>;
   }
 
   return (
-    <UserContext.Provider value={{ 
-      user: user, 
-      setUser: setUser,
-      userLoading: userLoading,
-      isAdminPage: isAdminPage,
-      setIsAdminPage: setIsAdminPage }}>
+    <UserContext.Provider
+      value={{
+        user: user,
+        setUser: setUser,
+        userLoading: userLoading,
+        isAdminPage: isAdminPage,
+        setIsAdminPage: setIsAdminPage,
+      }}
+    >
       <Router>
         <ThemeProvider theme={MyTheme}>
           <AppBar position="sticky" className="AppBar">
@@ -156,7 +178,6 @@ function App() {
                   <Typography>Event</Typography>
                 </Link>
 
-
                 <Link to="/forum/view">
                   <Typography>Community Forum</Typography>
                 </Link>
@@ -170,6 +191,12 @@ function App() {
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {/* {user && (
                   <>
+                    <Link to="/cart" >
+                      <IconButton>
+                        <ShoppingCartIcon />
+                      </IconButton>
+                    </Link>
+                    <Typography>{user.name}</Typography>
                     <Button>{user?.firstName}</Button>
                     <Button onClick={logout}>Logout</Button>
                   </>
@@ -315,11 +342,13 @@ function App() {
           <Container>
             <Routes>
               <Route path={"/"} element={<Home />} />
-              <Route path={"/tutorials"} element={<Tutorials />} />
+              {/* <Route path={"/tutorials"} element={<Tutorials />} />
               <Route path={"/addtutorial"} element={<AddTutorial />} />
-              <Route path={"/edittutorial/:id"} element={<EditTutorial />} />
+              <Route path={"/edittutorial/:id"} element={<EditTutorial />} /> */}
 
+              {/* IMPORTANT DONT TOUCH */}
               <Route path={"/admin/*"} element={<AdminRoutes />} />
+              {/* END OF IMPORTANT DONT TOUCH */}
 
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
@@ -331,11 +360,15 @@ function App() {
               />
               <Route path={"/edituser/:userId"} element={<EditUser />} />
 
-              <Route path={"/forum/create"} element={<CreateForumPost />} />
+              {/* Forum only logged in */}
+              <Route path={"/forum/*"} element={<ForumRoutes />} />
+              {/* Forum for Public */}
               <Route path={"/forum/view"} element={<ViewForum />} />
+              {/* End of forums */}
 
               <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />
+              <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />

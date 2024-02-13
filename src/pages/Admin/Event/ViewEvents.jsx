@@ -6,7 +6,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import http from "../../../http";
 import { useNavigate } from 'react-router-dom';
-import { useSnackbar } from 'notistack';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ViewEvents() {
     const [events, setEvents] = useState([]);
@@ -15,7 +16,6 @@ function ViewEvents() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [isActivating, setIsActivating] = useState(true);
     const navigate = useNavigate();
-    const { enqueueSnackbar } = useSnackbar();
 
     const fetchEvents = () => {
         setLoading(true);
@@ -24,7 +24,7 @@ function ViewEvents() {
                 setEvents(response.data);
             })
             .catch(error => {
-                enqueueSnackbar('Error fetching events: ' + error.message, { variant: 'error' });
+                toast.error('Error fetching events: ' + error.message);
             })
             .finally(() => setLoading(false));
     };
@@ -43,18 +43,22 @@ function ViewEvents() {
         const statusChange = isActivating ? 'activate' : 'deactivate';
         http.put(`/Admin/Event/${statusChange}/${currentEvent.id}`)
             .then(() => {
-                enqueueSnackbar(`Event successfully ${statusChange}d`, { variant: 'success' });
+                toast.success(`Event successfully ${statusChange}d`);
                 fetchEvents();
             })
             .catch(error => {
-                enqueueSnackbar(`Error: Could not ${statusChange} event - ${error.message}`, { variant: 'error' });
+                toast.error(`Error: Could not ${statusChange} event - ${error.message}`);
             })
             .finally(() => setDialogOpen(false));
     };
 
+
     useEffect(() => {
         fetchEvents();
     }, []);
+
+    // Sort events array by ID in descending order
+    const sortedEvents = [...events].sort((a, b) => b.id - a.id);
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 100 },
@@ -90,16 +94,30 @@ function ViewEvents() {
         },
     ];
 
+    const handleAddEventClick = () => {
+        navigate('/admin/events/add');
+    };
+
     return (
         <Container maxWidth="lg">
+            <ToastContainer />
             <Typography variant="h4" gutterBottom>
                 Event Management
             </Typography>
+            <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={handleAddEventClick}
+                style={{ marginBottom: '1rem' }}
+            >
+                Add Event
+            </Button>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     <Paper>
                         <DataGrid
-                            rows={events}
+                            rows={sortedEvents}
                             columns={columns}
                             pageSize={10}
                             loading={loading}
