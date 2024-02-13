@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Container from '@mui/material/Container';
@@ -18,11 +18,13 @@ import FormLabel from '@mui/material/FormLabel';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import UserContext from "../../contexts/UserContext";
+import { validateUser } from "../../functions/user";
+import { useSnackbar } from "notistack";
 
 const CreateTicket = () => {
     const { user } = useContext(UserContext)
+    const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate();
-    // const { id } = useParams();
 
     const currentDate = new Date();
     currentDate.setHours(currentDate.getHours() + 8);
@@ -34,7 +36,7 @@ const CreateTicket = () => {
             createdat: currentDate,
             status: 'Pending',
             responseType: '', // Added for user to choose between 'ai' and 'real'
-            createdBy: user.id,
+            createdBy: user ? user.id : 0,
             acceptedBy: 1
         },
         validationSchema: Yup.object({
@@ -57,6 +59,19 @@ const CreateTicket = () => {
             }
         },
     });
+
+    useEffect(() => {
+        const checkUser = async () => {
+            if (!validateUser()) {
+                enqueueSnackbar("You must be logged in to view this page", {
+                    variant: "error",
+                });
+                navigate("/login");
+            }
+        };
+    
+        checkUser();
+    }, [validateUser]);
 
     return (
         <Container maxWidth="xl" sx={{ marginTop: '1rem' }}>

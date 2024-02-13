@@ -31,29 +31,17 @@ import UserContext from "./contexts/UserContext";
 import http from "./http";
 import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
-import CreateReviewPage from "./pages/CreateReviewPage";
-import CreateTicket from "./pages/CreateTicket";
-import DeleteReview from "./pages/DeleteReview";
-import EditReviewPage from "./pages/EditReviewPage";
 import EditUser from "./pages/EditUser";
 import EventRoute from "./pages/Event/EventRoute";
 import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
-import ReviewsPage from "./pages/ReviewsPage";
-import TicketPage from "./pages/TicketPage";
-import TicketPageInd from "./pages/TicketPageInd";
 import ViewSpecificUser from "./pages/ViewSpecificUser";
 import MyTheme from "./themes/MyTheme";
 
 // WHATEVER U DO DON'T LEAVE THIS OUT!!! DON'T DELETE THIS ROUTE
 import AdminRoutes from "./pages/Admin/AdminRoutes";
-
 import ViewUsers from "./pages/Admin/User/ViewUsers";
-import ViewSpecificUser from "./pages/ViewSpecificUser";
-import EditUser from "./pages/EditUser";
-import EventRouteAdmin from './pages/Admin/Event/EventRouteAdmin';
-import EventRoute from './pages/Event/EventRoute';
 
 import ReviewsPage from './pages/Reviews/ReviewsPage';
 import CreateReviewPage from './pages/Reviews/CreateReviewPage';
@@ -62,17 +50,17 @@ import DeleteReview from './pages/Reviews/DeleteReview';
 
 import TicketPage from './pages/Admin/Tickets/TicketPage';
 import TicketPageInd from './pages/Admin/Tickets/TicketPageInd';
+
 import CreateTicket from './pages/Tickets/CreateTicket';
 import Chat from './pages/Tickets/Chat';
-import ChatComponent from './pages/Tickets/ChatComponent'
+import ChatComponent from './pages/Tickets/ChatComponent';
+import TicketRoutes from './pages/Tickets/TicketRoutes';
 
-import CreateForumPost from "./pages/CreateForumPost";
-import ViewForum from "./pages/ViewForum";
-import Home from "./pages/Home";
-
-import Home from "./pages/Home";
-import ForumRoutes from "./pages/Forum/ForumRoutes";
+import CreateForumPost from "./pages/Forum/CreateForumPost";
 import ViewForum from "./pages/Forum/ViewForum";
+import Home from "./pages/Home";
+
+import ForumRoutes from "./pages/Forum/ForumRoutes";
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
@@ -375,9 +363,9 @@ function App() {
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
 
-              <Route path={"/tickets/create"} element={<CreateTicket />} />
-              <Route path={"/tickets/chat"} element={<Chat />} />
+              {/* <Route path={"/tickets/*"} element={<TicketRoutes />} /> */}
               <Route path={"/tickets/chat/:id"} element={<Chat />} />
+              <Route path={"/tickets/create"} element={<CreateTicket />} />
 
             </Routes>
           </Container>

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import * as signalR from '@microsoft/signalr';
 import UserContext from "../../contexts/UserContext";
 import axios from 'axios';
+import OpenAI from "openai";
 import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
     MainContainer,
@@ -18,102 +19,31 @@ const ChatComponent = () => {
     const [connection, setConnection] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-    const [resolved, setResolved] = useState(false); // Changed to boolean
+    const [resolved, setResolved] = useState(false);
     const [ticket, setTicket] = useState(null);
-    const { user } = useContext(UserContext);
-    const userHasEmployeeRole = (user.roleName == "employee-master");
+    var { user } = useContext(UserContext);
+    // const key = fs.readFileSync('openaikey.txt', 'utf-8').trim();
+    const openai = new OpenAI({apiKey: import.meta.env.VITE_OPENAI, dangerouslyAllowBrowser: true});
 
-    // const resolveTicket = () => {
-    //     if (connection && user.firstName.trim() !== '') {
-    //         connection.invoke('ResolveTicket', user.firstName);
-    //         console.log("TICKET RESOLVED")
-    //         setResolved(true)
-    //         // The resolution state should be broadcasted to other clients via SignalR
-    //     }
-    // };
+    // If user is null or undefined, user will be assigned the default object
+    const defaultUser = { id: 0, firstName: 'Guest', roleName: 'Guest' };
+    user = user ?? defaultUser;
 
-    // // const sendMessage = () => {
-    // //     if (connection && newMessage.trim() !== '' && user !== '') {
-    // //         connection.invoke('SendMessage', newMessage, user.firstName);
-    // //         console.log("message sent", newMessage, user.firstName);
-    // //         setNewMessage('');
-    // //     }
-    // // };
+    // Now you can use updatedUser throughout your code
+    // console.log(user);
 
-    // const sendMessage = () => {
-    //     if (connection && newMessage.trim() !== '' && user !== '') {
-    //         // Convert ticket.createdBy to a string
-    //         const recipientId = ticket.createdBy !== null ? ticket.createdBy.toString() : '1';
-
-    //         connection.invoke('SendMessageTest', newMessage, user.firstName, recipientId)
-    //             .then(() => {
-    //                 console.log("Message sent", newMessage, user.firstName, recipientId);
-    //                 setNewMessage('');
-    //             })
-    //             .catch(error => console.error("Error sending message:", error));
-    //     }
-    // };
-
-
-    // useEffect(() => {
-    //     // Fetch TICKET from your ASP.NET MVC API
-    //     if (userHasEmployeeRole) {
-    //         axios.get('https://localhost:7261/Tickets/' + id)
-    //             .then(response => {
-    //                 setTicket(response.data);
-    //                 console.log("Created By: " + response.data.createdBy, response.data.acceptedBy);
-    //             })
-    //             .catch(error => console.error('Error fetching ticket:', error));
-    //     }
-    // }, [id, userHasEmployeeRole]); // Include dependencies in the dependency array
-
-    // useEffect(() => {
-    //     if (connection) {
-    //         connection.on('TicketResolved', () => {
-    //             console.log('Ticket resolved');
-    //             // Update the local state to reflect the resolution on the client side
-    //             setResolved(true);
-    //         });
-    //     }
-    // }, [connection]);
-
-    // useEffect(() => {
-    //     const newConnection = new signalR.HubConnectionBuilder()
-    //         .withUrl('https://localhost:7261/chat') // Replace with your SignalR backend URL
-    //         .withAutomaticReconnect()
-    //         .build();
-
-    //     setConnection(newConnection);
-    // }, []);
-
-    // useEffect(() => {
-    //     if (connection) {
-    //         connection
-    //             .start()
-    //             .then(() => {
-    //                 console.log('Connection established');
-    //             })
-    //             .catch((error) => {
-    //                 console.error('Error establishing connection:', error);
-    //             });
-
-    //         connection.on('ReceiveMessageTest', (message, user, recipient) => {
-    //             setMessages((prevMessages) => [...prevMessages, { message, user, recipient }]);
-    //             console.log(message, user, recipient);
-    //         });
-    //     }
-    // }, [connection]);
+    const userHasEmployeeRole = user && user.roleName === "employee-master";
 
     const resolveTicket = () => {
-        if (connection && user.firstName.trim() !== '') {
+        if (connection && user && user.firstName.trim() !== '') {
             connection.invoke('ResolveTicket', user.firstName);
             setResolved(true);
         }
     };
 
     const sendMessage = () => {
-        if (connection && newMessage.trim() !== '' && user !== '') {
-            const recipientId = ticket.createdBy !== null ? ticket.createdBy.toString() : '1';
+        if (connection && newMessage.trim() !== '' && user && user.firstName !== '') {
+            const recipientId = ticket && ticket.createdBy !== null ? ticket.createdBy.toString() : '1';
 
             connection.invoke('SendMessage', newMessage)
                 .then(() => {
@@ -123,13 +53,43 @@ const ChatComponent = () => {
         }
     };
 
+    const aiReply = async () => {
+        console.log("test 0")
+        if (connection && user && user.firstName.trim() !== '') {
+            // Make API call to OpenAI
+            try {
+                console.log("test 1", (messages[messages.length - 1]).message)
+                console.log(messages)
+                const openaiResponse = await openai.chat.completions.create({
+                    messages: [{ role: "system", content: messages}],
+                    model: "gpt-3.5-turbo",
+                });
+    
+                const aiMessage = openaiResponse.choices[0].message.content; //message.content
+                console.log(aiMessage)
+                console.log("test 2")
+    
+                connection.invoke('SendMessage', aiMessage)
+                    .then(() => {
+                        setNewMessage('');
+                        console.log("test 3")
+                    })
+                    .catch(error => console.error("Error sending message:", error));
+            } catch (error) {
+                console.error("Error calling OpenAI API:", error);
+            }
+        } else {
+            console.log("its else")
+        }
+    };
+    
     useEffect(() => {
-        axios.get('https://localhost:7261/Tickets/' + id)
+        axios.get(`https://localhost:7261/Tickets/${id}`)
             .then(response => {
                 setTicket(response.data);
             })
             .catch(error => console.error('Error fetching ticket:', error));
-    }, id);
+    }, [id]);
 
     useEffect(() => {
         const newConnection = new signalR.HubConnectionBuilder()
@@ -146,8 +106,7 @@ const ChatComponent = () => {
                 .start()
                 .then(() => {
                     console.log('Connection established');
-                    // Join the room when the connection is established
-                    connection.invoke('JoinRoom', { User: user.firstName, Room: id });
+                    connection.invoke('JoinRoom', { User: user && user.firstName, Room: id });
                 })
                 .catch((error) => {
                     console.error('Error establishing connection:', error);
@@ -159,10 +118,9 @@ const ChatComponent = () => {
 
             connection.on('UsersInRoom', (users) => {
                 console.log('Users in the room:', users);
-                // Handle the list of users in the room as needed
             });
         }
-    }, [connection, id, user.firstName]);
+    }, [connection, id, user && user.firstName]);
 
     return (
         <div>
@@ -222,6 +180,9 @@ const ChatComponent = () => {
                 />
                 <button onClick={sendMessage} disabled={resolved} style={{ padding: '5px 10px', marginLeft: '5px', border: 'none', borderRadius: '3px', backgroundColor: '#007bff', color: '#fff' }}>
                     Send
+                </button>
+                <button onClick={aiReply} disabled={resolved} style={{ padding: '5px 10px', marginLeft: '5px', border: 'none', borderRadius: '3px', backgroundColor: '#007bff', color: '#fff' }}>
+                    Reply
                 </button>
             </div>
         </div>
