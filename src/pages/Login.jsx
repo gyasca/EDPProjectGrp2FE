@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Typography, TextField, Button, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  Divider,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -113,10 +120,7 @@ function Login() {
         .email("Enter a valid email")
         .max(50, "Email must be at most 50 characters")
         .required("Email is required"),
-      password: yup
-        .string()
-        .trim()
-        .required("Password is required"),
+      password: yup.string().trim().required("Password is required"),
     }),
     onSubmit: (data) => {
       data.email = data.email.trim().toLowerCase();
@@ -130,6 +134,40 @@ function Login() {
         })
         .catch((err) => {
           toast.error(`Incorrect email or password`);
+        });
+    },
+  });
+
+  // forgot password functionalities
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  // Validation schema for the Forgot Password form
+  const forgotPasswordSchema = yup.object({
+    email: yup
+      .string()
+      .trim()
+      .email("Enter a valid email")
+      .max(50, "Email must be at most 50 characters")
+      .required("Email is required"),
+  });
+
+  // Formik hook for the Forgot Password form
+  const forgotPasswordFormik = useFormik({
+    initialValues: {
+      email: "",
+    },
+    validationSchema: forgotPasswordSchema,
+    onSubmit: (values) => {
+      // Send the email to the backend for password reset
+      console.log(values);
+      values.email = values.email.trim()
+      http
+        .post(`/user/forgotpassword/${values.email}`)
+        .then((res) => {
+          toast.success("Password reset link sent to your email.");
+        })
+        .catch((error) => {
+          toast.error("Failed to send password reset link.");
         });
     },
   });
@@ -180,6 +218,7 @@ function Login() {
           Login
         </Button>
       </Box>
+
       <Box
         fullWidth
         className="App"
@@ -192,9 +231,18 @@ function Login() {
       >
         <Box id="signInBox"></Box>
         {googleUser && (
-          <Grid container justifyContent="center" alignItems="center" spacing={1}>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            spacing={1}
+          >
             <Grid item>
-              <img src={googleUser.picture} alt="Profile" style={{ borderRadius: "50%", width: "50px", height: "50px" }} />
+              <img
+                src={googleUser.picture}
+                alt="Profile"
+                style={{ borderRadius: "50%", width: "50px", height: "50px" }}
+              />
             </Grid>
             <Grid item>
               <Typography variant="subtitle1">{googleUser.name}</Typography>
@@ -202,10 +250,65 @@ function Login() {
           </Grid>
         )}
 
+        {/* Forgot Password Form */}
+        {showForgotPassword ? (
+          <Box
+            component="form"
+            sx={{ maxWidth: "500px", mt: 2 }}
+            onSubmit={forgotPasswordFormik.handleSubmit}
+          >
+            {/* Form title */}
+            <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
+              Forgot Your Password?
+            </Typography>
+            {/* Email field */}
+            <TextField
+              fullWidth
+              margin="dense"
+              autoComplete="off"
+              label="Email"
+              name="email"
+              value={forgotPasswordFormik.values.email}
+              onChange={forgotPasswordFormik.handleChange}
+              onBlur={forgotPasswordFormik.handleBlur}
+              error={
+                forgotPasswordFormik.touched.email &&
+                Boolean(forgotPasswordFormik.errors.email)
+              }
+              helperText={
+                forgotPasswordFormik.touched.email &&
+                forgotPasswordFormik.errors.email
+              }
+            />
+            {/* Submit button */}
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ mt: 2 }}
+              type="submit"
+              disabled={forgotPasswordFormik.isSubmitting}
+            >
+              Send Reset Link
+            </Button>
+          </Box>
+        ) : (
+          // Button to show forgot password form
+          <Button
+            variant="text"
+            color="primary"
+            sx={{ mt: 2 }}
+            onClick={() => setShowForgotPassword(true)}
+          >
+            Forgot Password?
+          </Button>
+        )}
+        {/* Divider */}
+        <Divider sx={{ width: "100%", mt: 2, mb: 2 }} />
+
         {/* Don't have an account? Register now */}
         <Typography variant="body2" sx={{ mt: 4 }}>
           Don't have an account?{" "}
-          <Button href="/register" variant="body2" sx={{ color:"orangered" }}>
+          <Button href="/register" variant="body2" sx={{ color: "orangered" }}>
             Register an account
           </Button>
         </Typography>

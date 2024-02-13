@@ -54,6 +54,7 @@ import Home from "./pages/Home";
 import ForumRoutes from "./pages/Forum/ForumRoutes";
 import ViewForum from "./pages/Forum/ViewForum";
 import UserRoutes from "./pages/User/UserRoutes";
+import ResetPassword from "./pages/ResetPassword";
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
@@ -360,6 +361,7 @@ function App() {
 
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
+              <Route path={"/resetpassword/:token"} element={<ResetPassword />} />
               <Route path={"/form"} element={<MyForm />} />
               {/* <Route path={"/viewusersadmin"} element={<ViewUsers />} /> */}
               <Route path={"/user/*"} element={<UserRoutes />} />
