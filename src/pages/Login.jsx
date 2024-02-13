@@ -152,22 +152,85 @@ function Login() {
   });
 
   // Formik hook for the Forgot Password form
+  // const forgotPasswordFormik = useFormik({
+  //   initialValues: {
+  //     email: "",
+  //   },
+  //   validationSchema: forgotPasswordSchema,
+  //   onSubmit: (values) => {
+  //     // Send the email to the backend for password reset
+  //     console.log(values);
+
+  //     // Check if the user exists
+  //     http
+  //       .post(`/user/email/${values.email}`)
+  //       .then((res) => {
+  //         const userData = res.data;
+  //         // Check if the user has a Google account type
+  //         if (userData.googleAccountType) {
+  //           toast.error(
+  //             "Accounts with Google account type cannot change password."
+  //           );
+  //           return;
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         toast.error("User does not exist.");
+  //         console.log("user doesn't exist",error);
+  //       });
+
+  //     values.email = values.email.trim();
+  //     http
+  //       .post(`/user/forgotpassword/${values.email}`)
+  //       .then((res) => {
+  //         toast.success("Password reset link sent to your email.");
+  //       })
+  //       .catch((error) => {
+  //         toast.error("Failed to send password reset link.");
+  //         console.log(error);
+  //       });
+  //   },
+  // });
+
+  // Formik hook for the Forgot Password form
   const forgotPasswordFormik = useFormik({
     initialValues: {
       email: "",
     },
     validationSchema: forgotPasswordSchema,
     onSubmit: (values) => {
-      // Send the email to the backend for password reset
-      console.log(values);
-      values.email = values.email.trim()
+      // Disable the button to prevent multiple submissions
+  
+      // Check if the user exists
       http
-        .post(`/user/forgotpassword/${values.email}`)
+        .get(`/user/email/${values.email}`)
         .then((res) => {
-          toast.success("Password reset link sent to your email.");
+          const userData = res.data;
+          // Check if the user has a Google account type
+          console.log(res.data);
+          if (userData.googleAccountType) {
+            toast.error(
+              "Accounts with Google account type cannot change password."
+            );
+          } else {
+            // Proceed with sending the password reset link
+            values.email = values.email.trim();
+            http
+              .post(`/user/forgotpassword/${values.email}`)
+              .then((res) => {
+                toast.success("Password reset link sent to your email.");
+              })
+              .catch((error) => {
+                toast.error("Failed to send password reset link.");
+        
+                console.log(error);
+              });
+          }
         })
         .catch((error) => {
-          toast.error("Failed to send password reset link.");
+          // Handle the case where the user does not exist
+          toast.error("User does not exist.");
+          console.log("User doesn't exist", error);
         });
     },
   });
@@ -286,7 +349,6 @@ function Login() {
               variant="contained"
               sx={{ mt: 2 }}
               type="submit"
-              disabled={forgotPasswordFormik.isSubmitting}
             >
               Send Reset Link
             </Button>
