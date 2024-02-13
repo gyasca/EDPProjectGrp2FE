@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Typography, Box, Paper, IconButton, Button } from "@mui/material";
-import http from "../http";
+import http from "../../http";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Link, useNavigate } from 'react-router-dom';
@@ -80,12 +80,9 @@ const ViewUser = () => {
           Date of Birth: {new Date(user.dateOfBirth).toLocaleString()}
         </Typography>
       </Paper>
-      <IconButton component={Link} to={`/edituser/${userId}`} title="Edit user">
+      <IconButton component={Link} to={`/user/edituser/${userId}`} title="Edit user">
         <EditIcon />
       </IconButton>
-      <Button component={Link} to={`/viewusersadmin`} title="Edit user">
-        View All users
-      </Button>
     </Box>
   );
 };
