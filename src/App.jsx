@@ -71,6 +71,7 @@ import EventReviewAll from "./pages/Reviews/EventReviewAll";
 
 import ResetPassword from "./pages/ResetPassword";
 import UserRoutes from "./pages/User/UserRoutes";
+import CreateReviewPage from "./pages/Reviews/CreateReviewPage"
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
