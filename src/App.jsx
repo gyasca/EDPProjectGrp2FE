@@ -9,6 +9,7 @@ import {
 } from "@mui/icons-material";
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
   Container,
@@ -22,7 +23,6 @@ import {
   MenuItem,
   Toolbar,
   Typography,
-  Avatar,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { useEffect, useState } from "react";
@@ -33,50 +33,34 @@ import http from "./http";
 import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
 
-import CreateReviewPage from "./pages/CreateReviewPage";
-import CreateTicket from "./pages/CreateTicket";
-import DeleteReview from "./pages/DeleteReview";
-import EditReviewPage from "./pages/EditReviewPage";
-import EditUser from "./pages/User/EditUser";
+import CreateReview from "./pages/Reviews/CreateReview";
+import CreateTicket from "./pages/Tickets/CreateTicket";
+import DeleteReview from "./pages/Reviews/DeleteReview";
+import EditReviewPage from "./pages/Reviews/EditReviewPage";
 
 import EventRoute from "./pages/Event/EventRoute";
 import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
 
-import ReviewsPage from "./pages/ReviewsPage";
-import TicketPage from "./pages/TicketPage";
-import TicketPageInd from "./pages/TicketPageInd";
-import ViewSpecificUser from "./pages/User/ViewSpecificUser";
+import ReviewsPage from "./pages/Reviews/ReviewsPage";
 
 import MyTheme from "./themes/MyTheme";
 
 // WHATEVER U DO DON'T LEAVE THIS OUT!!! DON'T DELETE THIS ROUTE
 import AdminRoutes from "./pages/Admin/AdminRoutes";
-import ViewUsers from "./pages/Admin/User/ViewUsers";
 
-import ReviewsPage from './pages/Reviews/ReviewsPage';
-import CreateReviewPage from './pages/Reviews/CreateReviewPage';
-import EditReviewPage from './pages/Reviews/EditReviewPage';
-import DeleteReview from './pages/Reviews/DeleteReview';
 
-import TicketPage from './pages/Admin/Tickets/TicketPage';
-import TicketPageInd from './pages/Admin/Tickets/TicketPageInd';
 
-import CreateTicket from './pages/Tickets/CreateTicket';
 import Chat from './pages/Tickets/Chat';
-import ChatComponent from './pages/Tickets/ChatComponent';
-import TicketRoutes from './pages/Tickets/TicketRoutes';
 
-import CreateForumPost from "./pages/Forum/CreateForumPost";
 import ViewForum from "./pages/Forum/ViewForum";
 import Home from "./pages/Home";
 
 import ForumRoutes from "./pages/Forum/ForumRoutes";
 
-import ViewForum from "./pages/Forum/ViewForum";
-import UserRoutes from "./pages/User/UserRoutes";
 import ResetPassword from "./pages/ResetPassword";
+import UserRoutes from "./pages/User/UserRoutes";
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
@@ -399,7 +383,7 @@ function App() {
               <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
-              <Route path={"/reviews/create"} element={<CreateReviewPage />} />
+              <Route path={"/reviews/create"} element={<CreateReview />} />
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
 
