@@ -1,35 +1,34 @@
-import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
-  Typography,
-  TextField,
   Button,
   Container,
-  MenuItem,
   Grid,
+  MenuItem,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
-import * as yup from "yup";
-import http from "../../../http";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import FormControl from "@mui/material/FormControl";
+import * as yup from "yup";
+import http from "../../../http";
 
-import InputAdornment from "@mui/material/InputAdornment";
-import AdminPageTitle from "../../../components/AdminPageTitle";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import dayjs from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
+import AdminPageTitle from "../../../components/AdminPageTitle";
 import UserContext from "../../../contexts/UserContext";
 
 function EditUser() {
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { userId, adminId } = useParams();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const { contextUser, setContextUser } = useContext(UserContext);
+  const [user, setLocalUser] = useState(null);
+  const { setUser } = useContext(UserContext);
+  const [changed, setChanged] = useState(false);
   const [existingImage, setExistingImage] = useState(null);
   // more variable declarations below (config for user details form)
 
@@ -39,7 +38,7 @@ function EditUser() {
     http
       .get(`/user/${userId}`)
       .then((response) => {
-        setUser(response.data);
+        setLocalUser(response.data);
         setExistingImage(response.data.profilePhotoFile); // Update existingImage state
         console.log(response.data);
       })
@@ -185,12 +184,28 @@ function EditUser() {
           .put(`/user/${userId}`, data)
           .then((res) => {
             console.log(res.data);
-            // setContextUser(res.data);
+            if (userId === adminId) {
+              setUser(res.data);
+            }
             navigate(`/admin/users/allusers`);
           })
           .catch(function (err) {
             toast.error(`${err.response.data.message}`);
           });
+
+        console.log("id of user who got edited: ", userId);
+        console.log("id of admin who is editing user: ", adminId);
+        // http
+        //   .get(`/user/${adminId}`)
+        //   .then((response) => {
+        //     console.log(response.data);
+        //     setLocalUser(response.data);
+        //     setUser(response.data);
+        //     navigate(`/admin/users/allusers`);
+        //   })
+        //   .catch((error) => {
+        //     console.error("Error fetching user details:", error);
+        //   });
       },
     },
     [user]

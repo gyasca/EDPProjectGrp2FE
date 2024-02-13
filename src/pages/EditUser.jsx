@@ -14,13 +14,14 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import UserContext from "../contexts/UserContext";
+import AdminPageTitle from "../components/AdminPageTitle";
 
 function EditUser() {
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { userId, adminId } = useParams();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const { contextUser, setContextUser } = useContext(UserContext);
+  const [user, setLocalUser] = useState(null);
+  const { setUser } = useContext(UserContext);
 
   // Configurations for userDetails edit form.
   const handleChangeDate = (dateTime) => {
@@ -33,7 +34,7 @@ function EditUser() {
     http
       .get(`/user/${userId}`)
       .then((response) => {
-        setUser(response.data);
+        setLocalUser(response.data);
         console.log(response.data);
       })
       .catch((error) => {
@@ -140,7 +141,7 @@ function EditUser() {
           .put(`/user/${userId}`, data)
           .then((res) => {
             console.log(res.data);
-            // setContextUser(res.data);
+            setUser(res.data);
             navigate(`/viewspecificuser/${userId}`);
           })
           .catch(function (err) {
@@ -158,13 +159,14 @@ function EditUser() {
   return (
     <Box
       sx={{
-        marginTop: 8,
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "2rem",
+        gap: "0rem",
         alignItems: "start", // Align items at the top
       }}
     >
+      <AdminPageTitle title="Edit User" subtitle={`Update Details Or Password`} backbutton />
+      <Typography></Typography>
       {/* Edit User Details Form */}
       <Box
         component="form"
