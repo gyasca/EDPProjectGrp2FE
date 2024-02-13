@@ -253,55 +253,6 @@ function EditUser() {
             userDetailsFormik.touched.email && userDetailsFormik.errors.email
           }
         />
-        {/* <TextField
-          fullWidth
-          margin="dense"
-          autoComplete="off"
-          label="Change Password"
-          name="password"
-          type="password"
-          value={userDetailsFormik.values.password}
-          onChange={userDetailsFormik.handleChange}
-          onBlur={userDetailsFormik.handleBlur}
-          error={userDetailsFormik.touched.password && Boolean(userDetailsFormik.errors.password)}
-          helperText={userDetailsFormik.touched.password && userDetailsFormik.errors.password}
-        />
-        <TextField
-          fullWidth
-          margin="dense"
-          autoComplete="off"
-          label="Confirm new Password"
-          name="confirmPassword"
-          type="password"
-          value={userDetailsFormik.values.confirmPassword}
-          onChange={userDetailsFormik.handleChange}
-          onBlur={userDetailsFormik.handleBlur}
-          error={
-            userDetailsFormik.touched.confirmPassword &&
-            Boolean(userDetailsFormik.errors.confirmPassword)
-          }
-          helperText={
-            userDetailsFormik.touched.confirmPassword && userDetailsFormik.errors.confirmPassword
-          }
-        /> */}
-
-        {/* <TextField
-          fullWidth
-          id="roleName"
-          name="roleName"
-          label="Role Name"
-          select
-          variant="outlined"
-          value={userDetailsFormik.values.roleName}
-          onChange={userDetailsFormik.handleChange}
-          error={userDetailsFormik.touched.roleName && Boolean(userDetailsFormik.errors.roleName)}
-          helperText={userDetailsFormik.touched.roleName && userDetailsFormik.errors.roleName}
-          sx={{ marginY: "1rem" }}
-        >
-          <MenuItem value="employee-master">Employee (Master)</MenuItem>
-          <MenuItem value="employee-normal">Employee (Normal)</MenuItem>
-          <MenuItem value="customer">Customer</MenuItem>
-        </TextField> */}
 
         <TextField
           fullWidth
