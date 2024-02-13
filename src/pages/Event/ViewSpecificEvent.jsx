@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Paper, Container, Typography, Card, CardContent, Grid, IconButton, Button, Box, CardActions } from '@mui/material';
+import { Breadcrumbs, Link, Typography, Paper, Container, Grid, IconButton, Button, Box, Card, CardContent, CardActions } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import http from '../../http';
 import AddIcon from '@mui/icons-material/Add';
@@ -7,7 +7,10 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 import EventReviewSmall from '../Reviews/EventReviewSmall';
+
+import Carousel from 'react-material-ui-carousel';
 
 
 function ViewSingleEvent() {
@@ -17,6 +20,7 @@ function ViewSingleEvent() {
     const [quantity, setQuantity] = useState(1);
     const [relatedEvents, setRelatedEvents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [eventImage, setEventImage] = useState([]);
 
     async function getEvent() {
         try {
@@ -40,12 +44,9 @@ function ViewSingleEvent() {
             const response = await http.get(`/Event`);
             if (response.status === 200) {
                 const allEventsResponse = response.data;
-                // Filter events by the same category as the current event
                 const sameCategoryEvents = allEventsResponse.filter(e => e.category === eventCategory);
 
-                // Exclude the current event using its ID
                 const otherEvents = sameCategoryEvents.filter(e => e.id !== Number(eventId));
-
                 let relatedEventsToShow;
 
                 if (otherEvents.length < 3) {
@@ -68,17 +69,14 @@ function ViewSingleEvent() {
     }
 
     useEffect(() => {
-        // Call getEvent to fetch the event details
         getEvent();
     }, [eventId]);
 
     useEffect(() => {
-        // Call getAllEvents only after event is fetched and set
         if (event) {
-            getAllEvents(event.eventCategory); // Corrected property name to event.eventCategory
+            getAllEvents(event.eventCategory);
         }
     }, [event]);
-
 
     const addToCart = () => {
         http.post('/cart', {
@@ -118,6 +116,15 @@ function ViewSingleEvent() {
         }
     }
 
+    useEffect(() => {
+        setEventImage([
+            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/kuwt5cjgp7rsfqhqyhgx.webp',
+            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/gcm6mvtr83tdrok7psdu.webp',
+            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/ec0fd6a9-Snow-Play-Session-in-Snow-City-Singapore.JPG',
+            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/5fdfa430-Snow-Play-Session-in-Snow-City-Singapore.webp'
+        ]);
+    }, []);
+
     return (
         <>
             {event && (
@@ -128,15 +135,88 @@ function ViewSingleEvent() {
 
                     <Paper elevation={3} sx={{ p: 2 }}>
                         <Container maxWidth="lg">
-                            <Grid container spacing={2} sx={{ my: 2 }}>
-                                {/* Left Column: Event Description */}
+                            {/* Breadcrumbs and Back Button */}
+                            <Box sx={{ my: 2, display: 'flex', alignItems: 'center' }}>
+                                <Breadcrumbs aria-label="breadcrumb">
+                                    <Link underline="hover" color="inherit" href="/">
+                                        Home
+                                    </Link>
+                                    <Link underline="hover" color="inherit" href="/events">
+                                        Events
+                                    </Link>
+                                    <Typography color="text.primary">{event?.eventName}</Typography>
+                                </Breadcrumbs>
+                            </Box>
+
+                            {/* Event Title and Details */}
+                            <Typography variant="h4" gutterBottom>
+                                {event?.eventName}
+                            </Typography>
+                            <Typography variant="subtitle1" color="text.secondary">
+                                {event?.eventCategory} - {event?.eventLocation}
+                            </Typography>
+
+                            {/* Main Content */}
+                            <Grid container spacing={2}>
+                                {/* Left Column: Event Image and Description */}
                                 <Grid item xs={12} md={8}>
-                                    <Typography variant="h3" gutterBottom>
-                                        {event.eventName}
-                                    </Typography>
-                                    <Typography variant="subtitle1" color="text.secondary">
-                                        {event.eventDescription}
-                                    </Typography>
+                                     {/* Image */}
+                                    <Paper elevation={3} sx={{ p: 2 }}>
+                                        <Carousel
+                                            autoPlay={true}
+                                            animation="slide"
+                                            indicators={true}
+                                            navButtonsAlwaysVisible={true}
+                                            sx={{
+                                                '.carousel': {
+                                                    height: '500px',
+                                                    width: '100%',
+                                                    position: 'relative',
+                                                },
+                                                '.carousel .slide': {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                },
+                                                '.carousel img': {
+                                                    maxWidth: '100%',
+                                                    maxHeight: '100%',
+                                                    objectFit: 'contain',
+                                                },
+                                            }}
+                                        >
+                                            {eventImage && eventImage.map((image, i) => (
+                                                <Box
+                                                    key={i}
+                                                    component="img"
+                                                    src={image}
+                                                    alt={`Slide ${i + 1}`}
+                                                    sx={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '100%',
+                                                        objectFit: 'contain',
+                                                    }}
+                                                />
+                                            ))}
+                                        </Carousel>
+                                    </Paper>
+
+                                    <Box sx={{ marginTop: 2 }}>
+                                        {/* Description */}
+                                        <Paper elevation={3} sx={{ p: 2 }}>
+                                            <Typography variant="h5" gutterBottom>
+                                                Event Description
+                                            </Typography>
+                                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                                {event?.eventDescription}
+                                            </Typography>
+                                        </Paper>
+                                    </Box>
                                 </Grid>
 
                                 {/* Right Column: Add to Cart or Not on Sale */}
@@ -148,6 +228,7 @@ function ViewSingleEvent() {
                                                     Book Your Event
                                                 </Typography>
                                                 <Typography variant="h6">Price: ${event.eventPrice}</Typography>
+                                                <Typography variant="body2" color="text.secondary"> Availability : {event.eventStatus ? "Available" : "Not Available"}</Typography>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                     <Typography variant="body1">Select Quantity:</Typography>
                                                     <IconButton onClick={decreaseQuantity} disabled={quantity <= 1}>
@@ -173,7 +254,7 @@ function ViewSingleEvent() {
 
                             {/* Related Events Section */}
                             <Typography variant="h4" sx={{ mt: 4 }} gutterBottom>
-                                View More Events
+                                You might also like...
                             </Typography>
                             <Grid container spacing={4}>
                                 {relatedEvents.map((relatedEvent) => (
