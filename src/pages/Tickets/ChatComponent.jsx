@@ -154,7 +154,7 @@ const ChatComponent = () => {
                 });
 
             connection.on('ReceiveMessage', (message, user) => {
-                setMessages((prevMessages) => [...prevMessages, { message, user}]);
+                setMessages((prevMessages) => [...prevMessages, { message, user }]);
             });
 
             connection.on('UsersInRoom', (users) => {
@@ -184,23 +184,21 @@ const ChatComponent = () => {
                         </Message>
                         {messages.map((message, index) => (
                             <Message
-                            key={index}
-                            model={{
-                                message: message.user
-                                    ? `${message.user} says ${message.message}`
-                                    : message.message,
-                                sentTime: "just now",
-                                sender: user.firstName,
-                                direction: user.firstName === message.user ? "outgoing" : "incoming"
-                            }}
+                                key={index}
+                                model={{
+                                    message: message.message,
+                                    sentTime: "just now",
+                                    sender: user.firstName,
+                                    direction: user.firstName === message.user ? "outgoing" : "incoming"
+                                }}
                             >
-                                <Avatar name={user.firstName} />
+                                <Avatar name={message.user} />
                             </Message>
                         ))}
                     </MessageList>
                 </ChatContainer>
             </MainContainer>
-            <div>
+            {/* <div>
                 <input
                     type="text"
                     value={newMessage}
@@ -214,6 +212,17 @@ const ChatComponent = () => {
                         Resolve
                     </button>
                 )}
+            </div> */}
+            <div style={{ display: 'flex', padding: '5px', border: '1px solid #ccc', borderRadius: '3px', backgroundColor: '#f5f5f5' }}>
+                <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    style={{ flexGrow: 1, padding: '5px', border: 'none', borderRadius: '3px' }}
+                />
+                <button onClick={sendMessage} disabled={resolved} style={{ padding: '5px 10px', marginLeft: '5px', border: 'none', borderRadius: '3px', backgroundColor: '#007bff', color: '#fff' }}>
+                    Send
+                </button>
             </div>
         </div>
     );
