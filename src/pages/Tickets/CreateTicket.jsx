@@ -37,7 +37,7 @@ const CreateTicket = () => {
             status: 'Pending',
             responseType: '', // Added for user to choose between 'ai' and 'real'
             createdBy: user ? user.id : 0,
-            acceptedBy: 1
+            acceptedBy: user ? user.id : 0
         },
         validationSchema: Yup.object({
             subject: Yup.string().required('Subject is required'),
@@ -49,6 +49,19 @@ const CreateTicket = () => {
 
                 if (response.status === 201) {
                     console.log('Ticket added successfully');
+
+                    if (values.responseType === 'ai') {
+                        const updateResponse = await axios.put(`https://localhost:7261/Tickets/${ticketId}`, {
+                            status: 'Accepted'
+                        });
+
+                        if (updateResponse.status === 200) {
+                            console.log('Ticket status updated to Accepted');
+                        } else {
+                            console.error('Failed to update ticket status', updateResponse.status);
+                        }
+                    }
+                    
                     navigate("/tickets/chat/"+response.data.id);
                     onSubmit(values);
                 } else {

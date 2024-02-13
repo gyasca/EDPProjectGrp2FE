@@ -4,9 +4,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import http from '../../http';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import EventReviewSmall from '../Reviews/EventReviewSmall';
 
 
 function ViewSingleEvent() {
@@ -41,12 +42,12 @@ function ViewSingleEvent() {
                 const allEventsResponse = response.data;
                 // Filter events by the same category as the current event
                 const sameCategoryEvents = allEventsResponse.filter(e => e.category === eventCategory);
-                
+
                 // Exclude the current event using its ID
-                const otherEvents = sameCategoryEvents.filter(e => e.id !== Number(eventId)); 
-    
+                const otherEvents = sameCategoryEvents.filter(e => e.id !== Number(eventId));
+
                 let relatedEventsToShow;
-                
+
                 if (otherEvents.length < 3) {
                     const remainingEventsCount = 3 - otherEvents.length;
                     const otherCategoriesEvents = allEventsResponse.filter(e => e.category !== eventCategory && e.id !== Number(eventId));
@@ -56,7 +57,7 @@ function ViewSingleEvent() {
                 } else {
                     relatedEventsToShow = otherEvents.slice(0, 3);
                 }
-    
+
                 setRelatedEvents(relatedEventsToShow);
             } else {
                 toast.error("Failed to retrieve events!");
@@ -65,7 +66,7 @@ function ViewSingleEvent() {
             toast.error("Failed to retrieve events: " + error.message);
         }
     }
-    
+
     useEffect(() => {
         // Call getEvent to fetch the event details
         getEvent();
@@ -76,35 +77,35 @@ function ViewSingleEvent() {
         if (event) {
             getAllEvents(event.eventCategory); // Corrected property name to event.eventCategory
         }
-    }, [event]); 
-    
+    }, [event]);
+
 
     const addToCart = () => {
         http.post('/cart', {
             eventId: event.id,
             quantity: quantity
         })
-        .then(response => {
-            if (response.status === 200) {
-                toast.success(
-                    <span>
-                        Event added to cart.{' '}
-                        <span
-                            style={{ textDecoration: 'underline', cursor: 'pointer' }}
-                            onClick={() => navigate('/cart')}
-                        >
-                            Go to Cart
+            .then(response => {
+                if (response.status === 200) {
+                    toast.success(
+                        <span>
+                            Event added to cart.{' '}
+                            <span
+                                style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                                onClick={() => navigate('/cart')}
+                            >
+                                Go to Cart
+                            </span>
                         </span>
-                    </span>
-                );
-            } else {
+                    );
+                } else {
+                    toast.error('Error adding event to cart');
+                }
+            })
+            .catch(err => {
+                console.error('Error adding event to cart:', err);
                 toast.error('Error adding event to cart');
-            }
-        })
-        .catch(err => {
-            console.error('Error adding event to cart:', err);
-            toast.error('Error adding event to cart');
-        });
+            });
     }
 
     const increaseQuantity = () => {
@@ -120,7 +121,7 @@ function ViewSingleEvent() {
     return (
         <>
             {event && (
-                <Box> 
+                <Box>
                     <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: '10px', my: 2, cursor: 'pointer' }} onClick={() => navigate('/events')}>
                         <ArrowBackIcon /> Events
                     </Typography>
@@ -191,6 +192,9 @@ function ViewSingleEvent() {
                             </Grid>
                         </Container>
                     </Paper>
+                    {/* Event Review Section */}
+                    <EventReviewSmall eventId={eventId} />
+
                     <ToastContainer />
                 </Box>
             )}

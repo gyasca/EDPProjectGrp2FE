@@ -61,6 +61,7 @@ import ViewForum from "./pages/Forum/ViewForum";
 import Home from "./pages/Home";
 
 import ForumRoutes from "./pages/Forum/ForumRoutes";
+import EventReviewAll from "./pages/Reviews/EventReviewAll";
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
@@ -359,7 +360,9 @@ function App() {
               <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
+              <Route path={"/reviews/:id"} element={<EventReviewAll />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
+              <Route path={"/reviews/create/:id"} element={<CreateReviewPage />} />
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
 
