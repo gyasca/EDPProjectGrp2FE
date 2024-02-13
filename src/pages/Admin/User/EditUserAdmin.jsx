@@ -92,8 +92,6 @@ function EditUser() {
   };
 
   const [imageFile, setImageFile] = useState(null);
-  // State to track the number of uploads
-  const [uploadCounter, setUploadCounter] = useState(0);
 
   const onFileChange = (e) => {
     let file = e.target.files[0];
