@@ -47,10 +47,11 @@ import CreateReviewPage from './pages/Reviews/CreateReviewPage';
 import EditReviewPage from './pages/Reviews/EditReviewPage';
 import DeleteReview from './pages/Reviews/DeleteReview';
 
-import TicketPage from './pages/Tickets/TicketPage';
-import TicketPageInd from './pages/Tickets/TicketPageInd';
+import TicketPage from './pages/Admin/Tickets/TicketPage';
+import TicketPageInd from './pages/Admin/Tickets/TicketPageInd';
 import CreateTicket from './pages/Tickets/CreateTicket';
 import Chat from './pages/Tickets/Chat';
+import ChatComponent from './pages/Tickets/ChatComponent'
 
 import CreateForumPost from "./pages/CreateForumPost";
 import ViewForum from "./pages/ViewForum";
@@ -163,8 +164,8 @@ function App() {
                 <Link to="/reviews">
                   <Typography>Reviews</Typography>
                 </Link>
-                <Link to="/staff/tickets">
-                  <Typography>Customer Service Tickets</Typography>
+                <Link to="/tickets/create">
+                  <Typography>Customer Support</Typography>
                 </Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {/* {user && (
@@ -340,9 +341,6 @@ function App() {
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
-
-              <Route path={"/staff/tickets"} element={<TicketPage />} />
-              <Route path={"/staff/tickets/:id"} element={<TicketPageInd />} />
 
               <Route path={"/tickets/create"} element={<CreateTicket />} />
               <Route path={"/tickets/chat"} element={<Chat />} />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Container from '@mui/material/Container';
@@ -17,8 +17,10 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import UserContext from "../../contexts/UserContext";
 
-const CreateTicket = ({ onSubmit }) => {
+const CreateTicket = () => {
+    const { user } = useContext(UserContext)
     const navigate = useNavigate();
     // const { id } = useParams();
 
@@ -32,6 +34,8 @@ const CreateTicket = ({ onSubmit }) => {
             createdat: currentDate,
             status: 'Pending',
             responseType: '', // Added for user to choose between 'ai' and 'real'
+            createdBy: user.id,
+            acceptedBy: 1
         },
         validationSchema: Yup.object({
             subject: Yup.string().required('Subject is required'),
@@ -43,7 +47,7 @@ const CreateTicket = ({ onSubmit }) => {
 
                 if (response.status === 201) {
                     console.log('Ticket added successfully');
-                    navigate("/tickets/chat");
+                    navigate("/tickets/chat/"+response.data.id);
                     onSubmit(values);
                 } else {
                     console.error('Failed to add ticket', response.status);

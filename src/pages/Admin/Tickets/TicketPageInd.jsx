@@ -1,11 +1,11 @@
 // TicketDetailsPage.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
 import { Typography, Button } from '@mui/material';
 import axios from 'axios';
-
+import UserContext from "../../../contexts/UserContext";
 
 const TicketPageInd = () => {
     // State to store ticket details
@@ -21,20 +21,22 @@ const TicketPageInd = () => {
     });
 
     // Function to handle ticket acceptance
+    const { user } = useContext(UserContext)
     const handleAcceptance = async () => {
         try {
             const updateStatusEndpoint = `https://localhost:7261/Tickets/${id}`; // Replace with the actual API endpoint
-    
+
             // Define the request payload
             const requestData = {
                 status: 'Accepted',
+                acceptedBy: user.id,
                 subject: ticketDetails.subject,
-                description: ticketDetails.description
+                description: ticketDetails.description,
             };
-    
+
             // Send the PUT request using Axios
             const response = await axios.put(updateStatusEndpoint, requestData);
-    
+
             if (response.status === 204) {
                 console.log('Ticket Accepted');
                 navigate("/tickets/chat/"+id);
@@ -86,6 +88,12 @@ const TicketPageInd = () => {
         </Typography>
         <Typography variant="subtitle1">
             <strong>Status:</strong> {ticketDetails.status}
+        </Typography>
+        <Typography variant="subtitle1">
+            <strong>Created By:</strong> {ticketDetails.createdBy}
+        </Typography>
+        <Typography variant="subtitle1">
+            <strong>Accepted By:</strong> {ticketDetails.acceptedBy}
         </Typography>
         {/* <Typography variant="subtitle1">
             <strong>Response Type:</strong> {ticketDetails.responseType}

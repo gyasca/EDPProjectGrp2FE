@@ -19,6 +19,9 @@ import CreateUserAdmin from "./User/CreateUserAdmin";
 // event
 
 // ticket
+import Chat from "../Tickets/Chat";
+import TicketPage from "./Tickets/TicketPage";
+import TicketPageInd from "./Tickets/TicketPageInd";
 
 // whatever ur admin page feature name is
 
@@ -65,6 +68,10 @@ function AdminRoutes() {
           <Route path="/users/allusers" element={<ViewUsers />} />
           <Route path="/users/create" element={<CreateUserAdmin />} />
           <Route path="/users/edit/:userId" element={<EditUserAdmin />} />
+
+          {/* Ticket paths */ }
+          <Route path={"/tickets"} element={<TicketPage />} />
+          <Route path={"/tickets/:id"} element={<TicketPageInd />} />
 
           {/* Example paths */}
           {/* <Route path="/users/create" element={<CreateUser />} />
