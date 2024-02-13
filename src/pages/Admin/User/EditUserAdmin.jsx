@@ -26,10 +26,11 @@ import UserContext from "../../../contexts/UserContext";
 
 function EditUser() {
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { userId, adminId } = useParams();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const { contextUser, setContextUser } = useContext(UserContext);
+  const [user, setLocalUser] = useState(null);
+  const { setUser } = useContext(UserContext);
+  const [changed, setChanged] = useState(false);
   const [existingImage, setExistingImage] = useState(null);
   // more variable declarations below (config for user details form)
 
@@ -39,7 +40,7 @@ function EditUser() {
     http
       .get(`/user/${userId}`)
       .then((response) => {
-        setUser(response.data);
+        setLocalUser(response.data);
         setExistingImage(response.data.profilePhotoFile); // Update existingImage state
         console.log(response.data);
       })
@@ -185,12 +186,28 @@ function EditUser() {
           .put(`/user/${userId}`, data)
           .then((res) => {
             console.log(res.data);
-            // setContextUser(res.data);
+            if (userId === adminId) {
+              setUser(res.data);
+            }
             navigate(`/admin/users/allusers`);
           })
           .catch(function (err) {
             toast.error(`${err.response.data.message}`);
           });
+
+        console.log("id of user who got edited: ", userId);
+        console.log("id of admin who is editing user: ", adminId);
+        // http
+        //   .get(`/user/${adminId}`)
+        //   .then((response) => {
+        //     console.log(response.data);
+        //     setLocalUser(response.data);
+        //     setUser(response.data);
+        //     navigate(`/admin/users/allusers`);
+        //   })
+        //   .catch((error) => {
+        //     console.error("Error fetching user details:", error);
+        //   });
       },
     },
     [user]

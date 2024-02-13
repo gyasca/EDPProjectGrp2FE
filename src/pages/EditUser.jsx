@@ -17,10 +17,10 @@ import UserContext from "../contexts/UserContext";
 
 function EditUser() {
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { userId, adminId } = useParams();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const { contextUser, setContextUser } = useContext(UserContext);
+  const [user, setLocalUser] = useState(null);
+  const { setUser } = useContext(UserContext);
 
   // Configurations for userDetails edit form.
   const handleChangeDate = (dateTime) => {
@@ -33,7 +33,7 @@ function EditUser() {
     http
       .get(`/user/${userId}`)
       .then((response) => {
-        setUser(response.data);
+        setLocalUser(response.data);
         console.log(response.data);
       })
       .catch((error) => {
@@ -140,7 +140,7 @@ function EditUser() {
           .put(`/user/${userId}`, data)
           .then((res) => {
             console.log(res.data);
-            // setContextUser(res.data);
+            setUser(res.data);
             navigate(`/viewspecificuser/${userId}`);
           })
           .catch(function (err) {
