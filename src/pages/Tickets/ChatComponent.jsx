@@ -22,7 +22,7 @@ const ChatComponent = () => {
     const [resolved, setResolved] = useState(false);
     const [ticket, setTicket] = useState(null);
     var { user } = useContext(UserContext);
-    // const key = fs.readFileSync('openaikey.txt', 'utf-8').trim();
+
     const openai = new OpenAI({apiKey: import.meta.env.VITE_OPENAI, dangerouslyAllowBrowser: true});
 
     // If user is null or undefined, user will be assigned the default object
@@ -54,32 +54,35 @@ const ChatComponent = () => {
     };
 
     const aiReply = async () => {
-        console.log("test 0")
         if (connection && user && user.firstName.trim() !== '') {
+            // Construct the conversation array
+            const conversation = [
+                { role: "system", content: "You are a customer service representative for UPlay, a Singaporean activity planning website" },
+                ...messages.map((message) => ({ role: "user", content: message.message })),
+            ];
+    
             // Make API call to OpenAI
             try {
-                console.log("test 1", (messages[messages.length - 1]).message)
-                console.log(messages)
                 const openaiResponse = await openai.chat.completions.create({
-                    messages: [{ role: "system", content: messages}],
+                    messages: conversation,
                     model: "gpt-3.5-turbo",
                 });
     
-                const aiMessage = openaiResponse.choices[0].message.content; //message.content
-                console.log(aiMessage)
-                console.log("test 2")
+                const aiMessage = openaiResponse.choices[0].message.content;
     
-                connection.invoke('SendMessage', aiMessage)
-                    .then(() => {
-                        setNewMessage('');
-                        console.log("test 3")
-                    })
-                    .catch(error => console.error("Error sending message:", error));
+                // Add the AI's reply to the conversation
+                setMessages((prevMessages) => [...prevMessages, { message: aiMessage, user: "assistant" }]);
+    
+                // connection.invoke('SendMessage', aiMessage)
+                //     .then(() => {
+                //         setNewMessage('');
+                //     })
+                //     .catch(error => console.error("Error sending message:", error));
             } catch (error) {
                 console.error("Error calling OpenAI API:", error);
             }
         } else {
-            console.log("its else")
+            console.log("It's else");
         }
     };
     
@@ -122,6 +125,14 @@ const ChatComponent = () => {
         }
     }, [connection, id, user && user.firstName]);
 
+    useEffect(() => {
+        // Run aiReply when a user sends a message
+        if (messages.length > 0 && messages[messages.length - 1].user === user.firstName) {
+            aiReply();
+            console.log("test")
+        }
+    }, [messages]);
+
     return (
         <div>
             <h1>SignalR Chat</h1>
@@ -156,21 +167,6 @@ const ChatComponent = () => {
                     </MessageList>
                 </ChatContainer>
             </MainContainer>
-            {/* <div>
-                <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <button onClick={sendMessage} disabled={resolved}>Send</button>
-            </div>
-            <div>
-                {userHasEmployeeRole && (
-                    <button onClick={resolveTicket} disabled={resolved}>
-                        Resolve
-                    </button>
-                )}
-            </div> */}
             <div style={{ display: 'flex', padding: '5px', border: '1px solid #ccc', borderRadius: '3px', backgroundColor: '#f5f5f5' }}>
                 <input
                     type="text"
