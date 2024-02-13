@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Box, Typography, TextField, Button, Grid } from "@mui/material";
+import { Box, Typography, TextField, Button, Grid, Avatar } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -498,7 +498,7 @@ function EditUser() {
             >
               {/* Display user's profile photo as circular image */}
               <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                <img
+                <Avatar
                   alt="profilephoto"
                   src={`${
                     userDetailsFormik.values.profilePhotoFile
@@ -506,7 +506,7 @@ function EditUser() {
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "fill",
                   }}
                 />
               </Box>
@@ -544,7 +544,7 @@ function EditUser() {
               >
                 {imageFile ? (
                   <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                    <img
+                    <Avatar
                       alt="profilephoto"
                       src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}
                       style={{
@@ -557,7 +557,7 @@ function EditUser() {
                 ) : (
                   existingImage && (
                     <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                      <img
+                      <Avatar
                         alt="profilephoto"
                         src={`${
                           import.meta.env.VITE_FILE_BASE_URL
