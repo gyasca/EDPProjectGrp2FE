@@ -34,9 +34,7 @@ import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
 
 
-import EditUser from "./pages/User/EditUser";
 
-import CreateReview from "./pages/Reviews/CreateReview";
 import CreateTicket from "./pages/Tickets/CreateTicket";
 import DeleteReview from "./pages/Reviews/DeleteReview";
 import EditReviewPage from "./pages/Reviews/EditReviewPage";
@@ -48,7 +46,6 @@ import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
 
 
-import ViewSpecificUser from "./pages/User/ViewSpecificUser";
 
 import ReviewsPage from "./pages/Reviews/ReviewsPage";
 
@@ -57,7 +54,6 @@ import MyTheme from "./themes/MyTheme";
 
 // WHATEVER U DO DON'T LEAVE THIS OUT!!! DON'T DELETE THIS ROUTE
 import AdminRoutes from "./pages/Admin/AdminRoutes";
-
 
 
 import Chat from './pages/Tickets/Chat';
@@ -406,6 +402,7 @@ function App() {
               <Route path={"/tickets/chat/:id"} element={<Chat />} />
               <Route path={"/tickets/create"} element={<CreateTicket />} />
             </Routes>
+            
           </Container>
         </ThemeProvider>
       </Router>
