@@ -56,7 +56,6 @@ import Home from "./pages/Home";
 
 import ForumRoutes from "./pages/Forum/ForumRoutes";
 import EventReviewAll from "./pages/Reviews/EventReviewAll";
-import CreateReviewPage from "./pages/Reviews/CreateReviewPage"
 
 import ResetPassword from "./pages/ResetPassword";
 import UserRoutes from "./pages/User/UserRoutes";
