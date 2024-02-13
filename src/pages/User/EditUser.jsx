@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Box, Typography, TextField, Button, Grid, Avatar } from "@mui/material";
+import { Box, Typography, TextField, Button, Grid } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -36,8 +36,6 @@ function EditUser() {
   };
 
   const [imageFile, setImageFile] = useState(null);
-  // State to track the number of uploads
-  const [uploadCounter, setUploadCounter] = useState(0);
 
   const onFileChange = (e) => {
     let file = e.target.files[0];
@@ -175,6 +173,9 @@ function EditUser() {
         data.mobileNumber = data.mobileNumber.toString();
         data.email = data.email.trim().toLowerCase();
         data.postalCode = data.postalCode.toString();
+        if (imageFile) {
+          data.profilePhotoFile = imageFile;
+        }
 
         http
           .put(`/user/${userId}`, data)
@@ -253,6 +254,55 @@ function EditUser() {
             userDetailsFormik.touched.email && userDetailsFormik.errors.email
           }
         />
+        {/* <TextField
+          fullWidth
+          margin="dense"
+          autoComplete="off"
+          label="Change Password"
+          name="password"
+          type="password"
+          value={userDetailsFormik.values.password}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={userDetailsFormik.touched.password && Boolean(userDetailsFormik.errors.password)}
+          helperText={userDetailsFormik.touched.password && userDetailsFormik.errors.password}
+        />
+        <TextField
+          fullWidth
+          margin="dense"
+          autoComplete="off"
+          label="Confirm new Password"
+          name="confirmPassword"
+          type="password"
+          value={userDetailsFormik.values.confirmPassword}
+          onChange={userDetailsFormik.handleChange}
+          onBlur={userDetailsFormik.handleBlur}
+          error={
+            userDetailsFormik.touched.confirmPassword &&
+            Boolean(userDetailsFormik.errors.confirmPassword)
+          }
+          helperText={
+            userDetailsFormik.touched.confirmPassword && userDetailsFormik.errors.confirmPassword
+          }
+        /> */}
+
+        {/* <TextField
+          fullWidth
+          id="roleName"
+          name="roleName"
+          label="Role Name"
+          select
+          variant="outlined"
+          value={userDetailsFormik.values.roleName}
+          onChange={userDetailsFormik.handleChange}
+          error={userDetailsFormik.touched.roleName && Boolean(userDetailsFormik.errors.roleName)}
+          helperText={userDetailsFormik.touched.roleName && userDetailsFormik.errors.roleName}
+          sx={{ marginY: "1rem" }}
+        >
+          <MenuItem value="employee-master">Employee (Master)</MenuItem>
+          <MenuItem value="employee-normal">Employee (Normal)</MenuItem>
+          <MenuItem value="customer">Customer</MenuItem>
+        </TextField> */}
 
         <TextField
           fullWidth
@@ -449,7 +499,7 @@ function EditUser() {
             >
               {/* Display user's profile photo as circular image */}
               <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                <Avatar
+                <img
                   alt="profilephoto"
                   src={`${
                     userDetailsFormik.values.profilePhotoFile
@@ -457,7 +507,7 @@ function EditUser() {
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "fill",
+                    objectFit: "cover",
                   }}
                 />
               </Box>
@@ -495,7 +545,7 @@ function EditUser() {
               >
                 {imageFile ? (
                   <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                    <Avatar
+                    <img
                       alt="profilephoto"
                       src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}
                       style={{
@@ -508,7 +558,7 @@ function EditUser() {
                 ) : (
                   existingImage && (
                     <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                      <Avatar
+                      <img
                         alt="profilephoto"
                         src={`${
                           import.meta.env.VITE_FILE_BASE_URL
