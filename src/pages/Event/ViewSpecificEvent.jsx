@@ -118,7 +118,6 @@ function ViewSingleEvent() {
             'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/5fdfa430-Snow-Play-Session-in-Snow-City-Singapore.webp'
         ]);
     }, []);
-    
 
     return (
         <>
@@ -155,38 +154,63 @@ function ViewSingleEvent() {
                             <Grid container spacing={2}>
                                 {/* Left Column: Event Image and Description */}
                                 <Grid item xs={12} md={8}>
+                                     {/* Image */}
                                     <Paper elevation={3} sx={{ p: 2 }}>
-                                        {/* Image */}
-                                        <Paper elevation={3} sx={{ p: 2 }}>
                                         <Carousel
-                                        autoPlay={true}
-                                        animation="slide"
-                                        indicators={true}
-                                        navButtonsAlwaysVisible={true}
-                                        sx={{
-                                            '.carousel .slide': {
-                                            maxHeight: '500px', // Set a max-height or keep it relative
-                                            overflow: 'hidden',
-                                            },
-                                            img: {
-                                            width: '100%', // This will make sure the image fits the container
-                                            objectFit: 'cover', // Adjust as needed to 'contain' or 'cover' based on your preference
-                                            },
-                                        }}
+                                            autoPlay={true}
+                                            animation="slide"
+                                            indicators={true}
+                                            navButtonsAlwaysVisible={true}
+                                            sx={{
+                                                '.carousel': {
+                                                    height: '500px',
+                                                    width: '100%',
+                                                    position: 'relative',
+                                                },
+                                                '.carousel .slide': {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                },
+                                                '.carousel img': {
+                                                    maxWidth: '100%',
+                                                    maxHeight: '100%',
+                                                    objectFit: 'contain',
+                                                },
+                                            }}
                                         >
-                                        {eventImage && eventImage.map((image, i) => (
-                                            <Box key={i} component="img" src={image} alt={`Slide ${i + 1}`} />
-                                        ))}
+                                            {eventImage && eventImage.map((image, i) => (
+                                                <Box
+                                                    key={i}
+                                                    component="img"
+                                                    src={image}
+                                                    alt={`Slide ${i + 1}`}
+                                                    sx={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '100%',
+                                                        objectFit: 'contain',
+                                                    }}
+                                                />
+                                            ))}
                                         </Carousel>
-                                        </Paper>
-                                        {/* Description */}
-                                        <Typography variant="h5" gutterBottom>
-                                            Event Description
-                                        </Typography>
-                                        <Typography variant="body1" sx={{ mb: 2 }}>
-                                            {event?.eventDescription}
-                                        </Typography>
                                     </Paper>
+
+                                    <Box sx={{ marginTop: 2 }}>
+                                        {/* Description */}
+                                        <Paper elevation={3} sx={{ p: 2 }}>
+                                            <Typography variant="h5" gutterBottom>
+                                                Event Description
+                                            </Typography>
+                                            <Typography variant="body1" sx={{ mb: 2 }}>
+                                                {event?.eventDescription}
+                                            </Typography>
+                                        </Paper>
+                                    </Box>
                                 </Grid>
 
                                 {/* Right Column: Add to Cart or Not on Sale */}
