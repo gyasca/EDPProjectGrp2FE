@@ -50,11 +50,12 @@ function ViewEvents() {
     const filterEvents = (events, categories, prices) => {
         const filtered = events.filter(event => {
             const categoryMatch = categories[event.eventCategory] || Object.values(categories).every(v => !v);
-            const priceMatch = (event.eventPrice >= prices[0] && event.eventPrice <= prices[1]);
+            const priceMatch = (event.eventPrice >= prices[0] && (prices[1] === 500 ? event.eventPrice > 500 : event.eventPrice <= prices[1]));
             return categoryMatch && priceMatch;
         });
         setFilteredEvents(filtered);
     };
+    
 
     const renderEventImage = (event) => {
         // This should be the actual URL to the image related to the event
@@ -109,10 +110,11 @@ function ViewEvents() {
                             max={500}
                         />
                         <Typography>
-                            {`$${priceRange[0]} - $${priceRange[1] === 500 ? '500+' : priceRange[1]}`}
+                            {`$${priceRange[0]} - ${priceRange[1] === 500 ? '500+' : `$${priceRange[1]}`}`}
                         </Typography>
                     </Paper>
                 </Grid>
+
 
                 {/* Displaying filtered events */}
                 <Grid item xs={12} md={9}>
