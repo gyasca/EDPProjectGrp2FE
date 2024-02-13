@@ -1,22 +1,45 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Paper, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+// import StarRateRounded from '@mui/icons-material/StarRateRounded';
 
-const EditReviewPage = () => {
+const DeleteReview = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [review, setReview] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchReview = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7261/Reviews/${id}`);
+
+                if (response.status === 200) {
+                    setReview(response.data);
+                } else {
+                    console.error('Failed to fetch review', response.status);
+                }
+            } catch (error) {
+                console.error('Error fetching review', error.message, error.response?.data);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReview();
+    }, [id]);
+
     const handleDeleteReview = async () => {
+        // You can add a check to ensure the user wants to delete the review, similar to the dialog in the existing component
+
         try {
             const response = await axios.delete(`https://localhost:7261/Reviews/${id}`);
 
             if (response.status === 204) {
-                // Review deleted
                 console.log('Review deleted successfully');
-                navigate("/reviews")
-
+                navigate("/reviews");
             } else {
                 console.error('Failed to delete review', response.status);
             }
@@ -24,17 +47,60 @@ const EditReviewPage = () => {
             console.error('Error deleting review', error.message, error.response?.data);
         }
     }
+
+    const handleOpenDeleteDialog = () => {
+        setDeleteDialogOpen(true);
+    }
+
+    const handleCloseDeleteDialog = () => {
+        setDeleteDialogOpen(false);
+    }
+
     return (
-        <div>
-            <h1>Delete Review</h1>
+        <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
+            {loading ? (
+                <Typography variant="h4">Loading...</Typography>
+            ) : review ? (
+                <>
+                    <Typography variant="h4">Delete Review</Typography>
 
-            {/* Link back to the Reviews page */}
-            <Link to="/reviews">Back to Reviews</Link>
+                    {/* Confirmation Dialog for Deleting */}
+                    <Dialog open={isDeleteDialogOpen} onClose={handleCloseDeleteDialog}>
+                        <DialogTitle>Delete Review</DialogTitle>
+                        <DialogContent>
+                            <Typography>Are you sure you want to delete this review?</Typography>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+                            <Button onClick={handleDeleteReview} color="error">
+                                Delete
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
 
-            {/* Form for Editing a Review */}
-            <Button onClick={handleDeleteReview}>Delete</Button>
-        </div>
+                    {/* Button to open the delete confirmation dialog */}
+                    <Button onClick={handleOpenDeleteDialog} color="error">
+                        Delete
+                    </Button>
+
+                    {/* Display the review information */}
+                    <Typography variant="h5">{review.title}</Typography>
+                    <Typography variant="body1">{review.content}</Typography>
+                    <Typography variant="body1">
+                        Rating: {review.rating}
+                    </Typography>
+                    <Typography variant="body1">
+                        Subject: {review.subject}
+                    </Typography>
+                    <Typography variant="body1">
+                        Comment: {review.comment}
+                    </Typography>
+                </>
+            ) : (
+                <Typography variant="h4">Review not found</Typography>
+            )}
+        </Paper>
     );
 };
 
-export default EditReviewPage;
+export default DeleteReview;

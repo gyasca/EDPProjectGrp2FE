@@ -33,10 +33,6 @@ import http from "./http";
 import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
 
-import CreateReviewPage from "./pages/CreateReviewPage";
-import CreateTicket from "./pages/CreateTicket";
-import DeleteReview from "./pages/DeleteReview";
-import EditReviewPage from "./pages/EditReviewPage";
 import EditUser from "./pages/User/EditUser";
 
 import EventRoute from "./pages/Event/EventRoute";
@@ -44,9 +40,6 @@ import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
 
-import ReviewsPage from "./pages/ReviewsPage";
-import TicketPage from "./pages/TicketPage";
-import TicketPageInd from "./pages/TicketPageInd";
 import ViewSpecificUser from "./pages/User/ViewSpecificUser";
 
 import MyTheme from "./themes/MyTheme";
@@ -75,7 +68,6 @@ import Home from "./pages/Home";
 import ForumRoutes from "./pages/Forum/ForumRoutes";
 import EventReviewAll from "./pages/Reviews/EventReviewAll";
 
-import ViewForum from "./pages/Forum/ViewForum";
 import UserRoutes from "./pages/User/UserRoutes";
 import ResetPassword from "./pages/ResetPassword";
 

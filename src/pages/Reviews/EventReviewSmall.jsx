@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Card, CardContent, CardHeader, Paper, Typography, Box, Button } from '@mui/material';
+import React, { useEffect, useState, useContext } from 'react';
+import { Paper, CardHeader, Typography, Button, CardContent, Box } from '@mui/material';
 import StarRateRounded from '@mui/icons-material/StarRateRounded';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import UserContext from "../../contexts/UserContext";
 
-function EventReviewSmall({ eventId }) {
+function EventReviewSmall({ eventId, user }) {
     const [reviews, setReviews] = useState([]);
     const [eventAverageRating, setEventAverageRating] = useState(0);
     const navigate = useNavigate();
+    var { user } = useContext(UserContext);
 
     useEffect(() => {
         async function fetchReviews() {
@@ -45,6 +47,8 @@ function EventReviewSmall({ eventId }) {
         return [...fullStars, halfStar, ...emptyStars];
     }
 
+    const canEditOrDelete = (review) => review.name === user.firstName;
+
     return (
         <Paper elevation={3} sx={{ p: 2, my: 2 }}>
             <CardHeader
@@ -77,7 +81,33 @@ function EventReviewSmall({ eventId }) {
                             {getStarIcons(review.rating)}
                             <Typography variant="h6">{review.rating.toFixed(1)}</Typography>
                             <Typography variant="subtitle1">{review.name}</Typography>
-                            <Typography variant="caption">{new Date(review.datecreated).toLocaleDateString()}</Typography>
+                            <Typography variant="caption">{new Date(review.createdAt).toLocaleDateString()}</Typography>
+                            {canEditOrDelete(review) && (
+                                <React.Fragment>
+                                    <Button
+                                        variant="outlined"
+                                        color="primary"
+                                        onClick={() => {
+                                            // Handle edit logic
+                                            console.log("Edit review", review.id);
+                                            navigate("/reviews/edit/"+review.id)
+                                        }}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        color="secondary"
+                                        onClick={() => {
+                                            // Handle delete logic
+                                            console.log("Delete review", review.id);
+                                            navigate("/reviews/delete/"+review.id)
+                                        }}
+                                    >
+                                        Delete
+                                    </Button>
+                                </React.Fragment>
+                            )}
                         </Box>
                         <Typography variant="subtitle1">{review.subject}</Typography>
                         <Typography variant="body2">{review.comment}</Typography>

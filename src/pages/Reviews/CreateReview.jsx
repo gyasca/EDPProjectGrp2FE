@@ -1,5 +1,5 @@
 // src/pages/CreateReviewForm.jsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Container from '@mui/material/Container';
@@ -14,16 +14,19 @@ import Box from '@mui/material/Box';
 import CardTitle from "../../components/CardTitle";
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import UserContext from "../../contexts/UserContext";
 
 const CreateReview = ({ onSubmit, eventId }) => {
     const navigate = useNavigate();
+    var { user } = useContext(UserContext);
     const formik = useFormik({
         initialValues: {
-            name: 'name',
+            name: user.firstName,
             rating: '',
             subject: '',
             comment: '',
             eventId: '',
+            createdAt: new Date().toISOString(),
         },
         validationSchema: Yup.object({
             name: Yup.string().required('Name is required'),
