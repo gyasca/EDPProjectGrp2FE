@@ -31,13 +31,15 @@ const TicketPage = () => {
             },
         },
         { field: 'status', headerName: 'Status', flex: 1 },
+        { field: 'createdBy', headerName: 'Created By', flex: 0.5 },
+        { field: 'acceptedBy', headerName: 'Accepted By', flex: 0.5 },
         {
             field: 'actions', type: 'actions', flex: 1, getActions: (params) => [
                 <GridActionsCellItem
                     icon={<Visibility />}
                     label="View Ticket Details"
                     onClick={() => {
-                        navigate("/staff/tickets/" + params.row.id)
+                        navigate("/admin/tickets/" + params.row.id)
                     }}
                 />,
             ]
@@ -46,7 +48,7 @@ const TicketPage = () => {
 
     return (
         <Container>
-            <div><h1>Tickets Pending</h1></div>
+            <div><h1>Customer Support Tickets</h1></div>
 
             {/* <Link to="/tickets/create">Create Ticket</Link> */}
 

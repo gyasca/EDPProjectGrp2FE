@@ -11,7 +11,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import CardTitle from "../components/CardTitle";
+import CardTitle from "../../components/CardTitle";
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
