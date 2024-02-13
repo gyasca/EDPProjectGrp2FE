@@ -3,7 +3,7 @@ import { Box, Typography, TextField, Button, Grid } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import http from "../http";
+import http from "../../http";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -13,18 +13,57 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import UserContext from "../contexts/UserContext";
+import UserContext from "../../contexts/UserContext";
+import AdminPageTitle from "../../components/AdminPageTitle";
 
 function EditUser() {
   const navigate = useNavigate();
   const { userId } = useParams();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const { contextUser, setContextUser } = useContext(UserContext);
+  const [user, setLocalUser] = useState(null);
+  const [existingImage, setExistingImage] = useState(null);
+  const { setUser } = useContext(UserContext);
+
+  // logout after password change
+  const logout = () => {
+    localStorage.clear();
+    window.location = "/";
+  };
 
   // Configurations for userDetails edit form.
   const handleChangeDate = (dateTime) => {
     userDetailsFormik.setFieldValue("dateOfBirth", dateTime); // Update the "dateOfBirth" field directly with the selected dateTime
+  };
+
+  const [imageFile, setImageFile] = useState(null);
+  // State to track the number of uploads
+  const [uploadCounter, setUploadCounter] = useState(0);
+
+  const onFileChange = (e) => {
+    let file = e.target.files[0];
+    if (file) {
+      if (file.size > 1024 * 1024) {
+        toast.error("Maximum file size is 1MB");
+        return;
+      }
+
+      let formData = new FormData();
+      formData.append("file", file);
+      http
+        .post("/file/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+          setImageFile(res.data.filename);
+          setUploadCounter((prevCounter) => prevCounter + 1);
+        })
+        .catch(function (error) {
+          console.log(error.response);
+        });
+    }
   };
 
   useEffect(() => {
@@ -33,7 +72,7 @@ function EditUser() {
     http
       .get(`/user/${userId}`)
       .then((response) => {
-        setUser(response.data);
+        setLocalUser(response.data);
         console.log(response.data);
       })
       .catch((error) => {
@@ -71,7 +110,7 @@ function EditUser() {
           .put(`/user/password/${userId}`, data)
           .then((res) => {
             console.log(res.data);
-            navigate(`/viewspecificuser/${userId}`);
+            logout();
           })
           .catch(function (err) {
             toast.error(`${err.response.data.message}`);
@@ -100,6 +139,7 @@ function EditUser() {
           user?.newsletterSubscriptionStatus || false,
         twoFactorAuthStatus: user?.twoFactorAuthStatus || false,
         verificationStatus: user?.verificationStatus || false,
+        googleAccountType: user?.googleAccountType || false,
         dateOfBirth: dayjs(user?.dateOfBirth) || dayjs(new Date()),
       },
       enableReinitialize: true, // This option allows the form to reinitialize when props (in this case, initialValues) change
@@ -140,8 +180,8 @@ function EditUser() {
           .put(`/user/${userId}`, data)
           .then((res) => {
             console.log(res.data);
-            // setContextUser(res.data);
-            navigate(`/viewspecificuser/${userId}`);
+            setUser(res.data);
+            navigate(`/user/viewspecificuser/${userId}`);
           })
           .catch(function (err) {
             toast.error(`${err.response.data.message}`);
@@ -158,13 +198,18 @@ function EditUser() {
   return (
     <Box
       sx={{
-        marginTop: 8,
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "2rem",
+        gap: "0rem",
         alignItems: "start", // Align items at the top
       }}
     >
+      <AdminPageTitle
+        title="Edit User Account"
+        subtitle={`Update Details Or Password (Non-Google Authenticated users only)`}
+        backbutton
+      />
+      <Typography></Typography>
       {/* Edit User Details Form */}
       <Box
         component="form"
@@ -172,24 +217,6 @@ function EditUser() {
         onSubmit={userDetailsFormik.handleSubmit}
       >
         <Typography variant="h6">Edit User Details</Typography>
-
-        {/* <input
-          type="file"
-          onChange={(event) =>
-            formik.setFieldValue(
-              "profilePhotoFile",
-              event.currentTarget.files[0]
-            )
-          }
-          onBlur={formik.handleBlur}
-          error={
-            formik.touched.profilePhotoFile &&
-            Boolean(formik.errors.profilePhotoFile)
-          }
-          helperText={
-            formik.touched.profilePhotoFile && formik.errors.profilePhotoFile
-          }
-        /> */}
 
         <TextField
           fullWidth
@@ -456,57 +483,161 @@ function EditUser() {
           </LocalizationProvider>
         </Grid>
 
-        <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
+        {/* Conditional rendering for image upload button and profile photo based on Google logged in */}
+        {userDetailsFormik.values.googleAccountType ? (
+          <Grid item xs={12} lg={6}>
+            <Box
+              sx={{
+                height: "200px",
+                width: "200px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
+              {/* Display user's profile photo as circular image */}
+              <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
+                <img
+                  alt="profilephoto"
+                  src={`${
+                    userDetailsFormik.values.profilePhotoFile
+                  }`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+            </Box>
+          </Grid>
+        ) : (
+          <>
+            {/* Render image upload button */}
+            <Grid item xs={12} lg={6}>
+              <Box sx={{ textAlign: "center", mt: 2 }}>
+                <Button variant="contained" component="label">
+                  Upload Image
+                  <input
+                    hidden
+                    accept="image/*"
+                    multiple
+                    type="file"
+                    onChange={onFileChange}
+                  />
+                </Button>
+                <ToastContainer />
+              </Box>
+            </Grid>
+            {/* Display uploaded image or existing image */}
+            <Grid item xs={12} lg={6}>
+              <Box
+                sx={{
+                  height: "200px",
+                  width: "200px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  textAlign: "center",
+                  mt: 2,
+                }}
+              >
+                {imageFile ? (
+                  <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
+                    <img
+                      alt="profilephoto"
+                      src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  existingImage && (
+                    <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
+                      <img
+                        alt="profilephoto"
+                        src={`${
+                          import.meta.env.VITE_FILE_BASE_URL
+                        }${existingImage}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Box>
+                  )
+                )}
+              </Box>
+            </Grid>
+          </>
+        )}
+
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{ mt: 2, mb: 5 }}
+          type="submit"
+        >
           Save User Details
         </Button>
       </Box>
 
-      {/* Change Password Form */}
-      <Box
-        component="form"
-        sx={{ maxWidth: "500px" }}
-        onSubmit={passwordFormik.handleSubmit}
-      >
-        <Typography variant="h6">Change Password</Typography>
-        <TextField
-          fullWidth
-          margin="dense"
-          label="New Password"
-          name="password"
-          type="password"
-          value={passwordFormik.values.password}
-          onChange={passwordFormik.handleChange}
-          onBlur={passwordFormik.handleBlur}
-          error={
-            passwordFormik.touched.password &&
-            Boolean(passwordFormik.errors.password)
-          }
-          helperText={
-            passwordFormik.touched.password && passwordFormik.errors.password
-          }
-        />
-        <TextField
-          fullWidth
-          margin="dense"
-          label="Confirm New Password"
-          name="confirmPassword"
-          type="password"
-          value={passwordFormik.values.confirmPassword}
-          onChange={passwordFormik.handleChange}
-          onBlur={passwordFormik.handleBlur}
-          error={
-            passwordFormik.touched.confirmPassword &&
-            Boolean(passwordFormik.errors.confirmPassword)
-          }
-          helperText={
-            passwordFormik.touched.confirmPassword &&
-            passwordFormik.errors.confirmPassword
-          }
-        />
-        <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
-          Change Password
-        </Button>
-      </Box>
+      {/* Render password change form only if googleAccountType is false */}
+      {!userDetailsFormik.values.googleAccountType && (
+        <>
+          {/* Change Password Form */}
+          <Box
+            component="form"
+            sx={{ maxWidth: "500px" }}
+            onSubmit={passwordFormik.handleSubmit}
+          >
+            <Typography variant="h6">Change Password</Typography>
+            <TextField
+              fullWidth
+              margin="dense"
+              label="New Password"
+              name="password"
+              type="password"
+              value={passwordFormik.values.password}
+              onChange={passwordFormik.handleChange}
+              onBlur={passwordFormik.handleBlur}
+              error={
+                passwordFormik.touched.password &&
+                Boolean(passwordFormik.errors.password)
+              }
+              helperText={
+                passwordFormik.touched.password &&
+                passwordFormik.errors.password
+              }
+            />
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Confirm New Password"
+              name="confirmPassword"
+              type="password"
+              value={passwordFormik.values.confirmPassword}
+              onChange={passwordFormik.handleChange}
+              onBlur={passwordFormik.handleBlur}
+              error={
+                passwordFormik.touched.confirmPassword &&
+                Boolean(passwordFormik.errors.confirmPassword)
+              }
+              helperText={
+                passwordFormik.touched.confirmPassword &&
+                passwordFormik.errors.confirmPassword
+              }
+            />
+            <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
+              Change Password
+            </Button>
+          </Box>
+        </>
+      )}
 
       <ToastContainer />
     </Box>

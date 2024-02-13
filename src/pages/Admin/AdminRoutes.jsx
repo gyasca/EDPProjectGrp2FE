@@ -67,7 +67,7 @@ function AdminRoutes() {
           {/* User paths */}
           <Route path="/users/allusers" element={<ViewUsers />} />
           <Route path="/users/create" element={<CreateUserAdmin />} />
-          <Route path="/users/edit/:userId" element={<EditUserAdmin />} />
+          <Route path="/users/edit/:userId/editor/:adminId" element={<EditUserAdmin />} />
 
           {/* Ticket paths */ }
           <Route path={"/tickets"} element={<TicketPage />} />
