@@ -11,7 +11,8 @@ import {
     MessageList,
     Message,
     MessageInput,
-    Avatar
+    Avatar,
+    TypingIndicator
 } from "@chatscope/chat-ui-kit-react";
 
 const ChatComponent = () => {
@@ -21,18 +22,15 @@ const ChatComponent = () => {
     const [newMessage, setNewMessage] = useState('');
     const [resolved, setResolved] = useState(false);
     const [ticket, setTicket] = useState(null);
+    const [typingIndicator, setTypingIndicator] = useState(null);
+    const [otherUserTyping, setOtherUserTyping] = useState(false);
     var { user } = useContext(UserContext);
-
-    const openai = new OpenAI({apiKey: import.meta.env.VITE_OPENAI, dangerouslyAllowBrowser: true});
 
     // If user is null or undefined, user will be assigned the default object
     const defaultUser = { id: 0, firstName: 'Guest', roleName: 'Guest' };
     user = user ?? defaultUser;
 
-    // Now you can use updatedUser throughout your code
-    // console.log(user);
-
-    const userHasEmployeeRole = user && user.roleName === "employee-master";
+    const openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI, dangerouslyAllowBrowser: true });
 
     const resolveTicket = () => {
         if (connection && user && user.firstName.trim() !== '') {
@@ -48,6 +46,7 @@ const ChatComponent = () => {
             connection.invoke('SendMessage', newMessage)
                 .then(() => {
                     setNewMessage('');
+                    connection.invoke('StopTyping', user.firstName);
                 })
                 .catch(error => console.error("Error sending message:", error));
         }
@@ -60,19 +59,19 @@ const ChatComponent = () => {
                 { role: "system", content: "You are a customer service representative for UPlay, a Singaporean activity planning website" },
                 ...messages.map((message) => ({ role: "user", content: message.message })),
             ];
-    
+
             // Make API call to OpenAI
             try {
                 const openaiResponse = await openai.chat.completions.create({
                     messages: conversation,
                     model: "gpt-3.5-turbo",
                 });
-    
+
                 const aiMessage = openaiResponse.choices[0].message.content;
-    
+
                 // Add the AI's reply to the conversation
                 setMessages((prevMessages) => [...prevMessages, { message: aiMessage, user: "assistant" }]);
-    
+
                 // connection.invoke('SendMessage', aiMessage)
                 //     .then(() => {
                 //         setNewMessage('');
@@ -85,8 +84,8 @@ const ChatComponent = () => {
             console.log("It's else");
         }
     };
-    
-    useEffect(() => {
+
+    useEffect(() => { //get current ticket information
         axios.get(`https://localhost:7261/Tickets/${id}`)
             .then(response => {
                 setTicket(response.data);
@@ -94,7 +93,7 @@ const ChatComponent = () => {
             .catch(error => console.error('Error fetching ticket:', error));
     }, [id]);
 
-    useEffect(() => {
+    useEffect(() => { //create signalr connection
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl('https://localhost:7261/chat')
             .withAutomaticReconnect()
@@ -103,7 +102,7 @@ const ChatComponent = () => {
         setConnection(newConnection);
     }, []);
 
-    useEffect(() => {
+    useEffect(() => { //check for signals
         if (connection) {
             connection
                 .start()
@@ -122,16 +121,45 @@ const ChatComponent = () => {
             connection.on('UsersInRoom', (users) => {
                 console.log('Users in the room:', users);
             });
+
+            connection.on('ResolveTicket', (user) => {
+                console.log(user, "has resolved the ticket")
+                setResolved(true)
+            });
+
+            // connection.on('SetTyping', (user) => {
+            //     console.log(user, "is typing")
+            //     setIsTyping(true)
+            // });
+
+            connection.on('OtherUserTyping', (isTyping, userName) => {
+                console.log(isTyping, userName, "hello there");
+                // Update the typing indicator when other user is typing
+                if (isTyping) {
+                    setTypingIndicator(<TypingIndicator content={`${userName} is typing`} />);
+                } else {
+                    // Remove the typing indicator if other user is not typing
+                    setTypingIndicator(null);
+                }
+            });
         }
     }, [connection, id, user && user.firstName]);
 
     useEffect(() => {
-        // Run aiReply when a user sends a message
+        // Run aiReply when a user sends a message only if ticket response type is ai
         if (messages.length > 0 && messages[messages.length - 1].user === user.firstName) {
-            aiReply();
-            console.log("test")
+            console.log("yee")
+            // Check if the ticket's responseType is 'ai'
+            if (ticket && ticket.responseType === 'ai') {
+                setTypingIndicator(<TypingIndicator content="Uplay is typing" />);
+                aiReply().finally(() => {
+                    // Remove typing indicator once aiReply finishes
+                    setTypingIndicator(null);
+                });
+                console.log("test", ticket, ticket.responseType);
+            } else { console.log("haw", ticket, ticket.responseType) }
         }
-    }, [messages]);
+    }, [messages, user.firstName, ticket]);
 
     return (
         <div>
@@ -141,10 +169,10 @@ const ChatComponent = () => {
             </div>
             <MainContainer>
                 <ChatContainer>
-                    <MessageList>
+                    <MessageList typingIndicator={typingIndicator}>
                         <Message
                             model={{
-                                message: `A customer support staff will be with you shortly`,
+                                message: `Customer support will be with you shortly`,
                                 sentTime: "just now",
                                 sender: "System",
                                 direction: user.roleName === "employee-master" ? "outgoing" : "incoming"
@@ -171,14 +199,45 @@ const ChatComponent = () => {
                 <input
                     type="text"
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={
+                        (e) => {
+                            setNewMessage(e.target.value)
+                            if (!otherUserTyping) {
+                                connection.invoke('StartTyping', user.firstName)
+                            }
+                        }
+                    }
                     style={{ flexGrow: 1, padding: '5px', border: 'none', borderRadius: '3px' }}
                 />
-                <button onClick={sendMessage} disabled={resolved} style={{ padding: '5px 10px', marginLeft: '5px', border: 'none', borderRadius: '3px', backgroundColor: '#007bff', color: '#fff' }}>
+                <button
+                    onClick={sendMessage}
+                    disabled={resolved}
+                    style={{
+                        padding: '5px 10px',
+                        marginLeft: '5px',
+                        border: 'none',
+                        borderRadius: '3px',
+                        backgroundColor: resolved ? '#ccc' : '#007bff',
+                        color: '#fff',
+                        cursor: resolved ? 'not-allowed' : 'pointer',
+                    }}
+                >
                     Send
                 </button>
-                <button onClick={aiReply} disabled={resolved} style={{ padding: '5px 10px', marginLeft: '5px', border: 'none', borderRadius: '3px', backgroundColor: '#007bff', color: '#fff' }}>
-                    Reply
+                <button
+                    onClick={resolveTicket}
+                    disabled={resolved}
+                    style={{
+                        padding: '5px 10px',
+                        marginLeft: '5px',
+                        border: 'none',
+                        borderRadius: '3px',
+                        backgroundColor: resolved ? '#ccc' : '#007bff',
+                        color: '#fff',
+                        cursor: resolved ? 'not-allowed' : 'pointer',
+                    }}
+                >
+                    Resolve
                 </button>
             </div>
         </div>

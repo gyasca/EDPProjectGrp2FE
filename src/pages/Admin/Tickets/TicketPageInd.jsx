@@ -32,6 +32,7 @@ const TicketPageInd = () => {
                 acceptedBy: user.id,
                 subject: ticketDetails.subject,
                 description: ticketDetails.description,
+                responseType: ticketDetails.responseType
             };
 
             // Send the PUT request using Axios
