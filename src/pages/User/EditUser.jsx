@@ -71,6 +71,7 @@ function EditUser() {
       .get(`/user/${userId}`)
       .then((response) => {
         setLocalUser(response.data);
+        setExistingImage(response.data.profilePhotoFile);
         console.log(response.data);
       })
       .catch((error) => {
