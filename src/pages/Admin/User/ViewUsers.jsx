@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useTheme } from "@mui/material/styles";
 import {
   Container,
@@ -20,20 +20,44 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Link, useNavigate } from "react-router-dom";
 import AdminPageTitle from "../../../components/AdminPageTitle";
 import { grey } from "@mui/material/colors";
+import UserContext from "../../../contexts/UserContext";
 
 const ViewUsers = () => {
   const [users, setUsers] = useState([]);
   const [userId, setUserId] = useState(null); // Define userId state
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
 
   // Inside your functional component
   const theme = useTheme();
 
   const [open, setOpen] = useState(false);
+  const logout = () => {
+    localStorage.clear();
+    window.location = "/";
+  };
+  const handleDeleteUser = (userId) => {
+    // Make a request to delete the user by ID
+    http
+      .delete(`/user/${userId}`)
+      .then((response) => {
+        // Update the users list after deletion
+        setUsers(users.filter((user) => user.id !== userId));
+        setUser(null);
+        logout();
+        navigate("/admin/users/allusers");
+        handleClose(); // Close the dialog after successful deletion
+      })
+      .catch((error) => {
+        console.error("Error deleting user:", error);
+      });
+  };
+
   const handleOpen = (userId) => {
     setUserId(userId); // Set userId when opening the dialog
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -66,20 +90,22 @@ const ViewUsers = () => {
             icon={<VisibilityIcon />}
             label="View User"
             onClick={() => {
-              navigate("/viewspecificuser/" + params.row.id);
+              navigate("/user/viewspecificuser/" + params.id);
             }}
           />
           <GridActionsCellItem
             icon={<EditIcon />}
             label="Edit User"
             onClick={() => {
-              navigate("/admin/users/edit/" + params.id);
+              navigate(
+                "/admin/users/edit/" + params.id + "/editor/" + user?.id
+              );
             }}
           />
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete User"
-            onClick={() => handleOpen(params.row.id)}
+            onClick={() => handleOpen(params.id)}
           />
         </>
       ),
@@ -103,19 +129,6 @@ const ViewUsers = () => {
       width: 150,
     },
   ];
-
-  const handleDeleteUser = (userId) => {
-    // Make a request to delete the user by ID
-    http
-      .delete(`/user/${userId}`)
-      .then((response) => {
-        // Update the users list after deletion
-        setUsers(users.filter((user) => user.id !== userId));
-      })
-      .catch((error) => {
-        console.error("Error deleting user:", error);
-      });
-  };
 
   return (
     <Container
@@ -149,7 +162,11 @@ const ViewUsers = () => {
           <Button variant="contained" color="inherit" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="contained" color="error" onClick={handleDeleteUser}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => handleDeleteUser(userId)}
+          >
             Delete
           </Button>
         </DialogActions>
