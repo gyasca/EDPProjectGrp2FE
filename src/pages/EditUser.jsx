@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import UserContext from "../contexts/UserContext";
+import AdminPageTitle from "../components/AdminPageTitle";
 
 function EditUser() {
   const navigate = useNavigate();
@@ -158,13 +159,14 @@ function EditUser() {
   return (
     <Box
       sx={{
-        marginTop: 8,
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: "2rem",
+        gap: "0rem",
         alignItems: "start", // Align items at the top
       }}
     >
+      <AdminPageTitle title="Edit User" subtitle={`Update Details Or Password`} backbutton />
+      <Typography></Typography>
       {/* Edit User Details Form */}
       <Box
         component="form"
