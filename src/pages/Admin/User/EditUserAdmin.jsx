@@ -544,63 +544,41 @@ function EditUser() {
                 )}
               </Grid>
               <Grid item xs={12} lg={6}>
-                <Box
-                  sx={{
-                    height: "200px",
-                    width: "200px",
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    textAlign: "center",
-                    mt: 2,
-                  }}
-                >
-                  {/* Conditionally render user's profile photo based on googleAccountType */}
-                  {user?.googleAccountType ? (
-                    // If user has a google account, display their google image
-                    <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                      <Avatar
-                        alt="profilephoto"
-                        src={user?.profilePhotoFile} // Assuming user's google image URL is stored in profilePhotoFile
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "fill",
-                        }}
-                      />
-                    </Box>
-                  ) : // If not, display their image normally
-                  imageFile ? ( // Check if imageFile is set
-                    <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
+                {user.googleAccountType ? (
+                  <Avatar
+                    alt="profilephoto"
+                    src={user.profilePhotoFile}
+                    sx={{ width: 200, height: 200, margin: "0 auto 16px auto" }}
+                  />
+                ) : (
+                  <>
+                    {imageFile ? (
                       <Avatar
                         alt="profilephoto"
                         src={`${
                           import.meta.env.VITE_FILE_BASE_URL
                         }${imageFile}`}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "fill",
+                        sx={{
+                          width: 200,
+                          height: 200,
+                          margin: "0 auto 16px auto",
                         }}
                       />
-                    </Box>
-                  ) : (
-                    existingImage && ( // Fall back to existingImage if imageFile is not set
-                      <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                        <Avatar
-                          alt="profilephoto"
-                          src={`${
-                            import.meta.env.VITE_FILE_BASE_URL
-                          }${existingImage}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "fill",
-                          }}
-                        />
-                      </Box>
-                    )
-                  )}
-                </Box>
+                    ) : (
+                      <Avatar
+                        alt="profilephoto"
+                        src={`${
+                          import.meta.env.VITE_FILE_BASE_URL
+                        }${existingImage}`}
+                        sx={{
+                          width: 200,
+                          height: 200,
+                          margin: "0 auto 16px auto",
+                        }}
+                      />
+                    )}
+                  </>
+                )}
               </Grid>
             </Grid>
 
@@ -627,7 +605,12 @@ function EditUser() {
           />
         </LocalizationProvider> */}
 
-            <Button fullWidth variant="contained" sx={{mb: 5, mt: 2}} type="submit">
+            <Button
+              fullWidth
+              variant="contained"
+              sx={{ mb: 5, mt: 2 }}
+              type="submit"
+            >
               Save User Details
             </Button>
           </Box>
