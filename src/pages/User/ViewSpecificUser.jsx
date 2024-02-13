@@ -6,7 +6,7 @@ import {
   Paper,
   Tab,
   Tabs,
-  Typography
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -23,7 +23,6 @@ const ViewUser = () => {
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-
 
   useEffect(() => {
     http
@@ -42,44 +41,12 @@ const ViewUser = () => {
 
   return (
     <Box>
-      <AdminPageTitle title="User Details" subtitle={`View profile information`} backbutton />
+      <AdminPageTitle
+        title="My Profile"
+        subtitle={`View profile information`}
+        backbutton
+      />
       <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ padding: 3, textAlign: "center" }}>
-            {user.googleAccountType ? (
-              <Avatar
-                alt="profilephoto"
-                src={user.profilePhotoFile}
-                sx={{ width: 200, height: 200, margin: "0 auto 16px auto" }}
-              />
-            ) : (
-              <Avatar
-                alt="profilephoto"
-                src={`${import.meta.env.VITE_FILE_BASE_URL}${
-                  user.profilePhotoFile
-                }`}
-                sx={{ width: 200, height: 200, margin: "0 auto 16px auto" }}
-              />
-            )}
-            <Typography variant="h6" gutterBottom>
-              {user.firstName} {user.lastName}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {user.email}
-            </Typography>
-            <Box sx={{ textAlign: "center", mt: 2 }}>
-              <Button
-                variant="contained"
-                component={Link}
-                to={`/user/edituser/${userId}`}
-                sx={{ width: "100%" }}
-              >
-                Edit Profile
-              </Button>
-            </Box>
-          </Paper>
-        </Grid>
-
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ padding: 2 }}>
             <Tabs
@@ -105,7 +72,9 @@ const ViewUser = () => {
                     <Typography variant="body1" gutterBottom>
                       <InfoBox
                         title="Verification Status:"
-                        value={user.verificationStatus ? "Verified" : "Not Verified"}
+                        value={
+                          user.verificationStatus ? "Verified" : "Not Verified"
+                        }
                         boolean={user.verificationStatus}
                       />
                     </Typography>
@@ -114,7 +83,11 @@ const ViewUser = () => {
                     <Typography variant="body1" gutterBottom>
                       <InfoBox
                         title="Authenticated with Google"
-                        value={user.googleAccountType ? "Google Verified" : "Not Google Verified"}
+                        value={
+                          user.googleAccountType
+                            ? "Google Verified"
+                            : "Not Google Verified"
+                        }
                         boolean={user.googleAccountType}
                       />
                     </Typography>
@@ -218,6 +191,43 @@ const ViewUser = () => {
           {activeTab === "4" && (
             <Typography variant="h6">Display Wishlist Here</Typography>
           )}
+        </Grid>
+
+        {/* User profile pic and email */}
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ padding: 3, textAlign: "center" }}>
+            {user.googleAccountType ? (
+              <Avatar
+                alt="profilephoto"
+                src={user.profilePhotoFile}
+                sx={{ width: 200, height: 200, margin: "0 auto 16px auto" }}
+              />
+            ) : (
+              <Avatar
+                alt="profilephoto"
+                src={`${import.meta.env.VITE_FILE_BASE_URL}${
+                  user.profilePhotoFile
+                }`}
+                sx={{ width: 200, height: 200, margin: "0 auto 16px auto" }}
+              />
+            )}
+            <Typography variant="h6" gutterBottom>
+              {user.firstName} {user.lastName}
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              {user.email}
+            </Typography>
+            <Box sx={{ textAlign: "center", mt: 2 }}>
+              <Button
+                variant="contained"
+                component={Link}
+                to={`/user/edituser/${userId}`}
+                sx={{ width: "100%" }}
+              >
+                Edit Profile
+              </Button>
+            </Box>
+          </Paper>
         </Grid>
       </Grid>
     </Box>
