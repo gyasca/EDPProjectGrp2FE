@@ -1,0 +1,4 @@
+Note: Files that are categorized in folders are protected (User, ForumPosts)
+
+Note to teammembers: You can implement this file structure for admin/user authorization
+as well.

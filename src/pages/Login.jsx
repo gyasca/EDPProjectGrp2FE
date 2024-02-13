@@ -38,6 +38,7 @@ function Login() {
       newsletterSubscriptionStatus: false,
       twoFactorAuthStatus: false,
       verificationStatus: userObject.email_verified,
+      googleAccountType: true,
       dateOfBirth: "2024-01-10T16:31:11.578Z",
     };
 

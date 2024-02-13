@@ -75,6 +75,7 @@ function Register() {
       newsletterSubscriptionStatus: false,
       twoFactorAuthStatus: false,
       verificationStatus: false,
+      googleAccountType: false,
       //   field for edit
       //   dateOfBirth: dayjs(user.dateOfBirth),
       dateOfBirth: dayjs(),
@@ -144,6 +145,7 @@ function Register() {
       data.newsletterSubscriptionStatus = data.newsletterSubscriptionStatus;
       data.twoFactorAuthStatus = data.twoFactorAuthStatus;
       data.verificationStatus = data.verificationStatus;
+      data.googleAccountType = data.googleAccountType;
       //   if (imageFile) {
       //     data.imageFile = imageFile;
 

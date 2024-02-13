@@ -40,6 +40,7 @@ function Register() {
       newsletterSubscriptionStatus: false,
       twoFactorAuthStatus: false,
       verificationStatus: userObject.email_verified,
+      googleAccountType: true,
       dateOfBirth: "2024-01-10T16:31:11.578Z",
     };
 
@@ -121,6 +122,7 @@ function Register() {
       newsletterSubscriptionStatus: false,
       twoFactorAuthStatus: false,
       verificationStatus: false,
+      googleAccountType: false,
       dateOfBirth: "2024-01-10T16:31:11.578Z",
       confirmPassword: "",
     },
@@ -178,6 +180,7 @@ function Register() {
       data.newsletterSubscriptionStatus = data.newsletterSubscriptionStatus;
       data.twoFactorAuthStatus = data.twoFactorAuthStatus;
       data.verificationStatus = data.verificationStatus;
+      data.googleAccountType = data.googleAccountType;
       data.dateOfBirth = data.dateOfBirth;
 
       http

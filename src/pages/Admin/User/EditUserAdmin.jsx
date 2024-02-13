@@ -6,6 +6,7 @@ import {
   MenuItem,
   TextField,
   Typography,
+  Avatar,
 } from "@mui/material";
 import { useFormik } from "formik";
 import React, { useContext, useEffect, useState } from "react";
@@ -25,10 +26,8 @@ import UserContext from "../../../contexts/UserContext";
 function EditUser() {
   const navigate = useNavigate();
   const { userId, adminId } = useParams();
-  const [loading, setLoading] = useState(false);
   const [user, setLocalUser] = useState(null);
   const { setUser } = useContext(UserContext);
-  const [changed, setChanged] = useState(false);
   const [existingImage, setExistingImage] = useState(null);
   // more variable declarations below (config for user details form)
 
@@ -142,6 +141,7 @@ function EditUser() {
           user?.newsletterSubscriptionStatus || false,
         twoFactorAuthStatus: user?.twoFactorAuthStatus || false,
         verificationStatus: user?.verificationStatus || false,
+        googleAccountType: user?.googleAccountType || false,
         dateOfBirth: dayjs(user?.dateOfBirth) || dayjs(new Date()),
       },
       enableReinitialize: true, // This option allows the form to reinitialize when props (in this case, initialValues) change
@@ -528,19 +528,22 @@ function EditUser() {
               </Grid>
 
               <Grid item xs={12} lg={6}>
-                <Box sx={{ textAlign: "center", mt: 2 }}>
-                  <Button variant="contained" component="label">
-                    Upload Image
-                    <input
-                      hidden
-                      accept="image/*"
-                      multiple
-                      type="file"
-                      onChange={onFileChange}
-                    />
-                  </Button>
-                  <ToastContainer />
-                </Box>
+                {/* Conditionally render upload image button */}
+                {!user?.googleAccountType && (
+                  <Box sx={{ textAlign: "center", mt: 2 }}>
+                    <Button variant="contained" component="label">
+                      Upload Image
+                      <input
+                        hidden
+                        accept="image/*"
+                        multiple
+                        type="file"
+                        onChange={onFileChange}
+                      />
+                    </Button>
+                    <ToastContainer />
+                  </Box>
+                )}
               </Grid>
               <Grid item xs={12} lg={6}>
                 <Box
@@ -553,9 +556,24 @@ function EditUser() {
                     mt: 2,
                   }}
                 >
-                  {imageFile ? ( // Check if imageFile is set
+                  {/* Conditionally render user's profile photo based on googleAccountType */}
+                  {user?.googleAccountType ? (
+                    // If user has a google account, display their google image
                     <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                      <img
+                      <Avatar
+                        alt="profilephoto"
+                        src={user?.profilePhotoFile} // Assuming user's google image URL is stored in profilePhotoFile
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "fill",
+                        }}
+                      />
+                    </Box>
+                  ) : // If not, display their image normally
+                  imageFile ? ( // Check if imageFile is set
+                    <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
+                      <Avatar
                         alt="profilephoto"
                         src={`${
                           import.meta.env.VITE_FILE_BASE_URL
@@ -563,14 +581,14 @@ function EditUser() {
                         style={{
                           width: "100%",
                           height: "100%",
-                          objectFit: "cover",
+                          objectFit: "fill",
                         }}
                       />
                     </Box>
                   ) : (
                     existingImage && ( // Fall back to existingImage if imageFile is not set
                       <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                        <img
+                        <Avatar
                           alt="profilephoto"
                           src={`${
                             import.meta.env.VITE_FILE_BASE_URL
@@ -578,7 +596,7 @@ function EditUser() {
                           style={{
                             width: "100%",
                             height: "100%",
-                            objectFit: "cover",
+                            objectFit: "fill",
                           }}
                         />
                       </Box>
@@ -611,75 +629,78 @@ function EditUser() {
           />
         </LocalizationProvider> */}
 
-            <Button fullWidth variant="contained" sx={{}} type="submit">
+            <Button fullWidth variant="contained" sx={{mb: 5, mt: 2}} type="submit">
               Save User Details
             </Button>
           </Box>
         </Grid>
+
         <Grid item xs={12} lg={6}>
           {/* Content for the second half of the grid */}
           {/* Change Password Form */}
-          <Box
-            component="form"
-            sx={{ maxWidth: "500px" }}
-            onSubmit={passwordFormik.handleSubmit}
-          >
-            <Typography variant="h5">Change Password</Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} lg={12}>
-                {/* Content for the first half of the grid */}
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  label="New Password"
-                  name="password"
-                  type="password"
-                  value={passwordFormik.values.password}
-                  onChange={passwordFormik.handleChange}
-                  onBlur={passwordFormik.handleBlur}
-                  error={
-                    passwordFormik.touched.password &&
-                    Boolean(passwordFormik.errors.password)
-                  }
-                  helperText={
-                    passwordFormik.touched.password &&
-                    passwordFormik.errors.password
-                  }
-                />
+          {!user?.googleAccountType && ( // Conditionally render password form if user is not using Google account
+            <Box
+              component="form"
+              sx={{ maxWidth: "500px" }}
+              onSubmit={passwordFormik.handleSubmit}
+            >
+              <Typography variant="h5">Change Password</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} lg={12}>
+                  {/* Content for the first half of the grid */}
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    label="New Password"
+                    name="password"
+                    type="password"
+                    value={passwordFormik.values.password}
+                    onChange={passwordFormik.handleChange}
+                    onBlur={passwordFormik.handleBlur}
+                    error={
+                      passwordFormik.touched.password &&
+                      Boolean(passwordFormik.errors.password)
+                    }
+                    helperText={
+                      passwordFormik.touched.password &&
+                      passwordFormik.errors.password
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} lg={12}>
+                  {/* Content for the second half of the grid */}
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    label="Confirm New Password"
+                    name="confirmPassword"
+                    type="password"
+                    value={passwordFormik.values.confirmPassword}
+                    onChange={passwordFormik.handleChange}
+                    onBlur={passwordFormik.handleBlur}
+                    error={
+                      passwordFormik.touched.confirmPassword &&
+                      Boolean(passwordFormik.errors.confirmPassword)
+                    }
+                    helperText={
+                      passwordFormik.touched.confirmPassword &&
+                      passwordFormik.errors.confirmPassword
+                    }
+                  />
+                </Grid>
               </Grid>
               <Grid item xs={12} lg={12}>
-                {/* Content for the second half of the grid */}
-                <TextField
+                <Button
                   fullWidth
-                  margin="dense"
-                  label="Confirm New Password"
-                  name="confirmPassword"
-                  type="password"
-                  value={passwordFormik.values.confirmPassword}
-                  onChange={passwordFormik.handleChange}
-                  onBlur={passwordFormik.handleBlur}
-                  error={
-                    passwordFormik.touched.confirmPassword &&
-                    Boolean(passwordFormik.errors.confirmPassword)
-                  }
-                  helperText={
-                    passwordFormik.touched.confirmPassword &&
-                    passwordFormik.errors.confirmPassword
-                  }
-                />
+                  variant="contained"
+                  sx={{ mt: 2 }}
+                  type="submit"
+                >
+                  Change Password
+                </Button>
               </Grid>
-            </Grid>
-            <Grid item xs={12} lg={12}>
-              <Button
-                fullWidth
-                variant="contained"
-                sx={{ mt: 2 }}
-                type="submit"
-              >
-                Change Password
-              </Button>
-            </Grid>
-          </Box>
+            </Box>
+          )}
         </Grid>
       </Grid>
 
