@@ -33,30 +33,23 @@ import http from "./http";
 import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
 
-
-
 import CreateTicket from "./pages/Tickets/CreateTicket";
 import DeleteReview from "./pages/Reviews/DeleteReview";
 import EditReviewPage from "./pages/Reviews/EditReviewPage";
-
 
 import EventRoute from "./pages/Event/EventRoute";
 import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
 
-
-
 import ReviewsPage from "./pages/Reviews/ReviewsPage";
-
 
 import MyTheme from "./themes/MyTheme";
 
 // WHATEVER U DO DON'T LEAVE THIS OUT!!! DON'T DELETE THIS ROUTE
 import AdminRoutes from "./pages/Admin/AdminRoutes";
 
-
-import Chat from './pages/Tickets/Chat';
+import Chat from "./pages/Tickets/Chat";
 
 import ViewForum from "./pages/Forum/ViewForum";
 import Home from "./pages/Home";
@@ -64,10 +57,9 @@ import Home from "./pages/Home";
 import ForumRoutes from "./pages/Forum/ForumRoutes";
 import EventReviewAll from "./pages/Reviews/EventReviewAll";
 
-
 import ResetPassword from "./pages/ResetPassword";
 import UserRoutes from "./pages/User/UserRoutes";
-import CreateReviewPage from "./pages/Reviews/CreateReviewPage"
+import CreateReviewPage from "./pages/Reviews/CreateReviewPage";
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
@@ -164,9 +156,19 @@ function App() {
             <Container>
               <Toolbar disableGutters={true}>
                 <Link to="/">
-                  <Typography variant="h6" component="div">
-                    UPlay
-                  </Typography>
+                  <Box>
+                    {/* Placeholder for Carousel/Slider Images */}
+                    <img
+                      src="src\assets\logo_uplay.png"
+                      alt="www2"
+                      style={{
+                        width: "100%",
+                        maxHeight: "35px",
+                        objectFit: "cover",
+                        filter: "grayscale(70%) brightness(700%)", // Apply grayscale and brightness effects
+                      }}
+                    />
+                  </Box>
                 </Link>
                 <Link to="/events">
                   <Typography>Event</Typography>
@@ -374,7 +376,10 @@ function App() {
 
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
-              <Route path={"/resetpassword/:token"} element={<ResetPassword />} />
+              <Route
+                path={"/resetpassword/:token"}
+                element={<ResetPassword />}
+              />
               <Route path={"/form"} element={<MyForm />} />
               {/* <Route path={"/viewusersadmin"} element={<ViewUsers />} /> */}
               <Route path={"/user/*"} element={<UserRoutes />} />
@@ -390,10 +395,13 @@ function App() {
               <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
-              
+
               <Route path={"/reviews/:id"} element={<EventReviewAll />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
-              <Route path={"/reviews/create/:id"} element={<CreateReviewPage />} />
+              <Route
+                path={"/reviews/create/:id"}
+                element={<CreateReviewPage />}
+              />
 
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
@@ -402,7 +410,6 @@ function App() {
               <Route path={"/tickets/chat/:id"} element={<Chat />} />
               <Route path={"/tickets/create"} element={<CreateTicket />} />
             </Routes>
-            
           </Container>
         </ThemeProvider>
       </Router>

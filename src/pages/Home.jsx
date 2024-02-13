@@ -7,7 +7,7 @@ function Home() {
   return (
     <div>
       {/* Secondary Navigation (App Bar) */}
-      <AppBar position="sticky" color="default" sx={{top: "80px", borderRadius: "20px"}}>
+      <AppBar position="sticky" color="default" sx={{top: "80px", borderRadius: "0px", boxShadow: 15}}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'center', backgroundColor: '#FFFFFF' }}>
           <Button variant="contained" sx={{ borderRadius: '20px', margin: '0 10px' }}>All Categories</Button>
           <Button variant="contained" sx={{ borderRadius: '20px', margin: '0 10px' }}>Dine & Wine</Button>
@@ -28,26 +28,26 @@ function Home() {
             timeout={500}
             navButtonsAlwaysVisible={true}
             navButtonsProps={{style: {backgroundColor: 'rgba(255, 255, 255, 0.5)'}}}
-            style={{maxHeight: '500px'}}
+            style={{maxHeight: '500px', borderRadius: 15}}
         >
             <Box>
             {/* Placeholder for Carousel/Slider Images */}
-            <img src="src\assets\yishun.jpg" alt="Yishun" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
+            <img src="src\assets\wildwet2.jpg" alt="www2" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
             </Box>
             <Box>
             {/* Placeholder for Carousel/Slider Images */}
-            <img src="src\assets\sunset vector wallpaper.jpg" alt="Placeholder 2" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
+            <img src="src\assets\snowcity.jpg" alt="snowcity" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
             </Box>
             <Box>
             {/* Placeholder for Carousel/Slider Images */}
-            <img src="src\assets\dark waves.jpg" alt="Placeholder 3" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
+            <img src="src\assets\adcove.jpg" alt="adcove" style={{width: '100%', maxHeight: '600px', objectFit: 'cover'}} />
             </Box>
         </Carousel>
         </Container>
 
 
       {/* About UPlay Section */}
-      <Container sx={{ marginTop: '2rem' }}>
+      <Container sx={{ marginTop: '2rem'}}>
         <Typography variant="h4">About UPlay</Typography>
         <Typography variant="h6" sx={{ fontStyle: 'italic', fontWeight: 'medium', marginTop: '1rem' }}>
           You Play, We'll Do The Rest
@@ -59,7 +59,7 @@ function Home() {
       </Container>
 
       {/* Awesome Experiences Section */}
-      <Container sx={{ marginTop: '2rem' }}>
+      <Container sx={{ marginTop: '2rem', marginBottom: '2rem' }}>
         <Typography variant="h4">Awesome Experiences</Typography>
         <Grid container spacing={2} sx={{ marginTop: '1rem' }}>
           {/* Placeholder for 8 activity cards */}
