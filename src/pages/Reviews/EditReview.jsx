@@ -1,5 +1,5 @@
 // src/pages/EditReview.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Container from '@mui/material/Container';
@@ -11,17 +11,19 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import CardTitle from "../components/CardTitle";
+import CardTitle from "../../components/CardTitle";
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import UserContext from "../../contexts/UserContext";
 
 const EditReview = ({ onSubmit }) => {
     const navigate = useNavigate();
     const { id } = useParams();
+    var { user } = useContext(UserContext);
 
     const formik = useFormik({
         initialValues: {
-            name: 'name',
+            name: user.firstName,
             rating: '',
             subject: '',
             comment: '',
@@ -39,7 +41,7 @@ const EditReview = ({ onSubmit }) => {
                 if (response.status === 204) {
                     // Review added successfully, you can perform additional actions if needed
                     console.log('Review edited successfully');
-                    navigate("/reviews")
+                    navigate("/events")
 
                     // Call the provided onSubmit callback
                     onSubmit(values);

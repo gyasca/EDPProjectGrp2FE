@@ -26,7 +26,7 @@ function AdminNavList() {
     // lines can be replaced with your own relevant feature names. this is just
     // to handle the collapsing and opening of side bar.
     const [forumsOpen, setForumsOpen] = React.useState(false);
-    const [eventsOpen, setEventsOpen] = React.useState(false);
+    const [ticketsOpen, setTicketsOpen] = React.useState(false);
     const [locationsOpen, setLocationsOpen] = React.useState(false);
     const [requestsOpen, setRequestsOpen] = React.useState(false);
     const [shopOpen, setShopOpen] = React.useState(false);
@@ -44,9 +44,9 @@ function AdminNavList() {
         setEventsOpen(!eventsOpen);
     };
 
-    // const handleClickBicycles = () => {
-    //     setBicyclesOpen(!bicyclesOpen);
-    // };
+    const handleClickTickets = () => {
+        setTicketsOpen(!ticketsOpen);
+    };
 
     // const handleClickLocations = () => {
     //     setLocationsOpen(!locationsOpen);
@@ -99,6 +99,32 @@ function AdminNavList() {
                             <ListItemText primary={"Edit User"} />
                         </ListItemButton>
                     </ListItem> */}
+                </List>
+            </Collapse>
+            
+            {/* Tickets */}
+            <ListItem key={"Tickets"} disablePadding>
+                <ListItemButton onClick={handleClickTickets}>
+                    <ListItemIcon><ForumIcon /></ListItemIcon>
+                    <ListItemText primary={"Tickets"} />
+                    {ticketsOpen ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+            </ListItem>
+            <Collapse in={ticketsOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    <ListItem key={"ViewAllTickets"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/tickets">
+                            <ListItemIcon><DensitySmallIcon /></ListItemIcon>
+                            <ListItemText primary={"View All Tickets"} />
+                        </ListItemButton>
+                    </ListItem>
+                    {/* <ListItem key={"ViewQuestions"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/driver/viewdrivers">
+                            <ListItemIcon><ContactSupportIcon /></ListItemIcon>
+                            <ListItemText primary={"View Questions"} />
+                        </ListItemButton>
+                    </ListItem> */}
+                    {/* Add more here for more sublist items */}
                 </List>
             </Collapse>
 

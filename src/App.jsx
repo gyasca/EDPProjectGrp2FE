@@ -9,6 +9,7 @@ import {
 } from "@mui/icons-material";
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
   Container,
@@ -31,27 +32,34 @@ import UserContext from "./contexts/UserContext";
 import http from "./http";
 import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
-import CreateReviewPage from "./pages/CreateReviewPage";
-import CreateTicket from "./pages/CreateTicket";
-import DeleteReview from "./pages/DeleteReview";
-import EditReviewPage from "./pages/EditReviewPage";
-import EditUser from "./pages/EditUser";
+
+import CreateTicket from "./pages/Tickets/CreateTicket";
+import DeleteReview from "./pages/Reviews/DeleteReview";
+import EditReviewPage from "./pages/Reviews/EditReviewPage";
+
 import EventRoute from "./pages/Event/EventRoute";
 import Login from "./pages/Login";
 import MyForm from "./pages/MyForm";
 import Register from "./pages/Register";
-import ReviewsPage from "./pages/ReviewsPage";
-import TicketPage from "./pages/TicketPage";
-import TicketPageInd from "./pages/TicketPageInd";
-import ViewSpecificUser from "./pages/ViewSpecificUser";
+
+import ReviewsPage from "./pages/Reviews/ReviewsPage";
+
 import MyTheme from "./themes/MyTheme";
 
 // WHATEVER U DO DON'T LEAVE THIS OUT!!! DON'T DELETE THIS ROUTE
 import AdminRoutes from "./pages/Admin/AdminRoutes";
 
-import Home from "./pages/Home";
-import ForumRoutes from "./pages/Forum/ForumRoutes";
+import Chat from "./pages/Tickets/Chat";
+
 import ViewForum from "./pages/Forum/ViewForum";
+import Home from "./pages/Home";
+
+import ForumRoutes from "./pages/Forum/ForumRoutes";
+import EventReviewAll from "./pages/Reviews/EventReviewAll";
+
+import ResetPassword from "./pages/ResetPassword";
+import UserRoutes from "./pages/User/UserRoutes";
+import CreateReviewPage from "./pages/Reviews/CreateReviewPage";
 
 // validateAdmin and validateUser functions from user.js to check if user is logged in
 
@@ -127,7 +135,6 @@ function App() {
     setAnchorEl(null);
   };
 
-
   // Render loading message while waiting for user data
   if (loading) {
     return <Typography variant="h5">Loading...</Typography>;
@@ -149,9 +156,19 @@ function App() {
             <Container>
               <Toolbar disableGutters={true}>
                 <Link to="/">
-                  <Typography variant="h6" component="div">
-                    UPlay
-                  </Typography>
+                  <Box>
+                    {/* Placeholder for Carousel/Slider Images */}
+                    <img
+                      src="src\assets\logo_uplay.png"
+                      alt="www2"
+                      style={{
+                        width: "100%",
+                        maxHeight: "35px",
+                        objectFit: "cover",
+                        filter: "grayscale(70%) brightness(700%)", // Apply grayscale and brightness effects
+                      }}
+                    />
+                  </Box>
                 </Link>
                 <Link to="/events">
                   <Typography>Event</Typography>
@@ -164,8 +181,8 @@ function App() {
                 <Link to="/reviews">
                   <Typography>Reviews</Typography>
                 </Link>
-                <Link to="/staff/tickets">
-                  <Typography>Customer Service Tickets</Typography>
+                <Link to="/tickets/create">
+                  <Typography>Customer Support</Typography>
                 </Link>
                 <Box sx={{ flexGrow: 1 }}></Box>
                 {/* {user && (
@@ -194,15 +211,43 @@ function App() {
                     </Typography>
 
                     <Box>
-                      <IconButton
-                        aria-label="account of current user"
-                        aria-controls="menu-appbar"
-                        aria-haspopup="true"
-                        onClick={handleMenuOpen}
-                        color="inherit"
-                      >
-                        <AccountCircle />
-                      </IconButton>
+                      {fullUser && fullUser.googleAccountType ? (
+                        // If user has a Google account, display their Google profile photo
+                        <IconButton
+                          aria-label="profile photo"
+                          onClick={handleMenuOpen}
+                        >
+                          <Avatar
+                            alt="profilephoto"
+                            src={fullUser.profilePhotoFile}
+                          />
+                        </IconButton>
+                      ) : fullUser &&
+                        typeof fullUser.profilePhotoFile === "string" ? (
+                        // If user does not have a Google account and profilePhotoFile is a string, display the profile photo
+                        <IconButton
+                          aria-label="profile photo"
+                          onClick={handleMenuOpen}
+                        >
+                          <Avatar
+                            alt="profilephoto"
+                            src={`${import.meta.env.VITE_FILE_BASE_URL}${
+                              fullUser.profilePhotoFile
+                            }`}
+                          />
+                        </IconButton>
+                      ) : (
+                        // If user does not have a Google account and profilePhotoFile is not a string or empty, display a default image or placeholder
+                        <IconButton
+                          aria-label="account of current user"
+                          aria-controls="menu-appbar"
+                          aria-haspopup="true"
+                          onClick={handleMenuOpen}
+                          color="inherit"
+                        >
+                          <AccountCircle />
+                        </IconButton>
+                      )}
                       <Menu
                         id="menu-appbar"
                         anchorEl={anchorEl}
@@ -220,7 +265,7 @@ function App() {
                       >
                         <MenuItem
                           component={Link}
-                          to={`/viewspecificuser/${user?.id}`}
+                          to={`/user/viewspecificuser/${user?.id}`}
                           onClick={handleMenuClose}
                         >
                           <Visibility />
@@ -229,7 +274,7 @@ function App() {
 
                         <MenuItem
                           component={Link}
-                          to={`/edituser/${user?.id}`}
+                          to={`/user/edituser/${user?.id}`}
                           onClick={handleMenuClose}
                         >
                           <Edit />
@@ -331,13 +376,13 @@ function App() {
 
               <Route path={"/register"} element={<Register />} />
               <Route path={"/login"} element={<Login />} />
+              <Route
+                path={"/resetpassword/:token"}
+                element={<ResetPassword />}
+              />
               <Route path={"/form"} element={<MyForm />} />
               {/* <Route path={"/viewusersadmin"} element={<ViewUsers />} /> */}
-              <Route
-                path={"/viewspecificuser/:userId"}
-                element={<ViewSpecificUser />}
-              />
-              <Route path={"/edituser/:userId"} element={<EditUser />} />
+              <Route path={"/user/*"} element={<UserRoutes />} />
 
               {/* Forum only logged in */}
               <Route path={"/forum/*"} element={<ForumRoutes />} />
@@ -350,15 +395,20 @@ function App() {
               <Route path={"/cart/*"} element={<CartRoute />} />
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
+
+              <Route path={"/reviews/:id"} element={<EventReviewAll />} />
               <Route path={"/reviews/create"} element={<CreateReviewPage />} />
+              <Route
+                path={"/reviews/create/:id"}
+                element={<CreateReviewPage />}
+              />
+
               <Route path={"/reviews/edit/:id"} element={<EditReviewPage />} />
               <Route path={"/reviews/delete/:id"} element={<DeleteReview />} />
 
-              <Route path={"/staff/tickets"} element={<TicketPage />} />
-              <Route path={"/staff/tickets/:id"} element={<TicketPageInd />} />
-
+              {/* <Route path={"/tickets/*"} element={<TicketRoutes />} /> */}
+              <Route path={"/tickets/chat/:id"} element={<Chat />} />
               <Route path={"/tickets/create"} element={<CreateTicket />} />
-
             </Routes>
           </Container>
         </ThemeProvider>

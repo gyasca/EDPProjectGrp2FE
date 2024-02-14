@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from "react";
 import {
   Box,
-  Typography,
-  TextField,
   Button,
   Container,
-  MenuItem,
   Grid,
+  MenuItem,
+  TextField,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import dayjs from "dayjs";
 import { useFormik } from "formik";
-import * as yup from "yup";
-import http from "../../../http";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as yup from "yup";
 import AdminPageTitle from "../../../components/AdminPageTitle";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import dayjs from "dayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import http from "../../../http";
 // import DatePicker from "react-datepicker";
-import { parse, parseISO } from "date-fns";
 
 function Register() {
   const navigate = useNavigate();
@@ -77,6 +75,7 @@ function Register() {
       newsletterSubscriptionStatus: false,
       twoFactorAuthStatus: false,
       verificationStatus: false,
+      googleAccountType: false,
       //   field for edit
       //   dateOfBirth: dayjs(user.dateOfBirth),
       dateOfBirth: dayjs(),
@@ -146,6 +145,7 @@ function Register() {
       data.newsletterSubscriptionStatus = data.newsletterSubscriptionStatus;
       data.twoFactorAuthStatus = data.twoFactorAuthStatus;
       data.verificationStatus = data.verificationStatus;
+      data.googleAccountType = data.googleAccountType;
       //   if (imageFile) {
       //     data.imageFile = imageFile;
 
@@ -283,29 +283,29 @@ function Register() {
             </Grid>
 
             <Grid item xs={12} lg={6}>
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  autoComplete="off"
-                  label="Membership Status"
-                  name="membershipStatus"
-                  select
-                  variant="outlined"
-                  value={formik.values.membershipStatus}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.membershipStatus &&
-                    Boolean(formik.errors.membershipStatus)
-                  }
-                  helperText={
-                    formik.touched.membershipStatus &&
-                    formik.errors.membershipStatus
-                  }
-                >
-                  <MenuItem value={"member"}>Member</MenuItem>
-                  <MenuItem value={"non-member"}>Non Member</MenuItem>
-                </TextField>
-              </Grid>
+              <TextField
+                fullWidth
+                margin="dense"
+                autoComplete="off"
+                label="Membership Status"
+                name="membershipStatus"
+                select
+                variant="outlined"
+                value={formik.values.membershipStatus}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.membershipStatus &&
+                  Boolean(formik.errors.membershipStatus)
+                }
+                helperText={
+                  formik.touched.membershipStatus &&
+                  formik.errors.membershipStatus
+                }
+              >
+                <MenuItem value={"member"}>Member</MenuItem>
+                <MenuItem value={"non-member"}>Non Member</MenuItem>
+              </TextField>
+            </Grid>
 
             <Grid item xs={12} lg={6}>
               <TextField
@@ -382,7 +382,7 @@ function Register() {
             </Grid>
 
             <Grid item xs={12} lg={6}>
-            <TextField
+              <TextField
                 fullWidth
                 margin="dense"
                 autoComplete="off"
@@ -393,12 +393,9 @@ function Register() {
                 value={formik.values.roleName}
                 onChange={formik.handleChange}
                 error={
-                  formik.touched.roleName &&
-                  Boolean(formik.errors.roleName)
+                  formik.touched.roleName && Boolean(formik.errors.roleName)
                 }
-                helperText={
-                  formik.touched.roleName && formik.errors.roleName
-                }
+                helperText={formik.touched.roleName && formik.errors.roleName}
               >
                 <MenuItem value="employee-master">Employee (Master)</MenuItem>
                 <MenuItem value="employee-normal">Employee (Normal)</MenuItem>
@@ -455,41 +452,54 @@ function Register() {
                 <MenuItem value={false}>Not subscribed</MenuItem>
               </TextField>
             </Grid>
-          </Grid>
-          <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Button variant="contained" component="label">
-              Upload Image
-              <input
-                hidden
-                accept="image/*"
-                multiple
-                type="file"
-                onChange={onFileChange}
-              />
-            </Button>
-            <ToastContainer />
-          </Box>
-          <Box
-            sx={{
-              height: "200px",
-              width: "200px",
-              borderRadius: "50%",
-              overflow: "hidden",
-              textAlign: "center",
-              mt: 2,
-            }}
-          >
-            {imageFile && (
-              <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
-                <img
-                  alt="profilephoto"
-                  src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                ></img>
+            <Grid item xs={12} lg={6}>
+              <Box sx={{ textAlign: "center", mt: 2 }}>
+                <Button variant="contained" component="label">
+                  Upload Image
+                  <input
+                    hidden
+                    accept="image/*"
+                    multiple
+                    type="file"
+                    onChange={onFileChange}
+                  />
+                </Button>
               </Box>
-            )}
-          </Box>
-          <Button fullWidth variant="contained" sx={{ mt: 2 }} type="submit">
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <Box
+                sx={{
+                  height: "200px",
+                  width: "200px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  textAlign: "center",
+                  mt: 2,
+                }}
+              >
+                {imageFile && (
+                  <Box className="aspect-ratio-container" sx={{ mt: 2 }}>
+                    <img
+                      alt="profilephoto"
+                      src={`${import.meta.env.VITE_FILE_BASE_URL}${imageFile}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    ></img>
+                  </Box>
+                )}
+              </Box>
+            </Grid>
+          </Grid>
+          <ToastContainer />
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ mt: 2, mb: 5 }}
+            type="submit"
+          >
             Register
           </Button>
         </Box>

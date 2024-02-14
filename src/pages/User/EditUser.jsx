@@ -1,90 +1,49 @@
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Box,
-  Button,
-  Container,
-  Grid,
-  MenuItem,
-  TextField,
   Typography,
+  TextField,
+  Button,
+  Grid,
   Avatar,
+  Paper,
+  Tab,
+  Tabs,
 } from "@mui/material";
-import { useFormik } from "formik";
-import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import http from "../../http";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import * as yup from "yup";
-import http from "../../../http";
 
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import MenuItem from "@mui/material/MenuItem";
+import InputAdornment from "@mui/material/InputAdornment";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
-import AdminPageTitle from "../../../components/AdminPageTitle";
-import UserContext from "../../../contexts/UserContext";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import UserContext from "../../contexts/UserContext";
+import AdminPageTitle from "../../components/AdminPageTitle";
 
 function EditUser() {
   const navigate = useNavigate();
-  const { userId, adminId } = useParams();
+  const { userId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [user, setLocalUser] = useState(null);
-  const { setUser } = useContext(UserContext);
   const [existingImage, setExistingImage] = useState(null);
-  // more variable declarations below (config for user details form)
+  const [tabValue, setTabValue] = useState(0); // State to manage tab selection
+  const { setUser } = useContext(UserContext);
 
-  useEffect(() => {
-    // Fetch user details when the component mounts
-    console.log(userId);
-    http
-      .get(`/user/${userId}`)
-      .then((response) => {
-        setLocalUser(response.data);
-        setExistingImage(response.data.profilePhotoFile); // Update existingImage state
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching user details:", error);
-      });
-  }, [userId]);
+  // Reference for scrolling to specific elements
+  const detailsRef = useRef(null);
+  const passwordRef = useRef(null);
 
-  // userDetailsFormik hook for password change form
-  const passwordFormik = useFormik(
-    {
-      initialValues: {
-        password: "",
-        confirmPassword: "",
-      },
-      enableReinitialize: true, // This option allows the form to reinitialize when props (in this case, initialValues) change
-      validationSchema: yup.object({
-        password: yup
-          .string()
-          .trim()
-          .min(8, "Password must be at least 8 characters")
-          // .required("Password is required")
-          .matches(
-            /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
-            "At least 1 letter and 1 number"
-          ),
-        confirmPassword: yup
-          .string()
-          .oneOf([yup.ref("password")], "Passwords must match")
-          .required("Confirm password is required"),
-      }),
-      onSubmit: (data) => {
-        console.log("Password Form Values:", data);
-        // Handle password change submission
-        http
-          .put(`/user/password/${userId}`, data)
-          .then((res) => {
-            console.log(res.data);
-            navigate(`/viewspecificuser/${userId}`);
-          })
-          .catch(function (err) {
-            toast.error(`${err.response.data.message}`);
-          });
-      },
-    },
-    [user]
-  );
+  // logout after password change
+  const logout = () => {
+    localStorage.clear();
+    window.location = "/";
+  };
 
   // Configurations for userDetails edit form.
   const handleChangeDate = (dateTime) => {
@@ -120,7 +79,62 @@ function EditUser() {
     }
   };
 
-  // userDetailsFormik hook for user details edit form
+  useEffect(() => {
+    // Fetch user details when the component mounts
+    console.log(userId);
+    http
+      .get(`/user/${userId}`)
+      .then((response) => {
+        setLocalUser(response.data);
+        setExistingImage(response.data.profilePhotoFile);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching user details:", error);
+      });
+  }, [userId]);
+
+  // Formik hook for password change form
+  const passwordFormik = useFormik(
+    {
+      initialValues: {
+        password: "",
+        confirmPassword: "",
+      },
+      enableReinitialize: true, // This option allows the form to reinitialize when props (in this case, initialValues) change
+      validationSchema: yup.object({
+        password: yup
+          .string()
+          .trim()
+          .min(8, "Password must be at least 8 characters")
+          // .required("Password is required")
+          .matches(
+            /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/,
+            "At least 1 letter and 1 number"
+          ),
+        confirmPassword: yup
+          .string()
+          .oneOf([yup.ref("password")], "Passwords must match")
+          .required("Confirm password is required"),
+      }),
+      onSubmit: (data) => {
+        console.log("Password Form Values:", data);
+        // Handle password change submission
+        http
+          .put(`/user/password/${userId}`, data)
+          .then((res) => {
+            console.log(res.data);
+            logout();
+          })
+          .catch(function (err) {
+            toast.error(`${err.response.data.message}`);
+          });
+      },
+    },
+    [user]
+  );
+
+  // Formik hook for user details edit form
   const userDetailsFormik = useFormik(
     {
       initialValues: {
@@ -147,6 +161,7 @@ function EditUser() {
         mobileNumber: yup
           .string()
           .matches(/^\d{8}$/, "Mobile Number must be exactly 8 digits"),
+        profilePhotoFile: yup.mixed(),
         email: yup
           .string()
           .trim()
@@ -182,73 +197,63 @@ function EditUser() {
           .put(`/user/${userId}`, data)
           .then((res) => {
             console.log(res.data);
-            if (userId === adminId) {
-              setUser(res.data);
-            }
-            navigate(`/admin/users/allusers`);
+            setUser(res.data);
+            navigate(`/user/viewspecificuser/${userId}`);
           })
           .catch(function (err) {
             toast.error(`${err.response.data.message}`);
           });
-
-        console.log("id of user who got edited: ", userId);
-        console.log("id of admin who is editing user: ", adminId);
-        // http
-        //   .get(`/user/${adminId}`)
-        //   .then((response) => {
-        //     console.log(response.data);
-        //     setLocalUser(response.data);
-        //     setUser(response.data);
-        //     navigate(`/admin/users/allusers`);
-        //   })
-        //   .catch((error) => {
-        //     console.error("Error fetching user details:", error);
-        //   });
       },
     },
     [user]
   );
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   if (!user) {
     return <Typography variant="h5">Loading...</Typography>;
   }
 
   return (
-    <Container>
-      <AdminPageTitle title="Edit User" subtitle={`Admin`} backbutton />
-      {/* Edit User Details Form */}
-      <Grid container spacing={2}>
-        <Grid item xs={12} lg={6}>
-          {/* Content for the first half of the grid */}
-          <Box
-            component="form"
-            sx={{ maxWidth: "500px" }}
-            onSubmit={userDetailsFormik.handleSubmit}
-          >
-            <Typography variant="h5">Edit Details</Typography>
-            {/* <input
-          type="file"
-          onChange={(event) =>
-            userDetailsFormik.setFieldValue(
-              "profilePhotoFile",
-              event.currentTarget.files[0]
-            )
-          }
-          onBlur={userDetailsFormik.handleBlur}
-          error={
-            userDetailsFormik.touched.profilePhotoFile &&
-            Boolean(userDetailsFormik.errors.profilePhotoFile)
-          }
-          helperText={
-            userDetailsFormik.touched.profilePhotoFile && userDetailsFormik.errors.profilePhotoFile
-          }
-        /> */}
-            <Grid container spacing={2} sx={{}}>
-              <Grid item xs={12} lg={6}>
+    <Box>
+      <AdminPageTitle
+        title="Edit User Account"
+        subtitle={`Update Details Or Password (Non-Google Authenticated users only)`}
+        backbutton
+      />
+
+      <Paper elevation={3} sx={{ marginBottom: 2 }}>
+        {/* Tabs */}
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          variant="fullWidth"
+          centered={false}
+          aria-label="user details tabs"
+        >
+          <Tab label="Change Details" />
+          {!userDetailsFormik.values.googleAccountType && (
+            <Tab label="Change Password" />
+          )}
+        </Tabs>
+      </Paper>
+
+      {/* Tab Panels */}
+      <Box hidden={tabValue !== 0}>
+        {/* Change Details Panel */}
+        <Paper elevation={3} sx={{ padding: 2 }}>
+          <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            Edit User Details
+          </Typography>
+          <form onSubmit={userDetailsFormik.handleSubmit}>
+            <Grid container spacing={2}>
+              {/* Form fields for user details */}
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   margin="dense"
-                  autoComplete="off"
                   label="First Name"
                   name="firstName"
                   value={userDetailsFormik.values.firstName}
@@ -264,11 +269,10 @@ function EditUser() {
                   }
                 />
               </Grid>
-              <Grid item xs={12} lg={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   margin="dense"
-                  autoComplete="off"
                   label="Last Name"
                   name="lastName"
                   value={userDetailsFormik.values.lastName}
@@ -284,7 +288,8 @@ function EditUser() {
                   }
                 />
               </Grid>
-              <Grid item xs={12}>
+              {/* Other form fields go here */}
+              <Grid item xs={12} lg={6}>
                 <TextField
                   fullWidth
                   margin="dense"
@@ -305,56 +310,6 @@ function EditUser() {
                 />
               </Grid>
 
-              {/* Datepicker field for dateOfBirth */}
-              <Grid item xs={12} lg={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateTimePicker
-                    label="Date of Birth"
-                    slotProps={{ textField: { fullWidth: true } }}
-                    disableFuture
-                    value={userDetailsFormik.values.dateOfBirth}
-                    onChange={handleChangeDate}
-                    renderInput={(params) => (
-                      <TextField {...params} variant="outlined" />
-                    )}
-                    error={
-                      userDetailsFormik.touched.dateOfBirth &&
-                      Boolean(userDetailsFormik.errors.dateOfBirth)
-                    }
-                    helperText={
-                      userDetailsFormik.touched.dateOfBirth &&
-                      userDetailsFormik.errors.dateOfBirth
-                    }
-                    sx={{ marginY: "0.5rem" }}
-                  />
-                </LocalizationProvider>
-              </Grid>
-
-              <Grid item xs={12} lg={6}>
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  autoComplete="off"
-                  label="Membership Status"
-                  name="membershipStatus"
-                  select
-                  variant="outlined"
-                  value={userDetailsFormik.values.membershipStatus}
-                  onChange={userDetailsFormik.handleChange}
-                  error={
-                    userDetailsFormik.touched.membershipStatus &&
-                    Boolean(userDetailsFormik.errors.membershipStatus)
-                  }
-                  helperText={
-                    userDetailsFormik.touched.membershipStatus &&
-                    userDetailsFormik.errors.membershipStatus
-                  }
-                >
-                  <MenuItem value={"member"}>Member</MenuItem>
-                  <MenuItem value={"non-member"}>Non Member</MenuItem>
-                </TextField>
-              </Grid>
-
               <Grid item xs={12} lg={6}>
                 <TextField
                   fullWidth
@@ -362,6 +317,7 @@ function EditUser() {
                   autoComplete="off"
                   label="Mobile Number"
                   name="mobileNumber"
+                  type="tel"
                   value={userDetailsFormik.values.mobileNumber}
                   onChange={userDetailsFormik.handleChange}
                   onBlur={userDetailsFormik.handleBlur}
@@ -373,8 +329,14 @@ function EditUser() {
                     userDetailsFormik.touched.mobileNumber &&
                     userDetailsFormik.errors.mobileNumber
                   }
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">+65</InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
+
               <Grid item xs={12} lg={6}>
                 <TextField
                   fullWidth
@@ -404,74 +366,6 @@ function EditUser() {
                 </TextField>
               </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  autoComplete="off"
-                  label="Address"
-                  name="address"
-                  value={userDetailsFormik.values.address}
-                  onChange={userDetailsFormik.handleChange}
-                  onBlur={userDetailsFormik.handleBlur}
-                  error={
-                    userDetailsFormik.touched.address &&
-                    Boolean(userDetailsFormik.errors.address)
-                  }
-                  helperText={
-                    userDetailsFormik.touched.address &&
-                    userDetailsFormik.errors.address
-                  }
-                />
-              </Grid>
-              <Grid item xs={12} lg={12}>
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  autoComplete="off"
-                  label="Postal Code"
-                  name="postalCode"
-                  type="number"
-                  value={userDetailsFormik.values.postalCode}
-                  onChange={userDetailsFormik.handleChange}
-                  onBlur={userDetailsFormik.handleBlur}
-                  error={
-                    userDetailsFormik.touched.postalCode &&
-                    Boolean(userDetailsFormik.errors.postalCode)
-                  }
-                  helperText={
-                    userDetailsFormik.touched.postalCode &&
-                    userDetailsFormik.errors.postalCode
-                  }
-                />
-              </Grid>
-
-              <Grid item xs={12} lg={12}>
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  autoComplete="off"
-                  label="Role Name"
-                  name="roleName"
-                  select
-                  variant="outlined"
-                  value={userDetailsFormik.values.roleName}
-                  onChange={userDetailsFormik.handleChange}
-                  error={
-                    userDetailsFormik.touched.roleName &&
-                    Boolean(userDetailsFormik.errors.roleName)
-                  }
-                  helperText={
-                    userDetailsFormik.touched.roleName &&
-                    userDetailsFormik.errors.roleName
-                  }
-                >
-                  <MenuItem value="employee-master">Employee (Master)</MenuItem>
-                  <MenuItem value="employee-normal">Employee (Normal)</MenuItem>
-                  <MenuItem value="customer">Customer</MenuItem>
-                </TextField>
-              </Grid>
-
               <Grid item xs={12} lg={6}>
                 <TextField
                   fullWidth
@@ -496,7 +390,48 @@ function EditUser() {
                   <MenuItem value="employed">Employed</MenuItem>
                   <MenuItem value="unemployed">Unemployed</MenuItem>
                   <MenuItem value="self-employed">Self-Employed</MenuItem>
-                </TextField>
+                </TextField>{" "}
+              </Grid>
+              <Grid item xs={12} lg={6}>
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  autoComplete="off"
+                  label="Address"
+                  name="address"
+                  value={userDetailsFormik.values.address}
+                  onChange={userDetailsFormik.handleChange}
+                  onBlur={userDetailsFormik.handleBlur}
+                  error={
+                    userDetailsFormik.touched.address &&
+                    Boolean(userDetailsFormik.errors.address)
+                  }
+                  helperText={
+                    userDetailsFormik.touched.address &&
+                    userDetailsFormik.errors.address
+                  }
+                />{" "}
+              </Grid>
+              <Grid item xs={12} lg={6}>
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  autoComplete="off"
+                  label="Postal Code"
+                  name="postalCode"
+                  type="number"
+                  value={userDetailsFormik.values.postalCode}
+                  onChange={userDetailsFormik.handleChange}
+                  onBlur={userDetailsFormik.handleBlur}
+                  error={
+                    userDetailsFormik.touched.postalCode &&
+                    Boolean(userDetailsFormik.errors.postalCode)
+                  }
+                  helperText={
+                    userDetailsFormik.touched.postalCode &&
+                    userDetailsFormik.errors.postalCode
+                  }
+                />
               </Grid>
               <Grid item xs={12} lg={6}>
                 <TextField
@@ -525,30 +460,58 @@ function EditUser() {
                 </TextField>
               </Grid>
 
+              {/* Datepicker field for dateOfBirth */}
               <Grid item xs={12} lg={6}>
-                {/* Conditionally render upload image button */}
-                {!user?.googleAccountType && (
-                  <Box sx={{ textAlign: "center", mt: 2 }}>
-                    <Button variant="contained" component="label">
-                      Upload Image
-                      <input
-                        hidden
-                        accept="image/*"
-                        multiple
-                        type="file"
-                        onChange={onFileChange}
-                      />
-                    </Button>
-                    <ToastContainer />
-                  </Box>
-                )}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DateTimePicker
+                    label="Date of Birth"
+                    slotProps={{ textField: { fullWidth: true } }}
+                    disableFuture
+                    value={userDetailsFormik.values.dateOfBirth}
+                    onChange={handleChangeDate}
+                    renderInput={(params) => (
+                      <TextField {...params} variant="outlined" />
+                    )}
+                    error={
+                      userDetailsFormik.touched.dateOfBirth &&
+                      Boolean(userDetailsFormik.errors.dateOfBirth)
+                    }
+                    helperText={
+                      userDetailsFormik.touched.dateOfBirth &&
+                      userDetailsFormik.errors.dateOfBirth
+                    }
+                    sx={{ marginY: "0.5rem" }}
+                  />
+                </LocalizationProvider>
+              </Grid>
+
+              {/* Conditional rendering for image upload button and profile photo based on Google logged in */}
+
+              <Grid item xs={12} lg={6}>
+                <Box sx={{ textAlign: "center", mt: 2 }}>
+                  <Button variant="contained" component="label">
+                    Upload Image
+                    <input
+                      hidden
+                      accept="image/*"
+                      multiple
+                      type="file"
+                      onChange={onFileChange}
+                    />
+                  </Button>
+                  <ToastContainer />
+                </Box>
               </Grid>
               <Grid item xs={12} lg={6}>
-                {user.googleAccountType ? (
+                {userDetailsFormik.values.googleAccountType ? (
                   <Avatar
                     alt="profilephoto"
-                    src={user.profilePhotoFile}
-                    sx={{ width: 200, height: 200, margin: "0 auto 16px auto" }}
+                    src={user.profilePhotoFile} // Assuming `user` contains the user data including the profile photo for Google authenticated users
+                    sx={{
+                      width: 200,
+                      height: 200,
+                      margin: "0 auto 16px auto",
+                    }}
                   />
                 ) : (
                   <>
@@ -580,55 +543,32 @@ function EditUser() {
                   </>
                 )}
               </Grid>
+
+              <Grid item xs={12} sm={12}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{ width: "100%", mt: 2 }}
+                >
+                  Save User Details
+                </Button>
+              </Grid>
             </Grid>
+          </form>
+        </Paper>
+      </Box>
 
-            {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
-            label="Date of Birth"
-            // slotProps={{
-            //   textField: {
-            //     helperText: "MM/DD/YYYY",
-            //   },
-            // }}
-            slotProps={{ textField: { fullWidth: true } }}
-            value={userDetailsFormik.values.dateOfBirth}
-            onChange={handleChangeDate}
-            renderInput={(params) => (
-              <TextField {...params} variant="outlined" />
-            )}
-            error={
-              userDetailsFormik.touched.dateOfBirth && Boolean(userDetailsFormik.errors.dateOfBirth)
-            }
-            helperText={userDetailsFormik.touched.dateOfBirth && userDetailsFormik.errors.dateOfBirth}
-            sx={{ marginY: "1rem" }}
-            dateOfBirth
-          />
-        </LocalizationProvider> */}
-
-            <Button
-              fullWidth
-              variant="contained"
-              sx={{ mb: 5, mt: 2 }}
-              type="submit"
-            >
-              Save User Details
-            </Button>
-          </Box>
-        </Grid>
-
-        <Grid item xs={12} lg={6}>
-          {/* Content for the second half of the grid */}
-          {/* Change Password Form */}
-          {!user?.googleAccountType && ( // Conditionally render password form if user is not using Google account
-            <Box
-              component="form"
-              sx={{ maxWidth: "500px" }}
-              onSubmit={passwordFormik.handleSubmit}
-            >
-              <Typography variant="h5">Change Password</Typography>
+      <Box hidden={tabValue !== 1}>
+        {/* Change Password Panel */}
+        {!userDetailsFormik.values.googleAccountType && (
+          <Paper elevation={3} sx={{ padding: 2 }}>
+            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+              Change Password
+            </Typography>
+            <form onSubmit={passwordFormik.handleSubmit}>
               <Grid container spacing={2}>
-                <Grid item xs={12} lg={12}>
-                  {/* Content for the first half of the grid */}
+                {/* Form fields for changing password */}
+                <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     margin="dense"
@@ -648,8 +588,7 @@ function EditUser() {
                     }
                   />
                 </Grid>
-                <Grid item xs={12} lg={12}>
-                  {/* Content for the second half of the grid */}
+                <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     margin="dense"
@@ -669,24 +608,24 @@ function EditUser() {
                     }
                   />
                 </Grid>
+
+                <Grid item xs={12} sm={12}>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{ width: "100%", mt: 2 }}
+                  >
+                    Change Password
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item xs={12} lg={12}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  sx={{ mt: 2 }}
-                  type="submit"
-                >
-                  Change Password
-                </Button>
-              </Grid>
-            </Box>
-          )}
-        </Grid>
-      </Grid>
+            </form>
+          </Paper>
+        )}
+      </Box>
 
       <ToastContainer />
-    </Container>
+    </Box>
   );
 }
 
