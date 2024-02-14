@@ -6,10 +6,11 @@ import {
 } from '@mui/material';
 import http from '../../http';
 import { ToastContainer, toast } from 'react-toastify';
+import UserPageTitle from '../../components/UserPageTitle';
 
 export function CheckoutSummary() {
   const [order, setOrder] = useState(null);
-  const { orderId } = useParams(); 
+  const { orderId } = useParams();
   const navigate = useNavigate();
   const [newStatus, setNewStatus] = useState('');
   const [newPaymentMethod, setNewPaymentMethod] = useState('');
@@ -21,6 +22,7 @@ export function CheckoutSummary() {
         setOrder(response.data);
         setNewStatus(response.data.orderStatus);
         setNewPaymentMethod(response.data.orderPaymentMethod);
+        console.log(response.data);
       }
     } catch (error) {
       console.error("Failed to retrieve order details:", error.response ? error.response.data : error);
@@ -54,11 +56,14 @@ export function CheckoutSummary() {
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
+    <Container maxWidth="lg" sx={{
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        mt: 4
+      }}>
       <ToastContainer />
-      <Typography variant="h4" gutterBottom>
-        Order Summary
-      </Typography>
+      <UserPageTitle title="Order Summary" backbutton />
       <Card>
         <CardContent>
           <Table>
@@ -70,13 +75,15 @@ export function CheckoutSummary() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {order.$values.map((item) => (
-                <TableRow key={item.Id}>
-                  <TableCell>{item.Event.name}</TableCell>
-                  <TableCell align="right">{item.Quantity}</TableCell>
-                  <TableCell align="right">${item.Price.toFixed(2)}</TableCell>
-                </TableRow>
-              ))}
+              <TableBody>
+                {order.OrderItems.$values.map((item) => (
+                  <TableRow key={item.Id}>
+                    <TableCell>{item.Event.EventName}</TableCell>
+                    <TableCell align="right">{item.Quantity}</TableCell>
+                    <TableCell align="right">${item.Event.EventPrice.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
             </TableBody>
           </Table>
           <Typography variant="h6">Total: ${order.TotalAmount ? order.TotalAmount.toFixed(2) : 'N/A'}</Typography>
@@ -109,7 +116,7 @@ export function CheckoutSummary() {
             ))}
           </TextField>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Button variant="contained" onClick={updateOrder}>Update Order</Button>
+            <Button variant="contained" onClick={updateOrder}>Confirm Order</Button>
           </Box>
         </CardContent>
       </Card>

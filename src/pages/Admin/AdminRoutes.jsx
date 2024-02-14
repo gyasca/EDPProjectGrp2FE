@@ -17,8 +17,11 @@ import AdminPanelLandingPage from "./AdminPanelLandingPage";
 import CreateUserAdmin from "./User/CreateUserAdmin";
 
 // event
+import ViewEvents from "./Event/ViewEvents";
+import AddEvent from "./Event/AddEvent";
+import EditEvent from "./Event/EditEvent";
 
-// ticket
+// ticketo
 import Chat from "../Tickets/Chat";
 import TicketPage from "./Tickets/TicketPage";
 import TicketPageInd from "./Tickets/TicketPageInd";
@@ -72,6 +75,11 @@ function AdminRoutes() {
           {/* Ticket paths */ }
           <Route path={"/tickets"} element={<TicketPage />} />
           <Route path={"/tickets/:id"} element={<TicketPageInd />} />
+
+          {/* Event paths */}
+          <Route path="/events" element={<ViewEvents />} />
+          <Route path="/events/add" element={<AddEvent />} />
+          <Route path="/events/edit/:id" element={<EditEvent />} />
 
           {/* Example paths */}
           {/* <Route path="/users/create" element={<CreateUser />} />

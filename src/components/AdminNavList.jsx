@@ -27,7 +27,7 @@ function AdminNavList() {
     // to handle the collapsing and opening of side bar.
     const [forumsOpen, setForumsOpen] = React.useState(false);
     const [ticketsOpen, setTicketsOpen] = React.useState(false);
-    const [locationsOpen, setLocationsOpen] = React.useState(false);
+    const [eventsOpen, setEventsOpen] = React.useState(false);
     const [requestsOpen, setRequestsOpen] = React.useState(false);
     const [shopOpen, setShopOpen] = React.useState(false);
     const [supportOpen, setSupportOpen] = React.useState(false);
@@ -48,9 +48,6 @@ function AdminNavList() {
         setTicketsOpen(!ticketsOpen);
     };
 
-    // const handleClickLocations = () => {
-    //     setLocationsOpen(!locationsOpen);
-    // };
 
     // const handleClickRequests = () => {
     //     setRequestsOpen(!requestsOpen);

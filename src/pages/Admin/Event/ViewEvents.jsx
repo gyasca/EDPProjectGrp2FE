@@ -8,6 +8,8 @@ import http from "../../../http";
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminPageTitle from "../../../components/AdminPageTitle";
+
 
 function ViewEvents() {
     const [events, setEvents] = useState([]);
@@ -99,11 +101,15 @@ function ViewEvents() {
     };
 
     return (
-        <Container maxWidth="lg">
-            <ToastContainer />
-            <Typography variant="h4" gutterBottom>
-                Event Management
-            </Typography>
+        <Container
+            sx={{
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center",
+            }}
+        >            <ToastContainer />
+            <AdminPageTitle title="All Events" subtitle={`Manage events`} backbutton />
+
             <Button
                 variant="contained"
                 color="primary"

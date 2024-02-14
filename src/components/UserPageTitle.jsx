@@ -3,18 +3,14 @@ import { Box, IconButton, Typography } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 
-function AdminPageTitle(props) {
+function UserPageTitle(props) {
     const navigate = useNavigate()
     return (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", marginY: "1rem" }}>
             {props.backbutton && <IconButton size="large" onClick={() => navigate(-1)} sx={{ marginRight: "1rem" }}><ArrowBackIcon /></IconButton>}
-            <Box sx={{ marginY: ["1rem", "1rem", "2rem"] }}>
-                <Typography variant="h3" fontWeight={700}>{props.title}</Typography>
-                {props.subtitle && <Typography variant="subtitle1" color="textSecondary">{props.subtitle}</Typography>}
-            </Box>
-
+            <Typography variant="h4" fontWeight={700}>{props.title}</Typography>
         </Box>
     )
 }
 
-export default AdminPageTitle
+export default UserPageTitle

@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
-  Box, Card, CardContent, TextField, Grid, Typography, Divider, MenuItem, Select, FormControl, InputLabel, FormControlLabel, Checkbox, Tab, Tabs, Button, CardMedia, IconButton, useMediaQuery, CardActions,
+  Container, Box, Card, CardContent, TextField, Grid, Typography, Divider, MenuItem, Select, FormControl, InputLabel, FormControlLabel, Checkbox, Tab, Tabs, Button, CardMedia, IconButton, useMediaQuery, CardActions,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { CategoryContext } from './EventRouteAdmin';
 import MDEditor from '@uiw/react-md-editor';
 import http from '../../../http';
 import { toast } from 'react-toastify';
@@ -14,16 +13,19 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddIcon from '@mui/icons-material/Add';
 import CategoryIcon from '@mui/icons-material/Category';
+import ReorderIcon from '@mui/icons-material/Reorder';
 import ImageIcon from '@mui/icons-material/Image';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useSnackbar } from 'notistack';
+import AdminPageTitle from "../../../components/AdminPageTitle";
+
+
 
 function AddEvent() {
   const [loading, setLoading] = useState(false);
   const [markdown, setMarkdown] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
-  const { setActivePage } = useContext(CategoryContext);
   const isSmallerScreen = useMediaQuery('(max-width:600px)');
   const [productFiles, setProductFiles] = useState([]);
   const [productFileUploads, setProductFileUploads] = useState([]);
@@ -31,7 +33,6 @@ function AddEvent() {
 
   useEffect(() => {
     initAutocomplete();
-    setActivePage(2);
   }, []);
 
   async function initAutocomplete() {
@@ -46,15 +47,15 @@ function AddEvent() {
         document.body.appendChild(script);
       }
     });
-  
+
     const autocomplete = new window.google.maps.places.Autocomplete(document.getElementById('eventLocation'), {
       fields: ['formatted_address', 'geometry'], // Specify the fields to return
       types: ['establishment'], // Only show address predictions
     });
-  
+
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete.getPlace();
-      
+
       if (!place.geometry) {
         window.alert(`No details available for input: '${place.name}'`);
         return;
@@ -63,7 +64,7 @@ function AddEvent() {
       formik.setFieldValue('eventLocation', place.formatted_address);
     });
   }
-  
+
 
   const handleChangeProductImage = e => {
     const fileList = Array.from(e.target.files);
@@ -107,16 +108,16 @@ function AddEvent() {
 
   const formik = useFormik({
     initialValues: {
-      eventName: 'Monkies',
-      eventDescription: 'tjososos fkslfdk dgsdg',
-      eventCategory: 'Hobbies & Wellness',
-      eventLocation: 'Location',
-      eventTicketStock: 100,
-      eventPrice: 100,
-      eventUplayMemberPrice: 100,
-      eventNtucClubPrice: 100,
+      eventName: '',
+      eventDescription: '',
+      eventCategory: '',
+      eventLocation: '',
+      eventTicketStock: 0,
+      eventPrice: 0,
+      eventUplayMemberPrice: 0,
+      eventNtucClubPrice: 0,
       eventDate: '',
-      eventDuration: 100,
+      eventDuration: 0,
       eventSale: false,
       eventStatus: true,
       eventPicture: '',
@@ -196,178 +197,190 @@ function AddEvent() {
   };
 
   return (
-    <Box sx={{ marginY: "1rem" }} component="form">
-      <Card>
-        <CardContent>
-          <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: '10px', my: 2, cursor: 'pointer' }} onClick={() => navigate('/admin/events')}>
-            <ArrowBackIcon /> Create New Event
-          </Typography>
-          <LoadingButton
-            startIcon={<AddIcon />}
-            color="primary"
-            variant="contained"
-            loading={loading}
-            onClick={formik.handleSubmit}
-          >
-            Create Event
-          </LoadingButton>
-          <Divider sx={{ my: 1 }} />
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            aria-label="event tabs"
-          >
-            <Tab icon={<CategoryIcon />} iconPosition="start" label="Event Information" />
-            <Tab icon={<ImageIcon />} iconPosition="start" label="Event Images" />
-          </Tabs>
-          {tabValue === 0 && (
-            <Box>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                      <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>Basic Information</Typography>
-                      <TextField
-                        fullWidth
-                        id="eventName"
-                        name="eventName"
-                        label="Event Name"
-                        value={formik.values.eventName}
-                        onChange={formik.handleChange}
-                        error={formik.touched.eventName && Boolean(formik.errors.eventName)}
-                        helperText={formik.touched.eventName && formik.errors.eventName}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      {!isSmallerScreen && (
-                        <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>&nbsp;</Typography>
-                      )}
-                      <FormControl fullWidth>
-                        <InputLabel id="eventCategory-label">Event Category</InputLabel>
-                        <Select
-                          id="eventCategory"
-                          name="eventCategory"
-                          label="Event Category"
-                          value={formik.values.eventCategory}
+    <Container
+      sx={{
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Box sx={{ marginY: "1rem" }} component="form">
+        <Card>
+          <CardContent>
+            <AdminPageTitle title="Create New Event" subtitle={`Creation of event`} backbutton />
+
+            <LoadingButton
+              startIcon={<AddIcon />}
+              color="primary"
+              variant="contained"
+              loading={loading}
+              onClick={formik.handleSubmit}
+            >
+              Create Event
+            </LoadingButton>
+            <Divider sx={{ my: 1 }} />
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              aria-label="event tabs"
+            >
+              <Tab icon={<CategoryIcon />} iconPosition="start" label="Event Information" />
+              <Tab icon={<ReorderIcon />} iconPosition="start" label="Event Description" />
+              <Tab icon={<ImageIcon />} iconPosition="start" label="Event Images" />
+            </Tabs>
+            {tabValue === 0 && (
+              <Box>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={12}>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>Basic Information</Typography>
+                        <TextField
+                          fullWidth
+                          id="eventName"
+                          name="eventName"
+                          label="Event Name"
+                          value={formik.values.eventName}
                           onChange={formik.handleChange}
-                          error={formik.touched.eventCategory && Boolean(formik.errors.eventCategory)}
-                        >
-                          <MenuItem value="" disabled>
-                            Select Event Category
-                          </MenuItem>
-                          {['Dine & Wine', 'Family Bonding', 'Hobbies & Wellness', 'Sports & Adventure', 'Travel'].map((category) => (
-                            <MenuItem key={category} value={category}>
-                              {category}
+                          error={formik.touched.eventName && Boolean(formik.errors.eventName)}
+                          helperText={formik.touched.eventName && formik.errors.eventName}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {!isSmallerScreen && (
+                          <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>&nbsp;</Typography>
+                        )}
+                        <FormControl fullWidth>
+                          <InputLabel id="eventCategory-label">Event Category</InputLabel>
+                          <Select
+                            id="eventCategory"
+                            name="eventCategory"
+                            label="Event Category"
+                            value={formik.values.eventCategory}
+                            onChange={formik.handleChange}
+                            error={formik.touched.eventCategory && Boolean(formik.errors.eventCategory)}
+                          >
+                            <MenuItem value="" disabled>
+                              Select Event Category
                             </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={12}>
-                      <TextField
-                        fullWidth
-                        id="eventLocation"
-                        name="eventLocation"
-                        label="Event Location"
-                        value={formik.values.eventLocation}
-                        onChange={formik.handleChange}
-                        error={formik.touched.eventLocation && Boolean(formik.errors.eventLocation)}
-                        helperText={formik.touched.eventLocation && formik.errors.eventLocation}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <TextField
-                        fullWidth
-                        id="eventDuration"
-                        name="eventDuration"
-                        label="Event Duration (in hours)"
-                        type="number"
-                        value={formik.values.eventDuration}
-                        onChange={formik.handleChange}
-                        error={formik.touched.eventDuration && Boolean(formik.errors.eventDuration)}
-                        helperText={formik.touched.eventDuration && formik.errors.eventDuration}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <TextField
-                        fullWidth
-                        id="eventDate"
-                        name="eventDate"
-                        label="Event Date"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        value={formik.values.eventDate}
-                        onChange={formik.handleChange}
-                        error={formik.touched.eventDate && Boolean(formik.errors.eventDate)}
-                        helperText={formik.touched.eventDate && formik.errors.eventDate}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                      <TextField
-                        fullWidth
-                        id="eventTicketStock"
-                        name="eventTicketStock"
-                        label="Event Ticket Stock"
-                        type="number"
-                        value={formik.values.eventTicketStock}
-                        onChange={formik.handleChange}
-                        error={formik.touched.eventTicketStock && Boolean(formik.errors.eventTicketStock)}
-                        helperText={formik.touched.eventTicketStock && formik.errors.eventTicketStock}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        id="eventPrice"
-                        name="eventPrice"
-                        label="Event Price"
-                        type="number"
-                        value={formik.values.eventPrice}
-                        onChange={formik.handleChange}
-                        error={formik.touched.eventPrice && Boolean(formik.errors.eventPrice)}
-                        helperText={formik.touched.eventPrice && formik.errors.eventPrice}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        id="eventUplayMemberPrice"
-                        name="eventUplayMemberPrice"
-                        label="Uplay Member Price"
-                        type="number"
-                        value={formik.values.eventUplayMemberPrice}
-                        onChange={formik.handleChange}
-                        error={formik.touched.eventUplayMemberPrice && Boolean(formik.errors.eventUplayMemberPrice)}
-                        helperText={formik.touched.eventUplayMemberPrice && formik.errors.eventUplayMemberPrice}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={formik.values.eventSale}
-                            onChange={formik.handleChange}
-                            name="eventSale"
-                          />
-                        }
-                        label="Event Sale"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={true}
-                            onChange={formik.handleChange}
-                            name="eventStatus"
-                          />
-                        }
-                        label="Event Status"
-                      />
+                            {['Dine & Wine', 'Family Bonding', 'Hobbies & Wellness', 'Sports & Adventure', 'Travel'].map((category) => (
+                              <MenuItem key={category} value={category}>
+                                {category}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={12}>
+                        <TextField
+                          fullWidth
+                          id="eventLocation"
+                          name="eventLocation"
+                          label="Event Location"
+                          value={formik.values.eventLocation}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventLocation && Boolean(formik.errors.eventLocation)}
+                          helperText={formik.touched.eventLocation && formik.errors.eventLocation}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <TextField
+                          fullWidth
+                          id="eventDuration"
+                          name="eventDuration"
+                          label="Event Duration (in hours)"
+                          type="number"
+                          value={formik.values.eventDuration}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventDuration && Boolean(formik.errors.eventDuration)}
+                          helperText={formik.touched.eventDuration && formik.errors.eventDuration}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <TextField
+                          fullWidth
+                          id="eventDate"
+                          name="eventDate"
+                          label="Event Date"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          value={formik.values.eventDate}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventDate && Boolean(formik.errors.eventDate)}
+                          helperText={formik.touched.eventDate && formik.errors.eventDate}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={4}>
+                        <TextField
+                          fullWidth
+                          id="eventTicketStock"
+                          name="eventTicketStock"
+                          label="Event Ticket Stock"
+                          type="number"
+                          value={formik.values.eventTicketStock}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventTicketStock && Boolean(formik.errors.eventTicketStock)}
+                          helperText={formik.touched.eventTicketStock && formik.errors.eventTicketStock}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          id="eventPrice"
+                          name="eventPrice"
+                          label="Event Price"
+                          type="number"
+                          value={formik.values.eventPrice}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventPrice && Boolean(formik.errors.eventPrice)}
+                          helperText={formik.touched.eventPrice && formik.errors.eventPrice}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          id="eventUplayMemberPrice"
+                          name="eventUplayMemberPrice"
+                          label="Uplay Member Price"
+                          type="number"
+                          value={formik.values.eventUplayMemberPrice}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventUplayMemberPrice && Boolean(formik.errors.eventUplayMemberPrice)}
+                          helperText={formik.touched.eventUplayMemberPrice && formik.errors.eventUplayMemberPrice}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={formik.values.eventSale}
+                              onChange={formik.handleChange}
+                              name="eventSale"
+                            />
+                          }
+                          label="Event Sale"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={true}
+                              onChange={formik.handleChange}
+                              name="eventStatus"
+                            />
+                          }
+                          label="Event Status"
+                        />
+                      </Grid>
                     </Grid>
                   </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
+              </Box>
+            )}
+            {tabValue === 1 && (
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={12}>
                   <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>Event Description</Typography>
                   <MDEditor
                     value={markdown}
@@ -381,43 +394,59 @@ function AddEvent() {
                   )}
                 </Grid>
               </Grid>
-            </Box>
-          )}
-          {tabValue === 1 && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>Event Images</Typography>
-                <Grid container spacing={3}>
-                  {productFiles.map((file, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
-                      <Card>
-                        <CardMedia>
-                          <img src={file} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </CardMedia>
-                        <CardActions>
-                          <IconButton onClick={() => handleDeleteImage(index)}><DeleteIcon /></IconButton>
-                          {index > 0 && <IconButton onClick={() => handleMoveBackward(index)}><ArrowBackIcon /></IconButton>}
-                          {index < productFiles.length - 1 && <IconButton onClick={() => handleMoveForward(index)}><ArrowForwardIcon /></IconButton>}
-                        </CardActions>
-                      </Card>
-                    </Grid>
-                  ))}
+            )}
+            {tabValue === 2 && (
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={8}>
+                  <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>Event Images</Typography>
+                  <Grid container spacing={3}>
+                    {productFiles.map((file, index) => (
+                      <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Card>
+                          <CardMedia>
+                            <img src={file} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </CardMedia>
+                          <CardActions>
+                            <IconButton onClick={() => handleDeleteImage(index)}><DeleteIcon /></IconButton>
+                            {index > 0 && <IconButton onClick={() => handleMoveBackward(index)}><ArrowBackIcon /></IconButton>}
+                            {index < productFiles.length - 1 && <IconButton onClick={() => handleMoveForward(index)}><ArrowForwardIcon /></IconButton>}
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Grid>
+                {/* Render button below event images if there are no images */}
+                {productFiles.length === 0 && (<>
+                  <Grid item xs={12} sm={4}>
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <Button variant="contained" component="label" fullWidth>
+                      Upload Event Images
+                      <input hidden accept="image/*" onChange={handleChangeProductImage} multiple type="file" />
+                    </Button>
+                  </Grid>
+                </>)}
+                <Grid item xs={12} sm={4}>
+                  {productFiles.length > 0 && (
+                    <>
+                      {!isSmallerScreen && (
+                        <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>&nbsp;</Typography>
+                      )}
+                      <Button variant="contained" component="label" fullWidth>
+                        Upload Event Images
+                        <input hidden accept="image/*" onChange={handleChangeProductImage} multiple type="file" />
+                      </Button>
+                    </>
+                  )}
+
                 </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                {!isSmallerScreen && (
-                  <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>&nbsp;</Typography>
-                )}
-                <Button variant="contained" component="label" fullWidth>
-                  Upload Event Images
-                  <input hidden accept="image/*" onChange={handleChangeProductImage} multiple type="file" />
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-        </CardContent>
-      </Card>
-    </Box>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+    </Container>
   );
 }
 

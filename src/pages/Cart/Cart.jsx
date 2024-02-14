@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Grid, Card, CardContent, Button, Table,
   TableBody, TableCell, TableHead, TableRow, IconButton,
-  Container, Checkbox
+  Container, Checkbox, Tooltip, Stack, List, ListItem, ListItemText, Divider, CardActions,
 } from '@mui/material';
 import http from '../../http';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,23 +12,35 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, Link } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import UserPageTitle from '../../components/UserPageTitle';
+
 
 export function ViewCart() {
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [userId, setUserId] = useState(null);
+  const [invalidItems, setInvalidItems] = useState([]);
   const navigate = useNavigate();
 
   const fetchCartItems = async () => {
     try {
       const response = await http.get('/Cart');
       if (response.status === 200) {
-        setCartItems(response.data);
+        const items = response.data;
+        const validItems = items.filter(item => item.eventStatus); // Filter out items with eventStatus
+        const invalid = items.filter(item => !item.eventStatus);
+        setCartItems(validItems);
+        setInvalidItems(invalid);
       }
     } catch (error) {
       toast.error("Failed to retrieve cart items: " + error.message);
     }
   };
+
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
+
 
   const handleQuantityChange = async (itemId, quantity) => {
     try {
@@ -95,50 +107,28 @@ export function ViewCart() {
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce((acc, item) => {
-      if (selectedItems.includes(item.id)) {
-        return acc + (item.quantity * item.eventPrice);
-      }
-      return acc;
-    }, 0).toFixed(2);
-  };
-  
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await http.get('/user/auth', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        const userData = response.data.user;
-        setUserId(userData.id);
-        fetchCartItems();
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        toast.error("Failed to fetch user data. Please try again.");
-      }
-    };
-  
-    fetchUserData();
-  }, []);
-  
-  
-  const handleCheckout = async () => {
-    if (!userId) {
-      toast.error("User not authenticated");
-      return;
-    }
-  
     const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id));
-    console.log(selectedCartItems)
+    const subTotalAmount = selectedCartItems.reduce((acc, item) => acc + (item.quantity * item.eventPrice), 0);
+    const gstRate = 0.09; // Assuming 9% GST rate
+    const gstAmount = parseFloat((subTotalAmount * gstRate).toFixed(2));
+    const totalAmount = parseFloat((subTotalAmount + gstAmount).toFixed(2));
+    return {
+      subTotal: subTotalAmount.toFixed(2),
+      gst: gstAmount.toFixed(2),
+      total: totalAmount.toFixed(2),
+      noOfItems: cartItems.reduce((acc, item) => acc + item.quantity, 0)
+    };
+  };
+
+  const handleCheckout = async () => {
+
+    const selectedCartItems = cartItems.filter(item => selectedItems.includes(item.id));
     const subTotalAmount = selectedCartItems.reduce((acc, item) => acc + (item.quantity * item.eventPrice), 0);
     const gstRate = 0.09; // Assuming 9% GST rate
     const gstAmount = parseFloat((subTotalAmount * gstRate).toFixed(2));
     const totalAmount = parseFloat((subTotalAmount + gstAmount).toFixed(2));
     const noOfItems = selectedCartItems.reduce((acc, item) => acc + item.quantity, 0);
-  
+
     try {
       const order = {
         OrderStatus: "Pending",
@@ -151,20 +141,20 @@ export function ViewCart() {
           EventId: item.eventId,
           Quantity: item.quantity,
           TotalPrice: item.quantity * item.eventPrice,
-          Discounted: 0, 
+          Discounted: 0,
           DiscountedTotalPrice: item.quantity * item.eventPrice
         }))
       };
-  
+
       const orderResponse = await http.post(`/Order`, order);
       if (orderResponse.status === 200) {
         const orderId = orderResponse.data.orderId;
-  
+
         toast.success("Order created successfully!");
-  
+
         setSelectedItems([]);
         setCartItems([]);
-  
+
         navigate('/cart/checkout/' + orderId);
       }
     } catch (error) {
@@ -172,15 +162,18 @@ export function ViewCart() {
       toast.error("Failed to complete the order process: " + (error.response?.data.message || error.message));
     }
   };
-  
+
   return (
-    <Container maxWidth="lg" sx={{ my: 2 }}>
+    <Container maxWidth="lg" sx={{
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      mt: 4
+    }}>
       <ToastContainer />
       {cartItems.length > 0 ? (
         <Box>
-          <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: '10px', my: 2, cursor: 'pointer' }} onClick={() => navigate('/events')}>
-            <ArrowBackIcon /> Your cart
-          </Typography>
+          <UserPageTitle title="Your Cart" backbutton />
           <Grid item xs={12}>
             <Button variant="contained" color="secondary" onClick={handleClearCart}>
               Clear Cart
@@ -244,12 +237,41 @@ export function ViewCart() {
               </Table>
             </Grid>
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card variant="outlined" sx={{ mb: 3 }}>
                 <CardContent>
-                  <Typography variant="h6">Order Summary</Typography>
-                  <Typography>Subtotal: ${calculateTotal()}</Typography>
+                  <Stack direction="row" alignItems="center" spacing={2}>
+                    <RequestQuoteIcon />
+                    <Typography sx={{ fontSize: 18, fontWeight: 700 }} color="text.secondary" gutterBottom>
+                      Order Summary
+                    </Typography>
+                  </Stack>
                 </CardContent>
-                <Button variant="contained" color="primary" onClick={handleCheckout}>Checkout Selected</Button>
+                <List>
+                  <ListItem>
+                    <ListItemText primary="Subtotal" />
+                    <Typography variant="h6">${calculateTotal().subTotal}</Typography>
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="GST (9%)" />
+                    <Typography variant="h6">${calculateTotal().gst}</Typography>
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText primary="Total" />
+                    <Typography variant="h6">${calculateTotal().total}</Typography>
+                  </ListItem>
+                </List>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={selectedItems.length === 0}
+                    onClick={handleCheckout}
+                    sx={{ width: '100%', bgcolor: 'success.main' }}
+                  >
+                    Checkout Selected
+                  </Button>
+                </CardActions>
               </Card>
             </Grid>
           </Grid>
@@ -263,7 +285,40 @@ export function ViewCart() {
             Return to Homepage
           </Button>
         </Box>
-      )}
-    </Container>
+      )
+      }
+
+      {
+        invalidItems.length > 0 && (
+          <Box mt={4}>
+            <Typography variant="h5" gutterBottom>
+              Invalid Items
+            </Typography>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Event Name</TableCell>
+                  <TableCell align="right">Price</TableCell>
+                  <TableCell align="center">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {invalidItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.eventName}</TableCell>
+                    <TableCell align="right">${item.eventPrice}</TableCell>
+                    <TableCell align="center">
+                      <IconButton onClick={() => handleRemoveItem(item.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+        )
+      }
+    </Container >
   );
 }

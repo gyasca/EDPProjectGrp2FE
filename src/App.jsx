@@ -6,6 +6,7 @@ import {
   Settings,
   ShoppingCart,
   Visibility,
+  Favorite,
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -302,11 +303,20 @@ function App() {
                         </MenuItem>
                         <MenuItem
                           component={Link}
-                          to="/"
+                          to="/cart"
                           onClick={handleMenuClose}
                         >
                           <ShoppingCart />
                           &nbsp;&nbsp;&nbsp;Cart
+                        </MenuItem>
+
+                        <MenuItem
+                          component={Link}
+                          to="/"
+                          onClick={handleMenuClose}
+                        >
+                          <Favorite />
+                          &nbsp;&nbsp;&nbsp;Wishlist
                         </MenuItem>
 
                         <MenuItem component={Link} onClick={handleOpen}>
@@ -390,7 +400,6 @@ function App() {
               <Route path={"/forum/view"} element={<ViewForum />} />
               {/* End of forums */}
 
-              <Route path={"/admin/events/*"} element={<EventRouteAdmin />} />
               <Route path={"/events/*"} element={<EventRoute />} />
               <Route path={"/cart/*"} element={<CartRoute />} />
 
