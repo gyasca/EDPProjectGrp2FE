@@ -13,6 +13,8 @@ import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import ArticleIcon from '@mui/icons-material/Article';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import AddIcon from '@mui/icons-material/Add';
+import EventIcon from '@mui/icons-material/Event';
 import ForumIcon from '@mui/icons-material/Forum';
 import DensitySmallIcon from '@mui/icons-material/DensitySmall';
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
@@ -24,7 +26,7 @@ function AdminNavList() {
     // lines can be replaced with your own relevant feature names. this is just
     // to handle the collapsing and opening of side bar.
     const [forumsOpen, setForumsOpen] = React.useState(false);
-    const [bicyclesOpen, setBicyclesOpen] = React.useState(false);
+    const [eventsOpen, setEventsOpen] = React.useState(false);
     const [locationsOpen, setLocationsOpen] = React.useState(false);
     const [requestsOpen, setRequestsOpen] = React.useState(false);
     const [shopOpen, setShopOpen] = React.useState(false);
@@ -36,6 +38,10 @@ function AdminNavList() {
 
     const handleClickForums = () => {
         setForumsOpen(!forumsOpen);
+    };
+
+    const handleClickEvents = () => {
+        setEventsOpen(!eventsOpen);
     };
 
     // const handleClickBicycles = () => {
@@ -116,6 +122,38 @@ function AdminNavList() {
                         <ListItemButton component={Link} to="/admin/driver/viewdrivers">
                             <ListItemIcon><ContactSupportIcon /></ListItemIcon>
                             <ListItemText primary={"View Questions"} />
+                        </ListItemButton>
+                    </ListItem>
+                    {/* Add more here for more sublist items */}
+                </List>
+            </Collapse>
+
+            {/* Events */}
+            <ListItem key={"Events"} disablePadding>
+                <ListItemButton onClick={handleClickEvents}>
+                    <ListItemIcon><EventIcon /></ListItemIcon>
+                    <ListItemText primary={"Events"} />
+                    {eventsOpen ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+            </ListItem>
+            <Collapse in={eventsOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    <ListItem key={"ViewAllEvents"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/events/">
+                            <ListItemIcon><Category /></ListItemIcon>
+                            <ListItemText primary={"View All Events"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem key={"AddEvents"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/events/add">
+                            <ListItemIcon><AddIcon /></ListItemIcon>
+                            <ListItemText primary={"Add Event"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem key={"ViewAllOrders"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/events/">
+                            <ListItemIcon><ReceiptLongIcon /></ListItemIcon>
+                            <ListItemText primary={"View All Orders"} />
                         </ListItemButton>
                     </ListItem>
                     {/* Add more here for more sublist items */}
