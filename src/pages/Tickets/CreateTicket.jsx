@@ -50,17 +50,17 @@ const CreateTicket = () => {
                 if (response.status === 201) {
                     console.log('Ticket added successfully');
 
-                    if (values.responseType === 'ai') {
-                        const updateResponse = await axios.put(`https://localhost:7261/Tickets/${ticketId}`, {
-                            status: 'Accepted'
-                        });
+                    // if (values.responseType === 'ai') {
+                    //     const updateResponse = await axios.put(`https://localhost:7261/Tickets/${ticketId}`, {
+                    //         status: 'Accepted'
+                    //     });
 
-                        if (updateResponse.status === 200) {
-                            console.log('Ticket status updated to Accepted');
-                        } else {
-                            console.error('Failed to update ticket status', updateResponse.status);
-                        }
-                    }
+                    //     if (updateResponse.status === 200) {
+                    //         console.log('Ticket status updated to Accepted');
+                    //     } else {
+                    //         console.error('Failed to update ticket status', updateResponse.status);
+                    //     }
+                    // }
                     
                     navigate("/tickets/chat/"+response.data.id);
                     onSubmit(values);
