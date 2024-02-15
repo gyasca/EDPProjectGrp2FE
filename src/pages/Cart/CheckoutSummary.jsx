@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Container, Card, CardContent, Table,
-  TableBody, TableCell, TableHead, TableRow, Button, TextField, MenuItem
+  TableBody, TableCell, TableHead, TableRow, Button, Stack, List, ListItem, ListItemText, Divider, CardActions
 } from '@mui/material';
 import http from '../../http';
 import { ToastContainer, toast } from 'react-toastify';
 import UserPageTitle from '../../components/UserPageTitle';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import CheckoutForm from './CheckoutForm';
 
 export function CheckoutSummary() {
   const [order, setOrder] = useState(null);
@@ -14,36 +18,35 @@ export function CheckoutSummary() {
   const navigate = useNavigate();
   const [newStatus, setNewStatus] = useState('');
   const [newPaymentMethod, setNewPaymentMethod] = useState('');
+  const [stripePromise, setStripePromise] = useState(() => loadStripe(`${import.meta.env.VITE_STRIPE_PUBLISHING_KEY}`));
+  const [clientSecret, setClientSecret] = useState("");
 
   const fetchOrderDetails = async () => {
     try {
       const response = await http.get(`/Order/${orderId}`);
       if (response.status === 200) {
+        console.log(response.data);
         setOrder(response.data);
         setNewStatus(response.data.orderStatus);
         setNewPaymentMethod(response.data.orderPaymentMethod);
-        console.log(response.data);
+
+        try {
+          console.log(response.data.TotalAmount.toFixed(2))
+          const paymentIntentResponse = await http.post("/payments/create-payment-intent", {
+            amount: response.data.TotalAmount.toFixed(2) * 100,
+            orderId: orderId
+          });
+          if (paymentIntentResponse.status === 200) {
+            setClientSecret(paymentIntentResponse.data.clientSecret);
+          }
+        } catch (error) {
+          console.error("Failed to create payment intent:", error.response ? error.response.data : error);
+          toast.error("Failed to initialize payment: " + error.message);
+        }
       }
     } catch (error) {
       console.error("Failed to retrieve order details:", error.response ? error.response.data : error);
       toast.error("Failed to retrieve order details: " + error.message);
-    }
-  };
-
-  console.log(order)
-
-  const updateOrder = async () => {
-    try {
-      const response = await http.post(`/Order/UpdateOrder/${orderId}`, {
-        NewStatus: newStatus,
-        NewPaymentMethod: newPaymentMethod
-      });
-      if (response.status === 200) {
-        toast.success("Order updated successfully");
-        fetchOrderDetails(); // Refresh order details
-      }
-    } catch (error) {
-      toast.error("Failed to update order: " + error.message);
     }
   };
 
@@ -56,70 +59,51 @@ export function CheckoutSummary() {
   }
 
   return (
-    <Container maxWidth="lg" sx={{
-        width: "100%",
-        justifyContent: "center",
-        alignItems: "center",
-        mt: 4
-      }}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
       <ToastContainer />
-      <UserPageTitle title="Order Summary" backbutton />
-      <Card>
-        <CardContent>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Item Name</TableCell>
-                <TableCell align="right">Quantity</TableCell>
-                <TableCell align="right">Price</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableBody>
-                {order.OrderItems.$values.map((item) => (
-                  <TableRow key={item.Id}>
-                    <TableCell>{item.Event.EventName}</TableCell>
-                    <TableCell align="right">{item.Quantity}</TableCell>
-                    <TableCell align="right">${item.Event.EventPrice.toFixed(2)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </TableBody>
-          </Table>
-          <Typography variant="h6">Total: ${order.TotalAmount ? order.TotalAmount.toFixed(2) : 'N/A'}</Typography>
-          <TextField
-            select
-            label="Order Status"
-            value={newStatus}
-            onChange={(e) => setNewStatus(e.target.value)}
-            fullWidth
-            margin="normal"
-          >
-            {['Pending', 'Completed', 'Cancelled'].map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            select
-            label="Payment Method"
-            value={newPaymentMethod}
-            onChange={(e) => setNewPaymentMethod(e.target.value)}
-            fullWidth
-            margin="normal"
-          >
-            {['Credit Card', 'PayPal', 'Bank Transfer'].map((method) => (
-              <MenuItem key={method} value={method}>
-                {method}
-              </MenuItem>
-            ))}
-          </TextField>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Button variant="contained" onClick={updateOrder}>Confirm Order</Button>
-          </Box>
-        </CardContent>
-      </Card>
+      <UserPageTitle title="Order Payment" backbutton />
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ flex: '3 0', marginRight: 2 }}>
+          <Card>
+            <CardContent>
+              {clientSecret && stripePromise && (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <CheckoutForm orderId={orderId}/>
+                </Elements>
+              )}
+            </CardContent>
+          </Card>
+        </Box>
+        <Box sx={{ flex: '1 0' }}>
+          <Card variant="outlined">
+            <CardContent>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <RequestQuoteIcon />
+                <Typography sx={{ fontSize: 18, fontWeight: 700 }} color="text.secondary" gutterBottom>
+                  Order Summary
+                </Typography>
+              </Stack>
+              <List>
+                <ListItem>
+                  <ListItemText primary="Subtotal" />
+                  <Typography variant="h6">${order && order.SubTotalAmount ? order.SubTotalAmount.toFixed(2) : 'N/A'}</Typography>
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary="GST (9%)" />
+                  {/* Assuming your order object has a property for GST */}
+                  <Typography variant="h6">${order && order.GstAmount ? order.GstAmount.toFixed(2) : 'N/A'}</Typography>
+                </ListItem>
+                <Divider />
+                <ListItem>
+                  <ListItemText primary="Total" />
+                  {/* Assuming your order object has a property for total */}
+                  <Typography variant="h6">${order && order.TotalAmount ? order.TotalAmount.toFixed(2) : 'N/A'}</Typography>
+                </ListItem>
+              </List>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
     </Container>
   );
 }

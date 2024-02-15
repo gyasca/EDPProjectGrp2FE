@@ -21,6 +21,11 @@ import ViewEvents from "./Event/ViewEvents";
 import AddEvent from "./Event/AddEvent";
 import EditEvent from "./Event/EditEvent";
 
+// order
+import ViewOrders from "./Order/ViewOrders";
+import EditOrderStatus from "./Order/EditOrderStatus";
+import ViewSpecificOrder from "./Order/ViewSpecificOrder";
+
 // ticketo
 import Chat from "../Tickets/Chat";
 import TicketPage from "./Tickets/TicketPage";
@@ -81,29 +86,12 @@ function AdminRoutes() {
           <Route path="/events/add" element={<AddEvent />} />
           <Route path="/events/edit/:id" element={<EditEvent />} />
 
-          {/* Example paths */}
-          {/* <Route path="/users/create" element={<CreateUser />} />
-                <Route path="/locations/view" element={<ViewLocations />} />
-                <Route path="/locations/:id" element={<ViewSpecificLocation />} />
-                <Route path="/locations/create" element={<CreateLocation />} />
-                <Route path="/locations/edit/:id" element={<EditLocation />} />
-                <Route path="/users/:id" element={<EditUser />} />
-                <Route path="/products" element= {<ViewProducts />}/>
-                <Route path="/products/create" element= {<CreateProduct />}/>
-                <Route path="/products/:id" element= {<EditProduct />}/>
-                <Route path="/bicycle" element={<BicycleAdmin />} />
-                <Route path="/bicycle/view" element={<ViewBicycle />} />
-                <Route path="/bicycle/add" element={<AddBicycle />} />
-                <Route path="/bicycle/:id" element={<EditBicycle />} />
-                <Route path="/bicycle/panel" element={<BicyclePanel />} />
-                <Route path="/bicycle/details/:id" element={<BicycleDetails />} />
-                <Route path="/requests/viewAll" element={<ViewAllRequests />} />
-                <Route path="/orders" element={<ViewOrders />} />   
-                <Route path="/orders/:id" element= {<ViewAdminSingleOrder />}/>
-                <Route path="/orders/editstatus/:id" element= {<EditOrderStatus/>}/>
-                <Route path="/refunds" element={<ViewRefunds />} />
-                <Route path="/refunds/editstatus/:id" element={<ViewAdminSingleRefund />} />
-                <Route path="/requests" element={<ViewAllRequests />} /> */}
+          {/* Order paths */}
+          <Route path="/orders" element={<ViewOrders />} />
+          <Route path="/orders/edit/:id" element={<EditOrderStatus />} />
+          <Route path="/orders/:id" element={<ViewSpecificOrder />} />
+
+          {/* Chat paths */}
         </Routes>
       </Box>
     

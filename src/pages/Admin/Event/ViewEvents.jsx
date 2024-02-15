@@ -59,7 +59,6 @@ function ViewEvents() {
         fetchEvents();
     }, []);
 
-    // Sort events array by ID in descending order
     const sortedEvents = [...events].sort((a, b) => b.id - a.id);
 
     const columns = [
@@ -72,6 +71,7 @@ function ViewEvents() {
         {
             field: 'actions',
             type: 'actions',
+            headerName: 'Actions',
             width: 100,
             getActions: (params) => [
                 <GridActionsCellItem

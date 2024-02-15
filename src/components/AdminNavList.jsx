@@ -174,7 +174,7 @@ function AdminNavList() {
                         </ListItemButton>
                     </ListItem>
                     <ListItem key={"ViewAllOrders"} disablePadding>
-                        <ListItemButton component={Link} to="/admin/events/">
+                        <ListItemButton component={Link} to="/admin/orders/">
                             <ListItemIcon><ReceiptLongIcon /></ListItemIcon>
                             <ListItemText primary={"View All Orders"} />
                         </ListItemButton>

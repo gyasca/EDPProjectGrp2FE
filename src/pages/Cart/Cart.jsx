@@ -150,7 +150,7 @@ export function ViewCart() {
       if (orderResponse.status === 200) {
         const orderId = orderResponse.data.orderId;
 
-        toast.success("Order created successfully!");
+        console.log("Order created successfully!");
 
         setSelectedItems([]);
         setCartItems([]);
@@ -236,6 +236,7 @@ export function ViewCart() {
                 </TableBody>
               </Table>
             </Grid>
+            {/* {Order Summary} */}
             <Grid item xs={12} md={3}>
               <Card variant="outlined" sx={{ mb: 3 }}>
                 <CardContent>
@@ -267,7 +268,7 @@ export function ViewCart() {
                     color="primary"
                     disabled={selectedItems.length === 0}
                     onClick={handleCheckout}
-                    sx={{ width: '100%', bgcolor: 'success.main' }}
+                    sx={{ width: '100%' }}
                   >
                     Checkout Selected
                   </Button>
@@ -287,10 +288,11 @@ export function ViewCart() {
         </Box>
       )
       }
-
-      {
+        {
         invalidItems.length > 0 && (
           <Box mt={4}>
+                      <Grid container spacing={3}>
+            <Grid item xs={12} md={9}>
             <Typography variant="h5" gutterBottom>
               Invalid Items
             </Typography>
@@ -316,6 +318,8 @@ export function ViewCart() {
                 ))}
               </TableBody>
             </Table>
+            </Grid>
+          </Grid>
           </Box>
         )
       }
