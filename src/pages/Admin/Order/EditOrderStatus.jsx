@@ -5,8 +5,9 @@ import http from '../../../http';
 import AdminPageTitle from '../../../components/AdminPageTitle';
 import LoadingButton from '@mui/lab/LoadingButton/LoadingButton';
 import SaveIcon from '@mui/icons-material/Save';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 function EditOrderStatus() {
     const navigate = useNavigate();
@@ -90,7 +91,10 @@ function EditOrderStatus() {
                     </Select>
                 </FormControl>
             </Paper>
+            <ToastContainer />
+
         </Container>
+        
     );
 }
 

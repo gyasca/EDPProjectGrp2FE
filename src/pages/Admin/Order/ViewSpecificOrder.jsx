@@ -3,6 +3,7 @@ import { Button, Container, Grid, Card, CardContent, CardMedia, Typography, Pape
 import { useParams, useNavigate } from 'react-router-dom';
 import http from '../../../http';
 import AdminPageTitle from '../../../components/AdminPageTitle';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ViewSpecificOrder() {
     const { id } = useParams();
@@ -63,8 +64,7 @@ function ViewSpecificOrder() {
                                         <CardMedia
                                             component="img"
                                             sx={{ width: 60, height: 60, flexShrink: 0, borderRadius: '4px' }}
-                                            // Adjust the image path as necessary
-                                            image={`${productPath}${JSON.parse(item.Event.EventPicture)[0]}`}
+                                            image={`${productPath}${item.Event.EventPicture ? JSON.parse(item.Event.EventPicture)[0] : ''}`}
                                             alt={item.Event.EventName}
                                         />
                                         <Box sx={{ marginLeft: '16px', flexGrow: 1 }}>
@@ -106,6 +106,7 @@ function ViewSpecificOrder() {
                     </Box>
                 </CardContent>
             </Card>
+
         </Container>
     );
 }

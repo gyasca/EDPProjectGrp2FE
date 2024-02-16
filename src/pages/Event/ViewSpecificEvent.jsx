@@ -7,6 +7,15 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MDEditor from '@uiw/react-md-editor';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 import EventReviewSmall from '../Reviews/EventReviewSmall';
 
@@ -21,6 +30,8 @@ function ViewSingleEvent() {
     const [relatedEvents, setRelatedEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [eventImage, setEventImage] = useState([]);
+    const eventPath = `${import.meta.env.VITE_FILE_BASE_URL}`;
+    const [wishlistItems, setWishlistItems] = useState([]);
 
     async function getEvent() {
         try {
@@ -68,15 +79,6 @@ function ViewSingleEvent() {
         }
     }
 
-    useEffect(() => {
-        getEvent();
-    }, [eventId]);
-
-    useEffect(() => {
-        if (event) {
-            getAllEvents(event.eventCategory);
-        }
-    }, [event]);
 
     const addToCart = () => {
         http.post('/cart', {
@@ -116,24 +118,73 @@ function ViewSingleEvent() {
         }
     }
 
+
+
+    const loadWishlistItems = async () => {
+        try {
+            const response = await http.get('/wishlist');
+            const eventIds = response.data.map(item => item.eventId);
+            console.log(wishlistItems)
+            setWishlistItems(eventIds);
+        } catch (error) {
+            console.error('Error loading wishlist items:', error);
+        }
+    };
+
+    const handleAddToWishlist = async (eventId) => {
+        if (wishlistItems.includes(eventId)) {
+            handleRemoveFromWishlist(eventId);
+        } else {
+            try {
+                const response = await http.post('/wishlist', { EventId: eventId });
+                if (response.status === 200) {
+                    setWishlistItems(prevState => [...prevState, eventId]);
+                    // Call toast.success with just the message
+                    toast.success('Product added to wishlist');
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 400) {
+                    toast.error('Error adding product to wishlist: Product might already be in your wishlist or does not exist');
+                } else {
+                    console.error('Error adding product to wishlist:', error);
+                }
+            }
+        }
+    };
+
+    const handleRemoveFromWishlist = async (eventId) => {
+        try {
+            const response = await http.delete(`/wishlist/${eventId}`, {
+                data: { EventId: eventId }, // Pass the data in the `data` property
+                headers: { 'Content-Type': 'application/json' } // Explicitly set the Content-Type
+            });
+            if (response.status === 200) {
+                setWishlistItems(prevState => prevState.filter(id => id !== eventId));
+                // Call toast.success with just the message
+                toast.success('Product removed from wishlist');
+            }
+        } catch (error) {
+            console.error('Error removing product from wishlist:', error);
+        }
+    };
+
     useEffect(() => {
-        setEventImage([
-            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/kuwt5cjgp7rsfqhqyhgx.webp',
-            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/gcm6mvtr83tdrok7psdu.webp',
-            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/ec0fd6a9-Snow-Play-Session-in-Snow-City-Singapore.JPG',
-            'https://res.klook.com/image/upload/fl_lossy.progressive,q_65/w_1080/w_80,x_15,y_15,g_south_west,l_Klook_water_br_trans_yhcmh3/activities/5fdfa430-Snow-Play-Session-in-Snow-City-Singapore.webp'
-        ]);
-    }, []);
+        getEvent();
+        loadWishlistItems();
+    }, [eventId, wishlistItems]);
+
+    useEffect(() => {
+        if (event) {
+            getAllEvents(event.eventCategory);
+        }
+    }, [event]);
 
     return (
         <>
             {event && (
-                <Box>
-                    <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', gap: '10px', my: 2, cursor: 'pointer' }} onClick={() => navigate('/events')}>
-                        <ArrowBackIcon /> Events
-                    </Typography>
+                <Box sx={{ mt: 2 }}>
 
-                    <Paper elevation={3} sx={{ p: 2 }}>
+                    <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
                         <Container maxWidth="lg">
                             {/* Breadcrumbs and Back Button */}
                             <Box sx={{ my: 2, display: 'flex', alignItems: 'center' }}>
@@ -160,51 +211,26 @@ function ViewSingleEvent() {
                             <Grid container spacing={2}>
                                 {/* Left Column: Event Image and Description */}
                                 <Grid item xs={12} md={8}>
-                                     {/* Image */}
-                                    <Paper elevation={3} sx={{ p: 2 }}>
+                                    {/* Image */}
+                                    <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
                                         <Carousel
                                             autoPlay={true}
                                             animation="slide"
                                             indicators={true}
                                             navButtonsAlwaysVisible={true}
-                                            sx={{
-                                                '.carousel': {
-                                                    height: '500px',
-                                                    width: '100%',
-                                                    position: 'relative',
-                                                },
-                                                '.carousel .slide': {
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                },
-                                                '.carousel img': {
-                                                    maxWidth: '100%',
-                                                    maxHeight: '100%',
-                                                    objectFit: 'contain',
-                                                },
-                                            }}
+
                                         >
-                                            {eventImage && eventImage.map((image, i) => (
-                                                <Box
+                                            {event?.eventPicture && JSON.parse(event.eventPicture).map((image, i) => (
+                                                <img
                                                     key={i}
-                                                    component="img"
-                                                    src={image}
+                                                    src={`${eventPath}${image}`}
                                                     alt={`Slide ${i + 1}`}
-                                                    sx={{
-                                                        maxWidth: '100%',
-                                                        maxHeight: '100%',
-                                                        objectFit: 'contain',
-                                                    }}
+                                                    style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
                                                 />
                                             ))}
                                         </Carousel>
                                     </Paper>
+
 
                                     <Box sx={{ marginTop: 2 }}>
                                         {/* Description */}
@@ -213,7 +239,7 @@ function ViewSingleEvent() {
                                                 Event Description
                                             </Typography>
                                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                                {event?.eventDescription}
+                                                <MDEditor.Markdown style={{ marginTop: "0.5rem", color: "black", backgroundColor: "white" }} source={event?.eventDescription} />
                                             </Typography>
                                         </Paper>
                                     </Box>
@@ -221,27 +247,64 @@ function ViewSingleEvent() {
 
                                 {/* Right Column: Add to Cart or Not on Sale */}
                                 <Grid item xs={12} md={4}>
-                                    <Paper elevation={3} sx={{ p: 2 }}>
+                                    <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
                                         {event.eventStatus ? (
                                             <>
-                                                <Typography variant="h5" gutterBottom>
-                                                    Book Your Event
-                                                </Typography>
-                                                <Typography variant="h6">Price: ${event.eventPrice}</Typography>
-                                                <Typography variant="body2" color="text.secondary"> Availability : {event.eventStatus ? "Available" : "Not Available"}</Typography>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                    <Typography variant="body1">Select Quantity:</Typography>
-                                                    <IconButton onClick={decreaseQuantity} disabled={quantity <= 1}>
-                                                        <RemoveIcon />
-                                                    </IconButton>
-                                                    <Typography>{quantity}</Typography>
-                                                    <IconButton onClick={increaseQuantity}>
-                                                        <AddIcon />
-                                                    </IconButton>
-                                                </Box>
-                                                <Button variant="contained" onClick={addToCart} sx={{ my: 2 }}>
-                                                    Add to Cart
-                                                </Button>
+                                                <Grid container spacing={2} alignItems="center">
+                                                        <Grid item container alignItems="center">
+                                                            <Typography variant="h5" gutterBottom>
+                                                                Book Your Event
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid item container alignItems="center">
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                Date: {new Date(event.eventDate).toLocaleDateString()} - {new Date(event.eventEndDate).toLocaleDateString()}
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid item container alignItems="center">
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                Availability: {event.eventStatus ? "Available" : "Not Available"}
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid item container alignItems="center">
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                Schedule: Daily
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid item container alignItems="center">
+                                                            <Typography variant="body1"  gutterBottom style={{ fontWeight: 'bold' }}>
+                                                                Price: ${event.eventPrice}
+                                                            </Typography>
+                                                        </Grid>
+                                                    
+
+                                                    <Grid item xs={12} container alignItems="center" >
+                                                        <Typography variant="body1">Select Quantity:</Typography>
+                                                        <IconButton onClick={decreaseQuantity} disabled={quantity <= 1}>
+                                                            <RemoveIcon />
+                                                        </IconButton>
+                                                        <Typography>{quantity}</Typography>
+                                                        <IconButton onClick={increaseQuantity}>
+                                                            <AddIcon />
+                                                        </IconButton>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+
+                                                        <Box display={"flex"} alignItems={"center"}>
+                                                            <Button variant="contained" onClick={addToCart} fullWidth startIcon={<ShoppingCartIcon />}>
+                                                                Add to Cart
+                                                            </Button>
+                                                            <Box>
+                                                                <IconButton onClick={() => handleAddToWishlist(event.id)}>
+                                                                    {wishlistItems.includes(event.id)
+                                                                        ? <FavoriteIcon color="error" />
+                                                                        : <FavoriteBorderIcon />}
+                                                                </IconButton>
+                                                            </Box>
+                                                        </Box>
+                                                    </Grid>
+                                                </Grid>
+
                                             </>
                                         ) : (
                                             <Typography variant="h6" color="error">

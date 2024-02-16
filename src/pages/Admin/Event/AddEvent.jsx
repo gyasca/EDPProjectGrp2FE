@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 import http from '../../../http';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AddIcon from '@mui/icons-material/Add';
@@ -27,8 +27,8 @@ function AddEvent() {
   const [tabValue, setTabValue] = useState(0);
   const navigate = useNavigate();
   const isSmallerScreen = useMediaQuery('(max-width:600px)');
-  const [productFiles, setProductFiles] = useState([]);
-  const [productFileUploads, setProductFileUploads] = useState([]);
+  const [eventFiles, setEventFiles] = useState([]);
+  const [eventFileUploads, setEventFileUploads] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -66,44 +66,43 @@ function AddEvent() {
   }
 
 
-  const handleChangeProductImage = e => {
+  const handleChangeEventImage = e => {
     const fileList = Array.from(e.target.files);
-    const totalImages = productFiles.length + fileList.length;
+    const totalImages = eventFiles.length + fileList.length;
 
     if (totalImages > 5) {
       enqueueSnackbar("You can only upload a maximum of 5 images.", { variant: "warning" });
       return;
     }
 
-    setProductFiles(prevFiles => [...prevFiles, ...fileList.map(file => URL.createObjectURL(file))]);
-    setProductFileUploads(prevFiles => [...prevFiles, ...fileList]);
-    enqueueSnackbar("Successfully uploaded product pictures.", { variant: "success" });
+    setEventFiles(prevFiles => [...prevFiles, ...fileList.map(file => URL.createObjectURL(file))]);
+    setEventFileUploads(prevFiles => [...prevFiles, ...fileList]);
+    enqueueSnackbar("Successfully uploaded event pictures.", { variant: "success" });
   };
 
   function handleDeleteImage(index) {
-    // Update the productFiles state
-    const updatedFiles = [...productFiles];
+    const updatedFiles = [...eventFiles];
     updatedFiles.splice(index, 1);
-    setProductFiles(updatedFiles);
+    setEventFiles(updatedFiles);
 
-    const updatedFileUploads = [...productFileUploads];
+    const updatedFileUploads = [...eventFileUploads];
     updatedFileUploads.splice(index, 1);
-    setProductFileUploads(updatedFileUploads);
+    setEventFileUploads(updatedFileUploads);
 
     enqueueSnackbar("Image deleted successfully.", { variant: "success" });
   }
 
 
   function handleMoveBackward(index) {
-    const updatedFiles = [...productFiles];
+    const updatedFiles = [...eventFiles];
     [updatedFiles[index - 1], updatedFiles[index]] = [updatedFiles[index], updatedFiles[index - 1]];
-    setProductFiles(updatedFiles);
+    setEventFiles(updatedFiles);
   }
 
   function handleMoveForward(index) {
-    const updatedFiles = [...productFiles];
+    const updatedFiles = [...eventFiles];
     [updatedFiles[index], updatedFiles[index + 1]] = [updatedFiles[index + 1], updatedFiles[index]];
-    setProductFiles(updatedFiles);
+    setEventFiles(updatedFiles);
   }
 
   const formik = useFormik({
@@ -114,9 +113,11 @@ function AddEvent() {
       eventLocation: '',
       eventTicketStock: 0,
       eventPrice: 0,
+      eventDiscountPrice: 0,
       eventUplayMemberPrice: 0,
       eventNtucClubPrice: 0,
       eventDate: '',
+      eventEndDate: '',
       eventDuration: 0,
       eventSale: false,
       eventStatus: true,
@@ -129,9 +130,11 @@ function AddEvent() {
       eventLocation: Yup.string().required('Event Location is required'),
       eventTicketStock: Yup.number().min(1).required('Ticket Stock is required'),
       eventPrice: Yup.number().min(0).required('Event Price is required'),
+      eventDiscountPrice: Yup.number().min(0),
       eventUplayMemberPrice: Yup.number().min(0),
       eventNtucClubPrice: Yup.number().min(0),
       eventDate: Yup.date().required('Event Date is required'),
+      eventEndDate: Yup.date().required('Event End Date is required'),
       eventDuration: Yup.number().min(1).required('Event Duration is required'),
       eventSale: Yup.boolean(),
       eventStatus: Yup.boolean(),
@@ -142,13 +145,13 @@ function AddEvent() {
       try {
 
 
-        if (productFiles.length === 0) {
+        if (eventFiles.length === 0) {
           enqueueSnackbar("No files selected for upload.", { variant: "error" });
           return;
         }
 
         let formData = new FormData();
-        productFileUploads.forEach((file) => {
+        eventFileUploads.forEach((file) => {
           formData.append('files', file);
         });
 
@@ -283,7 +286,35 @@ function AddEvent() {
                           helperText={formik.touched.eventLocation && formik.errors.eventLocation}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={4}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          id="eventDate"
+                          name="eventDate"
+                          label="Event Start Date"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          value={formik.values.eventDate}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventDate && Boolean(formik.errors.eventDate)}
+                          helperText={formik.touched.eventDate && formik.errors.eventDate}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          id="eventEndDate"
+                          name="eventEndDate"
+                          label="Event End Date"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          value={formik.values.eventEndDate}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventEndDate && Boolean(formik.errors.eventEndDate)}
+                          helperText={formik.touched.eventEndDate && formik.errors.eventEndDate}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
                           id="eventDuration"
@@ -296,21 +327,7 @@ function AddEvent() {
                           helperText={formik.touched.eventDuration && formik.errors.eventDuration}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <TextField
-                          fullWidth
-                          id="eventDate"
-                          name="eventDate"
-                          label="Event Date"
-                          type="date"
-                          InputLabelProps={{ shrink: true }}
-                          value={formik.values.eventDate}
-                          onChange={formik.handleChange}
-                          error={formik.touched.eventDate && Boolean(formik.errors.eventDate)}
-                          helperText={formik.touched.eventDate && formik.errors.eventDate}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
+                      <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
                           id="eventTicketStock"
@@ -339,14 +356,14 @@ function AddEvent() {
                       <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
-                          id="eventUplayMemberPrice"
-                          name="eventUplayMemberPrice"
-                          label="Uplay Member Price"
+                          id="eventDiscountPrice"
+                          name="eventDiscountPrice"
+                          label="Discount Price"
                           type="number"
-                          value={formik.values.eventUplayMemberPrice}
+                          value={formik.values.eventDiscountPrice}
                           onChange={formik.handleChange}
-                          error={formik.touched.eventUplayMemberPrice && Boolean(formik.errors.eventUplayMemberPrice)}
-                          helperText={formik.touched.eventUplayMemberPrice && formik.errors.eventUplayMemberPrice}
+                          error={formik.touched.eventDiscountPrice && Boolean(formik.errors.eventDiscountPrice)}
+                          helperText={formik.touched.eventDiscountPrice && formik.errors.eventDiscountPrice}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
@@ -400,7 +417,7 @@ function AddEvent() {
                 <Grid item xs={12} sm={8}>
                   <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>Event Images</Typography>
                   <Grid container spacing={3}>
-                    {productFiles.map((file, index) => (
+                    {eventFiles.map((file, index) => (
                       <Grid item xs={12} sm={6} md={4} key={index}>
                         <Card>
                           <CardMedia>
@@ -409,7 +426,7 @@ function AddEvent() {
                           <CardActions>
                             <IconButton onClick={() => handleDeleteImage(index)}><DeleteIcon /></IconButton>
                             {index > 0 && <IconButton onClick={() => handleMoveBackward(index)}><ArrowBackIcon /></IconButton>}
-                            {index < productFiles.length - 1 && <IconButton onClick={() => handleMoveForward(index)}><ArrowForwardIcon /></IconButton>}
+                            {index < eventFiles.length - 1 && <IconButton onClick={() => handleMoveForward(index)}><ArrowForwardIcon /></IconButton>}
                           </CardActions>
                         </Card>
                       </Grid>
@@ -417,25 +434,25 @@ function AddEvent() {
                   </Grid>
                 </Grid>
                 {/* Render button below event images if there are no images */}
-                {productFiles.length === 0 && (<>
+                {eventFiles.length === 0 && (<>
                   <Grid item xs={12} sm={4}>
                   </Grid>
                   <Grid item xs={12} sm={4}>
                     <Button variant="contained" component="label" fullWidth>
                       Upload Event Images
-                      <input hidden accept="image/*" onChange={handleChangeProductImage} multiple type="file" />
+                      <input hidden accept="image/*" onChange={handleChangeEventImage} multiple type="file" />
                     </Button>
                   </Grid>
                 </>)}
                 <Grid item xs={12} sm={4}>
-                  {productFiles.length > 0 && (
+                  {eventFiles.length > 0 && (
                     <>
                       {!isSmallerScreen && (
                         <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>&nbsp;</Typography>
                       )}
                       <Button variant="contained" component="label" fullWidth>
                         Upload Event Images
-                        <input hidden accept="image/*" onChange={handleChangeProductImage} multiple type="file" />
+                        <input hidden accept="image/*" onChange={handleChangeEventImage} multiple type="file" />
                       </Button>
                     </>
                   )}
@@ -446,6 +463,8 @@ function AddEvent() {
           </CardContent>
         </Card>
       </Box>
+      <ToastContainer />
+
     </Container>
   );
 }

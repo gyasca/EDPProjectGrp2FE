@@ -27,11 +27,11 @@ function EditEvent() {
   const isSmallerScreen = useMediaQuery('(max-width:600px)');
   const [tabValue, setTabValue] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
-  const [productFiles, setProductFiles] = useState([]);
-  const [productFileUploads, setProductFileUploads] = useState([]);
-  const [productFileNewUploads, setProductFileNewUploads] = useState([]);
-  const [allProductFiles, setAllProductFiles] = useState([]);
-  const productPath = `${import.meta.env.VITE_FILE_BASE_URL}`
+  const [eventFiles, setEventFiles] = useState([]);
+  const [eventFileUploads, setEventFileUploads] = useState([]);
+  const [eventFileNewUploads, setEventFileNewUploads] = useState([]);
+  const [allEventFiles, setAllEventFiles] = useState([]);
+  const eventPath = `${import.meta.env.VITE_FILE_BASE_URL}`
 
   function getEvent() {
     http.get(`/Admin/Event/${eventId}`)
@@ -48,7 +48,7 @@ function EditEvent() {
           filenames = response.data.eventPicture;
         }
 
-        setProductFiles(filenames.map(filename => `${filename}`));
+        setEventFiles(filenames.map(filename => `${filename}`));
       })
       .catch(error => {
         console.error("Fetching Error:", error);
@@ -93,48 +93,48 @@ function EditEvent() {
   }, [eventId]);
 
   useEffect(() => {
-    setAllProductFiles([...productFiles, ...productFileNewUploads]);
-  }, [productFileNewUploads, productFiles]);
+    setAllEventFiles([...eventFiles, ...eventFileNewUploads]);
+  }, [eventFileNewUploads, eventFiles]);
 
   function handleDeleteImage(index) {
-    const deletedFile = allProductFiles[index];
-    const updatedFiles = [...allProductFiles];
+    const deletedFile = allEventFiles[index];
+    const updatedFiles = [...allEventFiles];
     updatedFiles.splice(index, 1);
-    setAllProductFiles(updatedFiles);
+    setAllEventFiles(updatedFiles);
 
-    if (productFileNewUploads.includes(deletedFile)) {
-      const fileNewUploadsIndex = productFileNewUploads.indexOf(deletedFile);
-      const updatedFileNewUploads = [...productFileNewUploads];
+    if (eventFileNewUploads.includes(deletedFile)) {
+      const fileNewUploadsIndex = eventFileNewUploads.indexOf(deletedFile);
+      const updatedFileNewUploads = [...eventFileNewUploads];
       updatedFileNewUploads.splice(fileNewUploadsIndex, 1);
-      setProductFileNewUploads(updatedFileNewUploads);
+      setEventFileNewUploads(updatedFileNewUploads);
 
       URL.revokeObjectURL(deletedFile);
 
-      const updatedFileUploads = [...productFileUploads];
+      const updatedFileUploads = [...eventFileUploads];
       updatedFileUploads.splice(fileNewUploadsIndex, 1);
-      setProductFileUploads(updatedFileUploads);
+      setEventFileUploads(updatedFileUploads);
 
       enqueueSnackbar("Image deleted successfully.", { variant: "success" });
     }
   }
 
-  function handleChangeProductImage(e) {
+  function handleChangeEventImage(e) {
     const fileList = Array.from(e.target.files);
-    if (allProductFiles.length + fileList.length > 5) {
+    if (allEventFiles.length + fileList.length > 5) {
       enqueueSnackbar("You can only upload a maximum of 5 images.", { variant: "warning" });
       return; // exit the function early
     }
-    setProductFileNewUploads(prevFiles => [...prevFiles, ...fileList.map(file => URL.createObjectURL(file))]);
-    setProductFileUploads(prevFiles => [...prevFiles, ...fileList]);
+    setEventFileNewUploads(prevFiles => [...prevFiles, ...fileList.map(file => URL.createObjectURL(file))]);
+    setEventFileUploads(prevFiles => [...prevFiles, ...fileList]);
   }
 
   function handleMoveBackward(index) {
 
-    const updatedAllFiles = [...allProductFiles];
+    const updatedAllFiles = [...allEventFiles];
     [updatedAllFiles[index - 1], updatedAllFiles[index]] = [updatedAllFiles[index], updatedAllFiles[index - 1]];
-    setAllProductFiles(updatedAllFiles);
+    setAllEventFiles(updatedAllFiles);
 
-    const updatedUploads = [...productFileUploads];
+    const updatedUploads = [...eventFileUploads];
     for (let i = 0; i < updatedAllFiles.length; i++) {
       if (typeof updatedAllFiles[i] === 'string' && !updatedUploads[i]) {
         updatedUploads.splice(i, 0, null);
@@ -142,16 +142,16 @@ function EditEvent() {
     }
     [updatedUploads[index - 1], updatedUploads[index]] = [updatedUploads[index], updatedUploads[index - 1]];
     var updatedUpload1s = updatedUploads.filter(item => item !== null);
-    setProductFileUploads(updatedUpload1s);
+    setEventFileUploads(updatedUpload1s);
   }
 
   function handleMoveForward(index) {
 
-    const updatedAllFiles = [...allProductFiles];
+    const updatedAllFiles = [...allEventFiles];
     [updatedAllFiles[index], updatedAllFiles[index + 1]] = [updatedAllFiles[index + 1], updatedAllFiles[index]];
-    setAllProductFiles(updatedAllFiles);
+    setAllEventFiles(updatedAllFiles);
 
-    const updatedUploads = [...productFileUploads];
+    const updatedUploads = [...eventFileUploads];
     for (let i = 0; i < updatedAllFiles.length; i++) {
       if (typeof updatedAllFiles[i] === 'string' && !updatedUploads[i]) {
         updatedUploads.splice(i, 0, null);
@@ -159,7 +159,7 @@ function EditEvent() {
     }
     [updatedUploads[index], updatedUploads[index + 1]] = [updatedUploads[index + 1], updatedUploads[index]];
     var updatedUpload1s = updatedUploads.filter(item => item !== null);
-    setProductFileUploads(updatedUpload1s);
+    setEventFileUploads(updatedUpload1s);
   }
 
 
@@ -180,12 +180,14 @@ function EditEvent() {
       eventLocation: '',
       eventTicketStock: 0,
       eventPrice: 0,
+      eventDiscountPrice: 0,
       eventUplayMemberPrice: 0,
       eventNtucClubPrice: 0,
       eventDate: '',
+      eventEndDate: '',
       eventDuration: 0,
       eventSale: false,
-      eventStatus: false,
+      eventStatus: true,
       eventPicture: '',
     },
     validationSchema: Yup.object({
@@ -195,9 +197,11 @@ function EditEvent() {
       eventLocation: Yup.string().required('Event Location is required'),
       eventTicketStock: Yup.number().min(1).required('Ticket Stock is required'),
       eventPrice: Yup.number().min(0).required('Event Price is required'),
-      eventUplayMemberPrice: Yup.number().min(0).max(999),
-      eventNtucClubPrice: Yup.number().min(0).max(999),
+      eventDiscountPrice: Yup.number().min(0),
+      eventUplayMemberPrice: Yup.number().min(0),
+      eventNtucClubPrice: Yup.number().min(0),
       eventDate: Yup.date().required('Event Date is required'),
+      eventEndDate: Yup.date().required('Event End Date is required'),
       eventDuration: Yup.number().min(1).required('Event Duration is required'),
       eventSale: Yup.boolean(),
       eventStatus: Yup.boolean(),
@@ -206,10 +210,10 @@ function EditEvent() {
     onSubmit: (values) => {
       setLoading(true);
 
-      if (productFileUploads.length > 0) {
+      if (eventFileUploads.length > 0) {
         let formData = new FormData();
 
-        productFileUploads.forEach((file) => {
+        eventFileUploads.forEach((file) => {
           formData.append('files', file);
         });
 
@@ -225,16 +229,16 @@ function EditEvent() {
           .then((response) => {
             console.log("Uploaded Images:", response.data.uploadedFiles);
             const newFilenames = response.data.uploadedFiles;
-            const combinedProductFiles = allProductFiles.map(file => {
+            const combinedEventFiles = allEventFiles.map(file => {
               if (file.startsWith('blob:http://') && newFilenames.length > 0) {
                 return newFilenames.shift();
               }
               return file;
             });
             if (newFilenames.length > 0) {
-              combinedProductFiles.push(...newFilenames);
+              combinedEventFiles.push(...newFilenames);
             }
-            values.eventPicture = JSON.stringify(combinedProductFiles);
+            values.eventPicture = JSON.stringify(combinedEventFiles);
             console.log("Event Picture:", values.eventPicture);
 
             http.put(`/Admin/Event/${eventId}`, values)
@@ -256,7 +260,7 @@ function EditEvent() {
             setLoading(false);
           });
       } else {
-        values.eventPicture = JSON.stringify(allProductFiles);
+        values.eventPicture = JSON.stringify(allEventFiles);
 
         http.put(`/Admin/Event/${eventId}`, values)
           .then(response => {
@@ -359,7 +363,35 @@ function EditEvent() {
                           helperText={formik.touched.eventLocation && formik.errors.eventLocation}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={4}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          id="eventDate"
+                          name="eventDate"
+                          label="Event Start Date"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          value={formik.values.eventDate ? new Date(formik.values.eventDate).toISOString().split('T')[0] : ''}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventDate && Boolean(formik.errors.eventDate)}
+                          helperText={formik.touched.eventDate && formik.errors.eventDate}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          id="eventEndDate"
+                          name="eventEndDate"
+                          label="Event End Date"
+                          type="date"
+                          InputLabelProps={{ shrink: true }}
+                          value={formik.values.eventEndDate ? new Date(formik.values.eventEndDate).toISOString().split('T')[0] : ''}
+                          onChange={formik.handleChange}
+                          error={formik.touched.eventEndDate && Boolean(formik.errors.eventEndDate)}
+                          helperText={formik.touched.eventEndDate && formik.errors.eventEndDate}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
                           id="eventDuration"
@@ -372,21 +404,7 @@ function EditEvent() {
                           helperText={formik.touched.eventDuration && formik.errors.eventDuration}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={4}>
-                        <TextField
-                          fullWidth
-                          id="eventDate"
-                          name="eventDate"
-                          label="Event Date"
-                          type="date"
-                          InputLabelProps={{ shrink: true }}
-                          value={formik.values.eventDate ? new Date(formik.values.eventDate).toISOString().split('T')[0] : ''}
-                          onChange={formik.handleChange}
-                          error={formik.touched.eventDate && Boolean(formik.errors.eventDate)}
-                          helperText={formik.touched.eventDate && formik.errors.eventDate}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={4}>
+                      <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
                           id="eventTicketStock"
@@ -415,14 +433,14 @@ function EditEvent() {
                       <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
-                          id="eventUplayMemberPrice"
-                          name="eventUplayMemberPrice"
-                          label="Uplay Member Price"
+                          id="eventDiscountPrice"
+                          name="eventDiscountPrice"
+                          label="Discount Price"
                           type="number"
-                          value={formik.values.eventUplayMemberPrice}
+                          value={formik.values.eventDiscountPrice}
                           onChange={formik.handleChange}
-                          error={formik.touched.eventUplayMemberPrice && Boolean(formik.errors.eventUplayMemberPrice)}
-                          helperText={formik.touched.eventUplayMemberPrice && formik.errors.eventUplayMemberPrice}
+                          error={formik.touched.eventDiscountPrice && Boolean(formik.errors.eventDiscountPrice)}
+                          helperText={formik.touched.eventDiscountPrice && formik.errors.eventDiscountPrice}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
@@ -476,12 +494,12 @@ function EditEvent() {
                 <Grid item xs={12} sm={8}>
                   <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>Event Images</Typography>
                   <Grid container spacing={3}>
-                    {allProductFiles.map((file, index) => (
+                    {allEventFiles.map((file, index) => (
                       <Grid item xs={12} sm={6} md={4} key={index}>
                         <Card>
                           <CardMedia >
                             <img
-                              src={productFileNewUploads.includes(file) ? file : `${productPath}${file}`}
+                              src={eventFileNewUploads.includes(file) ? file : `${eventPath}${file}`}
                               alt=""
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
@@ -489,7 +507,7 @@ function EditEvent() {
                           <CardActions>
                             <IconButton onClick={() => handleDeleteImage(index)}><DeleteIcon /></IconButton>
                             {index > 0 && <IconButton onClick={() => handleMoveBackward(index)}><ArrowBackIcon /></IconButton>}
-                            {index < allProductFiles.length - 1 && <IconButton onClick={() => handleMoveForward(index)}><ArrowForwardIcon /></IconButton>}
+                            {index < allEventFiles.length - 1 && <IconButton onClick={() => handleMoveForward(index)}><ArrowForwardIcon /></IconButton>}
                           </CardActions>
                         </Card>
                       </Grid>
@@ -500,10 +518,9 @@ function EditEvent() {
                   {!isSmallerScreen && (
                     <Typography fontWeight={700} marginTop={"1.25rem"} marginBottom={"1.25rem"}>&nbsp;</Typography>
                   )}
-                  {/* product_picture */}
                   <Button variant="contained" component="label" fullWidth>
                     Upload Event Image
-                    <input hidden accept="image/*" onChange={handleChangeProductImage} multiple type="file" />
+                    <input hidden accept="image/*" onChange={handleChangeEventImage} multiple type="file" />
                   </Button>
                 </Grid>
               </Grid>

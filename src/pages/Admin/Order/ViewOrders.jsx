@@ -43,15 +43,22 @@ function ViewOrders() {
         {
             field: 'OrderDate',
             headerName: 'Order Date',
-            width: 180, 
+            width: 180,
             valueFormatter: (params) => {
                 const date = new Date(params.value);
                 const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-                const formattedTime = `${date.getHours()}:${(date.getMinutes()<10?'0':'') + date.getMinutes()}:${(date.getSeconds()<10?'0':'') + date.getSeconds()}`;
+                const formattedTime = `${date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()}:${(date.getSeconds() < 10 ? '0' : '') + date.getSeconds()}`;
                 return `${formattedDate} ${formattedTime}`;
             }
         }
-        , { field: 'OrderStatus', headerName: 'Status', width: 150 },
+        , {
+            field: 'OrderStatus', headerName: 'Status', width: 150,
+            renderCell: (params) => (
+                <div style={{ color: 'red' }}>
+                    {params.value}
+                </div>
+            ),
+        },
         {
             field: 'TotalAmount',
             headerName: 'Total Amount',
@@ -71,8 +78,10 @@ function ViewOrders() {
                 <GridActionsCellItem
                     icon={<EditIcon />}
                     label="Edit"
+                    disabled={params.row.OrderStatus === 'Order Received'}
                     onClick={() => navigate(`/admin/orders/edit/${params.id}`)}
-                />,
+                />
+                ,
                 <GridActionsCellItem
                     icon={<VisibilityIcon />}
                     label="View"
@@ -81,7 +90,8 @@ function ViewOrders() {
                     }}
                 />,
             ],
-        },
+        }
+
     ];
 
 
@@ -105,6 +115,8 @@ function ViewOrders() {
                     </Paper>
                 </Grid>
             </Grid>
+            <ToastContainer />
+
         </Container>
     );
 }

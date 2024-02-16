@@ -65,7 +65,7 @@ function ViewEvents() {
         { field: 'id', headerName: 'ID', width: 100 },
         { field: 'eventName', headerName: 'Event Name', width: 200 },
         { field: 'eventCategory', headerName: 'Category', width: 150 },
-        { field: 'eventLocation', headerName: 'Location', width: 150 },
+        { field: 'eventTicketStock', headerName: 'Ticket Stock', width: 150 },
         { field: 'eventDate', headerName: 'Date', width: 110 },
         { field: 'eventStatus', headerName: 'Active', width: 100 },
         {

@@ -31,8 +31,8 @@ import { Link, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import UserContext from "./contexts/UserContext";
 import http from "./http";
-import EventRouteAdmin from "./pages/Admin/Event/EventRouteAdmin";
 import CartRoute from "./pages/Cart/CartRoute";
+import ViewWishlist from "./pages/Wishlist/ViewWishlist";
 
 import CreateTicket from "./pages/Tickets/CreateTicket";
 import DeleteReview from "./pages/Reviews/DeleteReview";
@@ -293,14 +293,7 @@ function App() {
                               &nbsp;&nbsp;&nbsp;Admin Panel
                             </MenuItem>
                           )}
-                        <MenuItem
-                          component={Link}
-                          to="/"
-                          onClick={handleMenuClose}
-                        >
-                          <AssignmentInd />
-                          &nbsp;&nbsp;&nbsp;Orders
-                        </MenuItem>
+
                         <MenuItem
                           component={Link}
                           to="/cart"
@@ -312,7 +305,7 @@ function App() {
 
                         <MenuItem
                           component={Link}
-                          to="/"
+                          to="/wishlist"
                           onClick={handleMenuClose}
                         >
                           <Favorite />
@@ -402,6 +395,8 @@ function App() {
 
               <Route path={"/events/*"} element={<EventRoute />} />
               <Route path={"/cart/*"} element={<CartRoute />} />
+              <Route path={"/wishlist"} element={<ViewWishlist />} />
+
 
               <Route path={"/reviews"} element={<ReviewsPage />} />
 
