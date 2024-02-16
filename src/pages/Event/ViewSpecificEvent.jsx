@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Breadcrumbs, Link, Typography, Paper, Container, Grid, IconButton, Button, Box, Card, CardContent, CardActions } from '@mui/material';
+import { Breadcrumbs, Link, Typography, Paper, Container, Grid, IconButton, Button, Box, Card, CardContent, CardActions, CardMedia } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import http from '../../http';
 import AddIcon from '@mui/icons-material/Add';
@@ -8,11 +8,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MDEditor from '@uiw/react-md-editor';
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -39,44 +34,49 @@ function ViewSingleEvent() {
             const response = await http.get(`/Event/${eventId}`);
             if (response.status === 200) {
                 setEvent(response.data);
-                setLoading(false);
+                getAllEvents(response.data.eventCategory);
             } else {
                 toast.error("Event retrieval failed!");
-                setLoading(false);
             }
         } catch (error) {
             toast.error("Event retrieval failed: " + error.message);
+        } finally {
             setLoading(false);
         }
     }
 
     async function getAllEvents(eventCategory) {
         try {
-            const response = await http.get(`/Event`);
-            if (response.status === 200) {
-                const allEventsResponse = response.data;
-                const sameCategoryEvents = allEventsResponse.filter(e => e.category === eventCategory);
+            if (relatedEvents.length === 0) {
+                const response = await http.get(`/Event`);
+                if (response.status === 200) {
+                    const allEventsResponse = response.data;
+                    const sameCategoryEvents = allEventsResponse.filter(e => e.category === eventCategory);
 
-                const otherEvents = sameCategoryEvents.filter(e => e.id !== Number(eventId));
-                let relatedEventsToShow;
+                    const otherEvents = sameCategoryEvents.filter(e => e.id !== Number(eventId));
+                    let relatedEventsToShow;
 
-                if (otherEvents.length < 3) {
-                    const remainingEventsCount = 3 - otherEvents.length;
-                    const otherCategoriesEvents = allEventsResponse.filter(e => e.category !== eventCategory && e.id !== Number(eventId));
-                    const shuffledOtherCategoriesEvents = otherCategoriesEvents.sort(() => 0.5 - Math.random());
-                    const additionalEvents = shuffledOtherCategoriesEvents.slice(0, Math.min(remainingEventsCount, shuffledOtherCategoriesEvents.length));
-                    relatedEventsToShow = otherEvents.concat(additionalEvents);
+                    if (otherEvents.length < 3) {
+                        const remainingEventsCount = 3 - otherEvents.length;
+                        const otherCategoriesEvents = allEventsResponse.filter(e => e.category !== eventCategory && e.id !== Number(eventId));
+                        const shuffledOtherCategoriesEvents = otherCategoriesEvents.sort(() => 0.5 - Math.random());
+                        const additionalEvents = shuffledOtherCategoriesEvents.slice(0, Math.min(remainingEventsCount, shuffledOtherCategoriesEvents.length));
+                        relatedEventsToShow = otherEvents.concat(additionalEvents);
+                    } else {
+                        relatedEventsToShow = otherEvents.slice(0, 3);
+                    }
+
+                    console.log("RELATED: ", relatedEventsToShow);
+                    console.log("RELATED EVENTS: ", relatedEvents)
+                    setRelatedEvents(relatedEventsToShow);
                 } else {
-                    relatedEventsToShow = otherEvents.slice(0, 3);
+                    toast.error("Failed to retrieve events!");
                 }
-
-                setRelatedEvents(relatedEventsToShow);
-            } else {
-                toast.error("Failed to retrieve events!");
             }
         } catch (error) {
             toast.error("Failed to retrieve events: " + error.message);
         }
+
     }
 
 
@@ -170,14 +170,11 @@ function ViewSingleEvent() {
 
     useEffect(() => {
         getEvent();
-        loadWishlistItems();
-    }, [eventId, wishlistItems]);
+    }, [eventId]);
 
     useEffect(() => {
-        if (event) {
-            getAllEvents(event.eventCategory);
-        }
-    }, [event]);
+        loadWishlistItems();
+    }, []);
 
     return (
         <>
@@ -251,33 +248,39 @@ function ViewSingleEvent() {
                                         {event.eventStatus ? (
                                             <>
                                                 <Grid container spacing={2} alignItems="center">
-                                                        <Grid item container alignItems="center">
-                                                            <Typography variant="h5" gutterBottom>
-                                                                Book Your Event
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid item container alignItems="center">
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Date: {new Date(event.eventDate).toLocaleDateString()} - {new Date(event.eventEndDate).toLocaleDateString()}
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid item container alignItems="center">
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Availability: {event.eventStatus ? "Available" : "Not Available"}
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid item container alignItems="center">
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                Schedule: Daily
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid item container alignItems="center">
-                                                            <Typography variant="body1"  gutterBottom style={{ fontWeight: 'bold' }}>
-                                                                Price: ${event.eventPrice}
-                                                            </Typography>
-                                                        </Grid>
-                                                    
-
+                                                    <Grid item container alignItems="center">
+                                                        <Typography variant="h5" gutterBottom>
+                                                            Book Your Event
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item container alignItems="center">
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            Date: {new Date(event.eventDate).toLocaleDateString()} - {new Date(event.eventEndDate).toLocaleDateString()}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item container alignItems="center">
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            Availability: {event.eventStatus ? "Available" : "Not Available"}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item container alignItems="center">
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            Schedule: Daily
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item container alignItems="center">
+                                                        <Typography variant="body1" gutterBottom style={{ fontWeight: 'bold' }}>
+                                                            {event.eventSale ? (
+                                                                <>
+                                                                    <del>${event.eventPrice}</del>
+                                                                    &nbsp;
+                                                                    <span style={{ color: 'red' }}>${event.eventDiscountPrice}&nbsp;(SALE!)</span>
+                                                                </>
+                                                            ) : (
+                                                                `$${event.eventPrice}`
+                                                            )}
+                                                        </Typography>
+                                                    </Grid>
                                                     <Grid item xs={12} container alignItems="center" >
                                                         <Typography variant="body1">Select Quantity:</Typography>
                                                         <IconButton onClick={decreaseQuantity} disabled={quantity <= 1}>
@@ -304,7 +307,6 @@ function ViewSingleEvent() {
                                                         </Box>
                                                     </Grid>
                                                 </Grid>
-
                                             </>
                                         ) : (
                                             <Typography variant="h6" color="error">
@@ -320,15 +322,54 @@ function ViewSingleEvent() {
                                 You might also like...
                             </Typography>
                             <Grid container spacing={4}>
+
                                 {relatedEvents.map((relatedEvent) => (
                                     <Grid item xs={12} sm={6} md={4} key={relatedEvent.id}>
-                                        <Card>
+                                        <Card sx={{ boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
+                                            <CardMedia
+                                                component="img"
+                                                height="140"
+                                                image={`${eventPath}${JSON.parse(relatedEvent.eventPicture)[0]}`}
+                                                alt="Activity Image"
+                                            />
                                             <CardContent>
-                                                <Typography variant="h6">{relatedEvent.eventName}</Typography>
-                                                <Typography variant="body2">{relatedEvent.eventDescription}</Typography>
+                                                <Typography gutterBottom variant="h6" component="div">
+                                                    {relatedEvent.eventName}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Genre: {relatedEvent.eventCategory}
+                                                </Typography
+                                                ><Typography variant="body2" color="text.secondary">
+                                                    Schedule: {relatedEvent.schedule || 'Daily'}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {relatedEvent.eventStatus ? (
+                                                        <>
+                                                            {relatedEvent.eventSale ? (
+                                                                <>
+                                                                    <del>${relatedEvent.eventPrice}</del>
+                                                                    &nbsp;
+                                                                    <span style={{ color: 'red' }}>${relatedEvent.eventDiscountPrice}&nbsp;(SALE!)</span>
+                                                                </>
+                                                            ) : (
+                                                                `$${relatedEvent.eventPrice}`
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        "Not for sale"
+                                                    )}
+                                                </Typography>
+
                                             </CardContent>
                                             <CardActions>
-                                                <Button onClick={() => navigate(`/events/${relatedEvent.id}`)}>View Details</Button>
+                                                <Button variant="contained" color="primary" fullWidth onClick={() => navigate(`/events/${relatedEvent.id}`)}>View Event</Button>
+                                                <Grid item>
+                                                    <IconButton onClick={() => handleAddToWishlist(relatedEvent.id)}>
+                                                        {wishlistItems.includes(relatedEvent.id)
+                                                            ? <FavoriteIcon color="error" />
+                                                            : <FavoriteBorderIcon />}
+                                                    </IconButton>
+                                                </Grid>
                                             </CardActions>
                                         </Card>
                                     </Grid>

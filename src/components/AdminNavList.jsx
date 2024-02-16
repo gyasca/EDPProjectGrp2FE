@@ -18,6 +18,7 @@ import EventIcon from '@mui/icons-material/Event';
 import ForumIcon from '@mui/icons-material/Forum';
 import DensitySmallIcon from '@mui/icons-material/DensitySmall';
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import { Add, AddLocation, Category, CurrencyExchange, DirectionsBike, Explore, Home, HowToReg, Map, NoCrash, Person, PersonAdd, Place, RequestPage } from '@mui/icons-material';
 
 
@@ -177,6 +178,12 @@ function AdminNavList() {
                         <ListItemButton component={Link} to="/admin/orders/">
                             <ListItemIcon><ReceiptLongIcon /></ListItemIcon>
                             <ListItemText primary={"View All Orders"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem key={"ViewAllRefunds"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/refunds/">
+                            <ListItemIcon><CurrencyExchangeIcon /></ListItemIcon>
+                            <ListItemText primary={"View All Refunds"} />
                         </ListItemButton>
                     </ListItem>
                     {/* Add more here for more sublist items */}

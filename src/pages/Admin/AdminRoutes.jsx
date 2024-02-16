@@ -26,6 +26,10 @@ import ViewOrders from "./Order/ViewOrders";
 import EditOrderStatus from "./Order/EditOrderStatus";
 import ViewSpecificOrder from "./Order/ViewSpecificOrder";
 
+// refund
+import ViewRefunds from "./Refund/ViewRefunds";
+import UpdateRefund from "./Refund/UpdateRefund";
+
 // ticketo
 import Chat from "../Tickets/Chat";
 import TicketPage from "./Tickets/TicketPage";
@@ -90,6 +94,10 @@ function AdminRoutes() {
           <Route path="/orders" element={<ViewOrders />} />
           <Route path="/orders/edit/:id" element={<EditOrderStatus />} />
           <Route path="/orders/:id" element={<ViewSpecificOrder />} />
+
+          {/* Refund paths */}
+          <Route path="/refunds" element={<ViewRefunds />} />
+          <Route path="/refunds/edit/:id" element={<UpdateRefund />} />
 
           {/* Chat paths */}
         </Routes>

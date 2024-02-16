@@ -1,10 +1,24 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Box, Typography, Button, Container } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useNavigate } from 'react-router-dom';
+import http from "../../http";
 
 export function CheckoutSuccessful() {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    http.get('/User/auth')
+          .then(response => {
+              setUser(response.data.user);
+          })
+          .catch(error => {
+              console.error('Error fetching user information:', error);
+              setError('Unable to fetch user information.');
+          });
+  }, []);
   
   return (
     <Container maxWidth="lg" sx={{
@@ -30,15 +44,14 @@ export function CheckoutSuccessful() {
         >
           <CheckCircleIcon color="success" sx={{ fontSize: 200 }} />
           <Typography variant="h4" gutterBottom>
-            We have received your request #ZP03.
+            We have received your order.
           </Typography>
           <Typography variant="subtitle1">
-            We would contact via email shortly.
           </Typography>
           <Button
             variant="contained"
             color="primary"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/user/viewspecificuser/'+user.id)}
             sx={{ marginTop: 4 }}
           >
             Go to Orders

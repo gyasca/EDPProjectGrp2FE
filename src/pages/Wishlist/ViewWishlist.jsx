@@ -11,7 +11,7 @@ import UserPageTitle from '../../components/UserPageTitle';
 function ViewWishlist() {
     const [wishlistItems, setWishlistItems] = useState([]);
     const [openDialog, setOpenDialog] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [selectedItemId, setSelectedItemId] = useState(null); 
     const navigate = useNavigate();
     const eventPath = `${import.meta.env.VITE_FILE_BASE_URL}`;
 
@@ -35,24 +35,28 @@ function ViewWishlist() {
     };
 
     const handleRemoveItem = (itemId) => {
-        setSelectedItem(itemId);
+        setSelectedItemId(itemId); 
         setOpenDialog(true);
     };
 
-    const handleConfirmRemoveItem = () => {
-        http.delete(`/wishlist/${selectedItem}`)
-            .then((response) => {
-                if (response.status === 200) {
-                    handleGetWishlistItems();
-                    toast.success("Item removed from wishlist");
-                }
-            })
-            .catch((error) => {
-                console.error('Error removing item from wishlist:', error);
-                toast.error("Error removing item from wishlist");
+    const handleConfirmRemoveItem = async () => {
+        try {
+            const response = await http.delete(`/wishlist/${selectedItemId}`, {
+                data: { EventId: selectedItemId },
+                headers: { 'Content-Type': 'application/json' }
             });
+    
+            if (response.status === 200) {
+                handleGetWishlistItems();
+                toast.success("Item removed from wishlist");
+            }
+        } catch (error) {
+            console.error('Error removing item from wishlist:', error);
+            toast.error("Error removing item from wishlist");
+        }
         setOpenDialog(false);
     };
+    
     
     const clearWishlist = () => {
         http.delete('/wishlist')
@@ -82,7 +86,7 @@ function ViewWishlist() {
         <Container maxWidth="xl" sx={{ marginY: "1rem", minWidth: 0 }}>
             <UserPageTitle title="Your Wishlist" subtitle="View Items" />
             {wishlistItems.length > 0 && (<Button onClick={clearWishlist}>Clear Wishlist</Button>)}
-            {wishlistItems.length === 0 && (<Button onClick={() => navigate('/products')}>Go to Products</Button>)}
+            {wishlistItems.length === 0 && (<Button onClick={() => navigate('/events')}>Go to Events</Button>)}
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     <TableContainer component={Paper}>
@@ -166,7 +170,6 @@ function ViewWishlist() {
                 </DialogActions>
             </Dialog>
             <ToastContainer />
-
         </Container>
     )
 }

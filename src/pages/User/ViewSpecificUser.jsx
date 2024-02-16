@@ -14,7 +14,9 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  CardActions
+  CardActions,
+  Stack,
+  TextField
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -25,8 +27,9 @@ import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CardTitle from "../../components/CardTitle2";
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
-
+import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
+import { ToastContainer, toast } from "react-toastify";
+import { ErrorMessage } from "formik";
 
 const ViewUser = () => {
   const { userId } = useParams();
@@ -37,6 +40,8 @@ const ViewUser = () => {
   const [orderEventName, setOrderEventName] = useState({});
   const navigate = useNavigate();
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [refundRequested, setRefundRequested] = useState(false);
+  const [refundReason, setRefundReason] = useState('');
 
   const handleViewDetails = (order) => {
     setSelectedOrder(order);
@@ -59,6 +64,21 @@ const ViewUser = () => {
     });
   };
 
+  const handleRefundRequest = async () => {
+    try {
+      const response = await http.post('/refund', {
+        OrderId: selectedOrder.Id,
+        RefundReason: refundReason,
+        RefundAmount: selectedOrder.TotalAmount
+      });
+      toast.success('Refund successfully created');
+      handleBackToSelectedOrders();
+    } catch (error) {
+      toast.error('Error in creating refund');
+      console.error('Error sending refund request:', error.response.data.message, error.response.data.errors, error.response.data.stackTrace);
+    }
+  };
+
   const handleBackToOrders = () => {
     setSelectedOrder(null);
   };
@@ -77,7 +97,23 @@ const ViewUser = () => {
         console.error('Error updating order status:', error);
       });
   };
+
+  const handleBackToSelectedOrders = () => {
+    setRefundRequested(false);
+    http.get(`/order/${selectedOrder.Id}`)
+      .then(response => {
+        setSelectedOrder(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching order details:', error);
+      });
+  };
   
+
+  const handleClickRefundRequest = () => {
+    setRefundRequested(true);
+  };
+
 
   function getOrders() {
     http.get(`/order`)
@@ -160,11 +196,10 @@ const ViewUser = () => {
               value={activeTab}
               onChange={handleTabChange}
               aria-label="user details tabs"
-              variant="fullWidth" 
+              variant="fullWidth"
             >
               <Tab label="Profile" value="1" />
               <Tab label="Purchases" value="2" />
-              <Tab label="Wishlist" value="3" />
             </Tabs>
           </Paper>
           {activeTab === "1" && (
@@ -291,7 +326,55 @@ const ViewUser = () => {
           {activeTab === "2" && (
             <Box>
               <Paper elevation={3} sx={{ mt: 2 }}>
-                {selectedOrder ? (
+                {refundRequested ? (
+                  <>
+                    <CardContent>
+                      <CardTitle title="Refund" back={true} onBackClick={handleBackToSelectedOrders} icon={<CurrencyExchange />} />
+                      <Box marginTop={2}>
+                        <Typography variant="h6" color="textSecondary" mt={"1rem"}>
+                          Order Details:
+                        </Typography>
+
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 4 }}>
+                          <InfoBox title="Name" value={user.firstName} />
+                          <InfoBox title="Email" value={user.email} />
+                          <InfoBox title="Order ID" value={selectedOrder.Id} />
+                        </Stack>
+
+                        <Divider style={{ marginBottom: '1rem', marginTop: '1rem' }} />
+
+                        <Typography variant="h6" color="textSecondary">
+                          Refund Reason:
+                        </Typography>
+
+                        <TextField
+                          margin="normal"
+                          fullWidth
+                          id="refundReason"
+                          label="Describe your reason"
+                          name="refundReason"
+                          multiline
+                          rows={4}
+                          value={refundReason}
+                          onChange={e => setRefundReason(e.target.value)}
+                          variant="outlined"
+                        />
+
+                        <Box mt={3}>
+                          <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            onClick={handleRefundRequest}
+                          >
+                            Request Refund
+                          </Button>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </>
+                ) : selectedOrder ? (
                   <CardContent>
                     <CardTitle title="Order Details" back={true} onBackClick={handleBackToOrders} icon={<ReceiptLongIcon />} />
                     <Box marginTop={2}>
@@ -301,6 +384,17 @@ const ViewUser = () => {
                       <Typography variant="body1" gutterBottom>
                         Order Status: {selectedOrder.OrderStatus}
                       </Typography>
+
+                      {selectedOrder.OrderStatus === "Order Delivered" && (
+                        <Box mt={2}>
+                          <Button variant="outlined" color="primary" fullWidth onClick={handleRecieved}>
+                            Order Received
+                          </Button>
+                          <Button variant="outlined" color="secondary" fullWidth sx={{ mt: 1 }} onClick={handleClickRefundRequest}>
+                            Request Refund
+                          </Button>
+                        </Box>
+                      )}
                       <Typography variant="subtitle1" gutterBottom>
                         Order Items:
                       </Typography>
@@ -351,13 +445,6 @@ const ViewUser = () => {
                             <Typography variant="body1" color="primary">${selectedOrder.TotalAmount.toFixed(2)}</Typography>
                           </ListItem>
                         </List>
-                        {selectedOrder.OrderStatus === "Order Delivered" && (
-                          <Box mt={2}>
-                            <Button variant="outlined" color="primary" fullWidth onClick={handleRecieved}>
-                              Order Received
-                            </Button>
-                          </Box>
-                        )}
                       </Box>
                     </Box>
                   </CardContent>
@@ -376,9 +463,6 @@ const ViewUser = () => {
             </Box>
           )}
 
-          {activeTab === "3" && (
-            <Typography variant="h6">Display Wishlist Here</Typography>
-          )}
         </Grid>
 
         {/* User profile pic and email */}

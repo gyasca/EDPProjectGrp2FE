@@ -112,7 +112,7 @@ function ViewEvents() {
             console.error('Error removing product from wishlist:', error);
         }
     };
-    
+
 
     const renderEventImage = (event) => {
         // This should be the actual URL to the image related to the event
@@ -188,14 +188,33 @@ function ViewEvents() {
                                             {event.eventName}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Schedule: {event.schedule || 'Daily'}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Price: ${event.eventPrice}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
                                             Genre: {event.eventCategory}
                                         </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Schedule: {event.schedule || 'Daily'}
+                                        </Typography>
+                                        <Typography variant="h6" color="text.secondary">
+                                            <Typography variant="h6" color="text.secondary">
+                                                {event.eventStatus ? (
+                                                    <>
+                                                        {event.eventSale ? (
+                                                            <>
+                                                                <del>${event.eventPrice}</del>
+                                                                &nbsp;
+                                                                <span style={{ color: 'red' }}>${event.eventDiscountPrice}&nbsp;(SALE!)</span>
+                                                            </>
+                                                        ) : (
+                                                            `$${event.eventPrice}`
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    "Not for sale"
+                                                )}
+                                            </Typography>
+
+                                        </Typography>
+
+
                                     </CardContent>
                                     <CardActions>
                                         <Button variant="contained" color="primary" fullWidth onClick={() => navigate(`/events/${event.id}`)}>View Event</Button>
